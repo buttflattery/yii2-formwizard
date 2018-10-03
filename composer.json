@@ -1,0 +1,20 @@
+{
+    "name": "buttflattery/yii2-formwizard",
+    "description": "A yii2 widget for form wizard, to create a multistep form.",
+    "type": "yii2-extension",
+    "require": {    
+        "php": ">=5.4.0"
+    },
+    "license": "MIT",
+    "authors": [{
+        "name": "omer aslam",
+        "email": "buttflattery@hotmail.com"
+    }],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "buttflattery\\formwizard\\": "//src"
+        }
+    }
+
+}
