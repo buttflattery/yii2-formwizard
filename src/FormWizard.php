@@ -17,19 +17,18 @@ class FormWizard extends Widget {
     private $form;
     private $allFields = [];
     //options widget
-    public $id;
+    public $wizardContainerId;
     public $steps = [];
     public $formOptions = [];
+    
     //plugin options
     public $theme = 'default';
     public $transitionEffect = 'slide';
     public $showStepURLhash = false;
     public $useURLhash = false;
-    public $backButtonSupport = true;
-    public $cycleSteps = false;
     public $enableYiiActiveFormValidation = true;
     public $toolbarPosition = 'top';
-    public $toolbarButtonPosition = 'end';
+    public $toolbarButtonPosition = 'left';
     public $toolbarExtraButtons;
     public $markDoneStep = true;
     public $markAllPreviousStepsAsDone = true;
@@ -57,12 +56,19 @@ class FormWizard extends Widget {
         self::THEME_MATERIAL_V => 'MaterialVerticle',
     ];
 
+    /**
+     * 
+     */
     public function init() {
         parent::init();
-        $this->dependencyCheck();
+        $this->setDefaults();
     }
 
-    private function dependencyCheck() {
+    /**
+     * 
+     * @throws InvalidArgumentException
+     */
+    private function setDefaults() {
         if( empty($this->steps) ){
             throw new InvalidArgumentException('You must provide steps for the form.');
         }
@@ -74,23 +80,29 @@ class FormWizard extends Widget {
         if( !isset($this->formOptions['action']) ){
             $this->formOptions['action'] = Url::to(['/' . Yii::$app->controller->id . '/' . Yii::$app->controller->action->id]);
         }
-        //set the default errorCssClass for the form to be used by the for and the steps plugin
-        if( !isset($this->formOptions['errorCssclass']) ){
-            $this->formOptions['errorCssClass'] = 'has-error';
+
+//        //set the default errorCssClass for the form to be used by the for and the steps plugin
+//        if( !isset($this->formOptions['errorCssclass']) ){
+//            $this->formOptions['errorCssClass'] = 'has-error';
+//        }
+
+        if( !isset($this->wizardContainerId) ){
+            $this->wizardContainerId = $this->getId() . '-form_wizard_container';
         }
 
-        if( !isset($this->id) ){
-            $this->id = $this->getId() . '-form_wizard_container';
-        }
-        if($this->theme == self::THEME_MATERIAL || $this->theme==self::THEME_MATERIAL_V){
-            $this->classNext='btn bg-teal waves-effect';
-            $this->classPrev='btn bg-teal waves-effect';
-            $this->classFinish='btn bg-green waves-effect';
-            $this->labelNext='<i class="glyphicon glyphicon-menu-right"></i>';
-            $this->labelPrev='<i class="glyphicon glyphicon-menu-left"></i>';
+        if( $this->theme == self::THEME_MATERIAL || $this->theme == self::THEME_MATERIAL_V ){
+            $this->classNext = 'btn bg-teal waves-effect';
+            $this->classPrev = 'btn bg-teal waves-effect';
+            $this->classFinish = 'btn bg-green waves-effect';
+            $this->labelNext = '<i class="glyphicon glyphicon-menu-right"></i>';
+            $this->labelPrev = '<i class="glyphicon glyphicon-menu-left"></i>';
         }
     }
 
+    /**
+     * 
+     * @return type
+     */
     public function getPluginOptions() {
         return [
             'selected' => 0,
@@ -115,10 +127,13 @@ class FormWizard extends Widget {
         ];
     }
 
+    /**
+     * 
+     */
     public function run() {
         parent::run();
 
-        $wizardContainerId = $this->id;
+        $wizardContainerId = $this->wizardContainerId;
 
         $pluginOptions = $this->getPluginOptions();
         $jsButton = <<< JS
@@ -185,6 +200,10 @@ JS;
         $view->registerJs($js, View::POS_READY);
     }
 
+    /**
+     * 
+     * @return type
+     */
     public function createFormWizard() {
         //get the steps
         $steps = $this->steps;
@@ -213,6 +232,12 @@ JS;
         return $htmlTabs . $htmlSteps;
     }
 
+    /**
+     * 
+     * @param type $index
+     * @param type $step
+     * @return type
+     */
     public function createStep($index, $step) {
         //step title
         $stepTitle = !isset($step['title']) ? 'Step-' . ($index + 1) : $step['title'];
@@ -220,19 +245,28 @@ JS;
         //step description
         $stepDescription = !isset($step['description']) ? 'Sample Description' : $step['description'];
 
-        //body Title
-        $contentTitle = !isset($step['contentTitle']) ? 'Add ' . basename($step['model']) . ' details below' : $step['contentTitle'];
+        $model = $step['model'];
+
+        //form body info text
+        $formInfoText = !isset($step['formInfoText']) ? 'Add ' . basename(get_class($model)) . ' details below' : $step['formInfoText'];
 
         //get html tabs
         $htmlTabs = $this->createTabs($index, $stepDescription, $stepTitle);
 
         //get html body
-        $htmlBody = $this->createBody($index, $contentTitle, $step);
+        $htmlBody = $this->createBody($index, $formInfoText, $step);
 
         //return html
         return [$htmlTabs, $htmlBody];
     }
 
+    /**
+     * 
+     * @param type $index
+     * @param type $stepDescription
+     * @param type $stepTitle
+     * @return type
+     */
     public function createTabs($index, $stepDescription, $stepTitle) {
         $html = '';
 
@@ -247,11 +281,18 @@ JS;
         return $html;
     }
 
-    public function createBody($index, $contentTitle, $step) {
+    /**
+     * 
+     * @param type $index
+     * @param type $formInfoText
+     * @param type $step
+     * @return type
+     */
+    public function createBody($index, $formInfoText, $step) {
         $html = '';
         //make steps
         $html .= Html::beginTag('div', ['id' => 'step-' . $index]);
-        $html .= Html::tag('h3', $contentTitle, ['class' => 'border-bottom border-gray pb-2']);
+        $html .= Html::tag('h3', $formInfoText, ['class' => 'border-bottom border-gray pb-2']);
         $html .= Html::beginTag('div');
         $html .= $this->createStepFields($step);
         $html .= Html::endTag('div');
@@ -259,9 +300,15 @@ JS;
         return $html;
     }
 
+    /**
+     * 
+     * @param type $step
+     * @return type
+     */
     public function createStepFields($step) {
-        $model = new $step['model'];
+        $model = $step['model'];
         $htmlFields = '';
+
 
         //field configurations
         $fieldConfig = !isset($step['fieldConfig']) ? false : $step['fieldConfig'];
@@ -302,6 +349,13 @@ JS;
         return $htmlFields;
     }
 
+    /**
+     * 
+     * @param type $model
+     * @param type $onlyFields
+     * @param type $disabledFields
+     * @return type
+     */
     public function getStepFields($model, $onlyFields, $disabledFields) {
         if( !empty($onlyFields) ){
             return array_values(array_filter(array_keys($model->getAttributes($model->safeAttributes())), function ($item) use ($onlyFields){
@@ -313,9 +367,20 @@ JS;
         });
     }
 
+    /**
+     * 
+     * @param type $model
+     * @param type $attribute
+     * @param type $fieldConfig
+     * @return type
+     */
     public function createCustomizedField($model, $attribute, $fieldConfig) {
         //options
         $options = isset($fieldConfig['options']) ? $fieldConfig['options'] : [];
+
+        //field type
+        $fieldType = isset($options['type']) ? $options['type'] : 'text';
+
 
         //widget
         $widget = isset($fieldConfig['widget']) ? $fieldConfig['widget'] : false;
@@ -329,8 +394,9 @@ JS;
         //container
         $containerOptions = isset($fieldConfig['containerOptions']) ? $fieldConfig['containerOptions'] : [];
 
-        //input value
-        $inputValue = isset($options['value']) ? $options['value'] : '';
+        //items list
+        $itemsList = isset($options['itemsList']) ? $options['itemsList'] : '';
+
 
         //label text
         $label = isset($labelConfig['label']) ? $labelConfig['label'] : null;
@@ -341,20 +407,57 @@ JS;
         //create field
         $field = $this->createField($model, $attribute, ['template' => $template, 'options' => $containerOptions]);
 
+        //remove the type and itemList from options
+        unset($options['type']);
+        unset($options['itemsList']);
+
         //widget
         if( $widget ){
             return $field->widget($widget, $options)->label($label, $labelOptions);
         }
 
-        //check if dropdown or text field depending on the type of the value provided
-        if( is_array($inputValue) ){
-            unset($options['value']);
-            return $field->dropDownList($inputValue, $options)->label($label, $labelOptions);
-        } else{
-            return $field->textInput($options)->label($label, $labelOptions);
+        $defaultFieldTypes = [
+            'text' => function($field, $options, $labelOptions, $label){
+                return $field->textInput($options)->label($label, $labelOptions);
+            },
+            'dropdown' => function($field, $options, $labelOptions, $label, $itemsList){
+                return $field->dropDownList($itemsList, $options)->label($label, $labelOptions);
+            },
+            'radio' => function($field, $options, $labelOptions, $label, $itemsList){
+                if( is_array($itemsList) ){
+                    return $field->radioList($itemsList, $options)->label($label, $labelOptions);
+                } else{
+                    $options['label'] = $label;
+                    $options['labelOptions'] = $labelOptions;
+                    return $field->radio($options);
+                }
+            },
+            'checkbox' => function($field, $options, $labelOptions, $label, $itemsList){
+                if( is_array($itemsList) ){
+                    return $field->checkboxList($itemsList, $options)->label($label, $labelOptions);
+                } else{
+                    $options['label'] = $label;
+                    $options['labelOptions'] = $labelOptions;
+                    return $field->checkbox($options);
+                }
+            },
+            'textarea' => function($field, $options, $labelOptions, $label){
+                return $field->textarea($options)->label($label, $labelOptions);
+            }
+        ];
+
+        //create field depending on the type of the value provided
+        if( isset($defaultFieldTypes[$fieldType]) ){
+            return $defaultFieldTypes[$fieldType]($field, $options, $labelOptions, $label, $itemsList);
         }
     }
 
+    /**
+     * 
+     * @param type $model
+     * @param type $attribute
+     * @return type
+     */
     public function createDefaultField($model, $attribute) {
         $columnMapping = [
             'string' => function ($field){
@@ -378,10 +481,20 @@ JS;
         }
     }
 
+    /**
+     * 
+     * @param type $model
+     * @param type $attribute
+     * @param type $fieldOptions
+     * @return type
+     */
     public function createField($model, $attribute, $fieldOptions = []) {
         return $this->form->field($model, $attribute, $fieldOptions);
     }
 
+    /**
+     * 
+     */
     public function registerScripts() {
         $view = $this->getView();
 

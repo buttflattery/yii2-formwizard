@@ -22,192 +22,107 @@ php composer.phar require  buttflattery/yii2-formwizard "@dev"
 
 or add into the `composer.json` file under `require` section
 
-```composer
+```
 "buttflattery/yii2-formwizard":"@dev"
-```
-
-### Usage 1 Carousel Mode ###
-```php
-<?php
-        echo Videowall::widget([
-            'videoTagOptions' => [
-                'height' => "500",
-            ],
-            'wallType' => Videowall::TYPE_CAROUSEL,
-            'videos' => [
-                [
-                    "src" => "/PATH/TO/VIDEO.MP4",
-                    "mime" => 'video/mime',
-                    "poster" => "/PATH/TO/POSTER.JPG",
-                    "title" => "Sweet Sexy Savage",
-                ], [
-                    "src" => '/PATH/TO/VIDEO.MP4',
-                    'poster' => '/PATH/TO/POSTER.JPG',
-                    'mime' => 'video/mime',
-                    'title' => 'Video 2',
-                ],
-            ]
-        ]);
-```
-
-### Usage 2 Thumbnail Mode ###
-
-Thumbnail mode for compact display of the video files along with filter option using the select2 dropdown.
-
-```php
-<?php
-        echo Videowall::widget([
-            'videoTagOptions' => [
-                'height' => "500",
-            ],
-            'wallType' => Videowall::TYPE_THUMB,
-            'videos' => [
-                [
-                    "src" => "/PATH/TO/VIDEO.MP4",
-                    "mime" => 'video/mime',
-                    "poster" => "/PATH/TO/POSTER.JPG",
-                    "title" => "Sweet Sexy Savage",
-                ], [
-                    "src" => '/PATH/TO/VIDEO.MP4',
-                    'poster' => '/PATH/TO/POSTER.JPG',
-                    'mime' => 'video/mime',
-                    'title' => 'Video 2',
-                ],
-            ]
-        ]);
-```
-
-### Usage 3 Playlist Mode ##
-Bonus Feature for disaplying th playlists inside the video wall. 
-
-```php 
-<?php
-        echo Videowall::widget([
-            'wallType' => Videowall::TYPE_PLAYLIST,
-            'videoTagOptions' => [
-                'width' => "800",
-                'height' => "600",
-            ],
-            'playlists' => [
-                [
-                    'name' => 'Sweet Sexy Savage',
-                    'cover' => '/PATH/TO/POSTER.JPG',
-                    'videos' => [
-                        [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ],
-                        [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ],
-                        [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ],
-                        [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ],
-                        [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ],
-                    ],
-                ],
-                [
-                    'name' => 'Hope',
-                    'cover' => '/PATH/TO/POSTER.JPG',
-                    'videos' => [
-                        [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ],
-                        [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ],
-                        [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ], [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ], [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ], [
-                            'src' => '/PATH/TO/VIDEO.MP4',
-                            'poster' => '/PATH/TO/POSTER.JPG',
-                            'mime' => 'video/mime',
-                            'title' => 'Video title',
-                        ]],
-                ],
-            ]
-        ]);
 ```
 
 ### Available Options ###
 
-- `videoTagOptions (array)`: Attributes for the the default video tag used by videoJs to initialize the player. You can pass the following options for the video tag.
+#### Widget options ####
+- `wizardContainerId (string)`: Id of the main container for the wizard.
+- `labelNext` : Next button label.
+- `labelPrev` : Previuos button label.
+- `labelFinish` : Finish button label.
+- `classNext` : css classes for the button Next.
+- `classPrev` : css classes for the button Prev.
+- `classFinish` : css classes for the button Finish.
+- `steps (array)` : An array of the steps(`array`), the steps can  have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
+    - `model (object)` : The `\yii\model\ActiveRecord` model object to create step fields.
+    - `title (string)` : The title of the step to be displayed inside the step Tab.
+    - `description (string)` : The short description for the step.
+    - `formInfoText (text)` : The text to be displayed on the top of the form fields inside the step.
+    - `fieldConfig (array)` : This option is used mainly to customize the form fields for the step.    2 special options are recognized inside the `fieldConfig`, `disabled` and `only`. See below for the details
 
-    - `class` : Html class for the the video tag.
-    - `width` : Width for the video tag.
-    - `height` : Height for the video tag.
-    - `setupOptions` : The setup options for the video tag used inside the `data-setup` attribute, below are few of the options commonly used by the videoJS player.
-        - `controls` : Default value `true`.
-        - `autoplay` : Default value `true`.
-        - `preload` : Default value `auto`.
-    - `poster (path)` : Path for the default poster for the video tag, use path relative to the web directory.
-- `wallType (string)` : 
-    - `Videowall::TYPE_CAROUSEL` (carousel)
-    - `Videowall::TYPE_THUMBNAIL` (thumbnail)
-    - `Videowall::TYPE_PLAYLIST` (playlist)
-- `slideShowDelay (milliseconds)` : integer, default value 2000 ms.
-- `videoWallContainer (string)`: container class name for the video wall, default class `video-wall-container`.
-- `containerId (string)` : container id for the video wall slides, default id prefix `video-wall-slides`.
-- `containerClass (string)` : container class name for the video wall  slides, default class `slides-container`.
-- `helpImproveVideoJs (boolean)` : `true` or `false` used by the videoJS player.
-- `thumbPageSize (int)` : page size for the thumbnails mode, default value `15`.
-- `playlistPageSize (int)` : page size for the playlist model, default value `8`.
-- `loadBootstrapAssets (boolean)` : select if plugin should load the bootstrap assets or use the globally registered yii bootstrap assets, by default this option is `false` and Yii2 default assets bundle is used.
-- `bootstrapCssSource (url)` : url to the bootstrap css file for the plugin to load, this option is effective when you have `"loadBootstrapAssets"=>true`.
-- `bootstrapJsSource (url)` : url to the boootstrap js file for the plugin to load, this option is effective when you have `"loadBootstrapAssets"=>true`.
-- `select2Defaults (array)` : default options used for rendring the kartik-v\yii2-select2 plugin, you override them and add you own too look into documentation for the options
-    - `allowClear`: default value `true`.
-    - `theme` : default value `default`.
-    - `width` : default value `100%`.
-    - `placeholder` : default value `Search Videos`.
-    - `minimumInputlength` : default value `2`.
-    - `dropdownCssClass` : default value `bigdrop`.
-- `openOnStart (boolean)` : Select if the video wall is open when player is initialized, default value is `true`.
-- `callback (function)`: a callback function called by the plugin after initialized.
-- `clientEvents (array)` : an array of client events supported by the plugin, you can see the plugin [documentation](https://github.com/buttflattery/idows-videojs-videowall) for the supported events, you can use them like below
-```
-"pluginEvents"=>[
-    'onBeforeNext' => 'function(event,dataObj){console.log(event);}',
-]
-```
+        - `disabled (array)` : List of fields that should not be populated in the step or should be ignored, for example 
+            ```
+            'fieldConfig'=>[
+                'disabled'=>[
+                    'created_on','updated_on'
+                ]
+            ]
+            ``` 
+            By default all the attributes that are safe to load value are populated, and the `id` or `primary_key` is ignored by default.
+    
+        - `only (array)` : list of the fields that should be populated for the step, on the fields specified in the list will be available and all other fields will be ignored.
+
+            Apart from the above options the `fieldConfig` recognizes some special options specific to every field separately when customizing a field, for example
+
+            ```
+            'fieldConfig'=>[
+                'username'=>[
+                    'options'=>[
+                        'class'=>'my-class'
+                    ]
+                ]
+            ]
+            ```
+            you should specify the field name of the model and its customization settings in form of `name=>value` pairs. The following special options can be used when specifying the form/model `field_name`.
+
+            - `options`
+            - `containerOptions`
+            - `template`
+            - `labelOptions`
+            - `widget`
+
+            Details
+            - `options (array)` : You can specify the HTML attributes (name-value pairs) for the field 
+                ```
+                'field_name'=>['options'=>['class'=>'my-class']]`
+
+                ```
+                All those special options that are recognized by the 
+                
+                - `checkbox(), radio()` : `uncheck`, `label`, `labelOptions`
+                - `checkboxList(), radioList()` : `tag`, `unselect`, `encode`, `separator`, `itemOptions`, `item`.
+                
+                can be used with-in the `options` option. The following 2 options are specially recognized by this widget when used with-in the `options`.
+
+                - `type (string)`: The type of the form field to be created, this can be `text`, `dropdown`,`checkbox`, `radio` or `textarea`. Default value for this option is `text`.
+
+                - `itemsList (string/array)` : This option can be used with a `dropdown`, `checkboxList` or `radioList`. It is used in combination of the the option `type`. If you provide the `itemsList` an array and use the `'type'=>'checkbox'` , it will call `checkboxList()`, and a `checkbox()` if you provide string, same goes for the radioList and radio.
+
+            - `lableOptions (array)`: The HTML and special options for customizing the field label, you can use the following settings
+                - `label (string)`: The label text.
+                - `options (array)` : The HTML attributes (name-value pairs) for the label.
+            - `template (string)` : The template used for the field the default value used is `{label}\n{input}\n{hint}\n{error}`.
+            - `containerOptions (array)` : HTML atrtibutes for the cotnainer tag used as `name=>value` pairs.
+            - `widget` :  This option can be used if you want to use a widget instead of the the default fields, you can specify the widget class name `'widget'=>widget::class`, and the options for the widget will be provided in the `options` option.
+
+#### Widget Plugin (SmartWizard) Options ####
+Only the following options of the plugin SmartWizard are allowed to be customized
+- `theme` : name of the theme to be used, there are mainly 6 themes supported by the plugin
+    - `default` : `const THEME_DEFAULT`
+    - `dots` : `const THEME_DOTS`
+    - `arrows` : `const THEME_ARROWS`
+    - `circles` : `const THEME_CIRCLES`
+    - `material` : `const THEME_MATERIAL`
+    - `material-v` : `const THEME_MATERIAL_V`
+- `transitionEffect (string)` : The effect used when sliding the step it can be one of the 
+    - `none`
+    - `slide`
+    - `fade`
+- `showStepURLhash (boolean)` : Show url hash based on step, default `false`.
+- `useURLHash (boolean)` :  Enable selection of the step based on url hash, default value is `false`.
+- `toolbarPosition` : Position of the toolbar (`none, top, bottom, both`), default value `top`.
+- `toolbarButtonPosition`: Position of the toolbar buttons (left, right), default value is left.
+- `toolbarExtraButtons` : Specify the extra buttons and its events to show on toolbar.
+- `markDoneSteps (boolean)` : Make already visited steps as done, default value is `true`.
+- `markAllPreviousStepsAsDone (boolean)`: When a step selected by url hash, all previous steps are marked done, default value is `true`.
+- `removeDoneStepOnNavigateBack (boolean)` : 	While navigate back done step after active step will be cleared, default value is `false`.
+- `enableAnchorOnDoneStep (boolean)` : Enable/Disable the done steps navigation, default value is `true`.
+
+
+    
 
 ### Who do I talk to? ###
 
