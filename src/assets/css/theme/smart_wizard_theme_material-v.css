@@ -37,12 +37,13 @@
     margin-left: 15px;
 }
 
+.sw-btn-group-extra{
+    float:right !important;
+}
 .sw-theme-material-v .step-content {
 
     margin: 0;
     padding: 0;
-    /* position: relative; */
-    /* float: left; */
     clear: both;
     width: 74%;
     font-size: 14px;
@@ -60,7 +61,6 @@
 }
 
 .sw-theme-material-v ul.step-anchor li {
-    /* width: 25%; */
     float: none;
     display: block;
     padding: 0;
@@ -103,8 +103,6 @@
     -ms-border-radius: 0;
     border-radius: 0;
     overflow-y: auto;
-    /*border: 1px solid #ddd;*/
-    /*margin: 0.5em;*/
     min-height: 35em;
     overflow: hidden;
     position: relative;
@@ -115,13 +113,12 @@
 
 .sw-theme-material-v .sw-toolbar {
     padding: 5px;
-    /*border: 1px solid #ddd;*/
     float: left;
     width: 73%;
     color: #555;
-    padding: 20px;
+    padding: 10px 20px;
     position: relative;
-    border-bottom: 1px solid rgba(204, 204, 204, 0.35);
+    
 }
 
 .sw-theme-material-v .sw-toolbar button,
