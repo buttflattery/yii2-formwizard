@@ -53,7 +53,7 @@ or add into the `composer.json` file under `require` section
             ``` 
             By default all the attributes that are safe to load value are populated, and the `id` or `primary_key` is ignored by default.
     
-        - `only (array)` : list of the fields that should be populated for the step, on the fields specified in the list will be available and all other fields will be ignored.
+        - `only (array)` : list of the fields that should be populated for the step, only the fields specified in the list will be available and all other fields will be ignored.
 
             Apart from the above options the `fieldConfig` recognizes some special options specific to every field separately when customizing a field, for example
 
