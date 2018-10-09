@@ -10,7 +10,7 @@ class ThemeMaterialAsset extends ThemeBase
         'js/theme/material.js',
     ];
     public $css = [
-        'css/theme/smart_wizard_theme_material.css',
+        'css/theme/smart_wizard_theme_material.min.css',
         'css/theme/waves.css',
     ];
 

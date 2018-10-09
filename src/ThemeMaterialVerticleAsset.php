@@ -11,7 +11,7 @@ class ThemeMaterialVerticleAsset extends ThemeBase
     ];
 
     public $css = [
-        'css/theme/smart_wizard_theme_material-v.css',
+        'css/theme/smart_wizard_theme_material-v.min.css',
         'css/theme/waves.css',
     ];
 
