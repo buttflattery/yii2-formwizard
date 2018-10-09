@@ -28,7 +28,6 @@ class FormWizard extends Widget {
     public $useURLhash = false;
     public $enableYiiActiveFormValidation = true;
     public $toolbarPosition = 'top';
-    public $toolbarButtonPosition = 'left';
     public $toolbarExtraButtons;
     public $markDoneStep = true;
     public $markAllPreviousStepsAsDone = true;
@@ -72,24 +71,29 @@ class FormWizard extends Widget {
         if( empty($this->steps) ){
             throw new InvalidArgumentException('You must provide steps for the form.');
         }
+        
         //set the form id for the form if not set by the user
         if( !isset($this->formOptions['id']) ){
-            $this->formOptions['id'] = $this->getId() . '-form_wizard';
+            $this->formOptions['id'] = $this->getId() . '_form_wizard';
+        }else{
+            preg_match('/\b(\w+)\b/', $this->formOptions['id'],$matches);
+            
+            if($matches[0]!==$this->formOptions['id']){
+                throw new InvalidArgumentException('You must provide the id for the form that matches any word character (equal to [a-zA-Z0-9_])');
+            }
         }
+        
         //set default action of the form to the current controller/actio if not set by user
         if( !isset($this->formOptions['action']) ){
             $this->formOptions['action'] = Url::to(['/' . Yii::$app->controller->id . '/' . Yii::$app->controller->action->id]);
         }
 
-//        //set the default errorCssClass for the form to be used by the for and the steps plugin
-//        if( !isset($this->formOptions['errorCssclass']) ){
-//            $this->formOptions['errorCssClass'] = 'has-error';
-//        }
-
+        //widget container ID
         if( !isset($this->wizardContainerId) ){
             $this->wizardContainerId = $this->getId() . '-form_wizard_container';
         }
 
+        //theme buttons material 
         if( $this->theme == self::THEME_MATERIAL || $this->theme == self::THEME_MATERIAL_V ){
             $this->classNext = 'btn bg-teal waves-effect';
             $this->classPrev = 'btn bg-teal waves-effect';
@@ -113,7 +117,6 @@ class FormWizard extends Widget {
                 'toolbarPosition' => $this->toolbarPosition,
                 'showNextButton' => false,
                 'showPreviousButton' => false,
-                'toolbarButtonPosition' => $this->toolbarButtonPosition,
                 'toolbarExtraButtons' => $this->toolbarExtraButtons,
             ],
             'anchorSettings' => [
@@ -193,7 +196,7 @@ JS;
         }
 
         //fields list
-        $.formwizard.fields={$fieldsJSON};
+        $.formwizard.fields.{$this->formOptions['id']}={$fieldsJSON};
 JS;
 
         //register script
@@ -221,7 +224,7 @@ JS;
             $htmlTabs .= $tabs;
             $htmlSteps .= $steps;
         }
-
+        
         //end tabs html
         $htmlTabs .= Html::endTag('ul');
 
@@ -294,7 +297,7 @@ JS;
         $html .= Html::beginTag('div', ['id' => 'step-' . $index]);
         $html .= Html::tag('h3', $formInfoText, ['class' => 'border-bottom border-gray pb-2']);
         $html .= Html::beginTag('div');
-        $html .= $this->createStepFields($step);
+        $html .= $this->createStepFields($index,$step);
         $html .= Html::endTag('div');
         $html .= Html::endTag('div');
         return $html;
@@ -305,7 +308,7 @@ JS;
      * @param type $step
      * @return type
      */
-    public function createStepFields($step) {
+    public function createStepFields($index,$step) {
         $model = $step['model'];
         $htmlFields = '';
 
@@ -323,10 +326,10 @@ JS;
         $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
 
         //add all the field ids to array
-        $this->allFields[] = array_map(function ($element) use ($model){
+        $this->allFields[$index] = array_map(function ($element) use ($model){
             return Html::getInputId($model, $element);
         }, $attributes);
-
+        
         //iterate all fields associated to the relevant model
         foreach( $attributes as $attribute ){
 
@@ -427,8 +430,6 @@ JS;
                 if( is_array($itemsList) ){
                     return $field->radioList($itemsList, $options)->label($label, $labelOptions);
                 } else{
-                    $options['label'] = $label;
-                    $options['labelOptions'] = $labelOptions;
                     return $field->radio($options);
                 }
             },
@@ -436,9 +437,12 @@ JS;
                 if( is_array($itemsList) ){
                     return $field->checkboxList($itemsList, $options)->label($label, $labelOptions);
                 } else{
-                    $options['label'] = $label;
-                    $options['labelOptions'] = $labelOptions;
-                    return $field->checkbox($options);
+                    $labelNull=$label===null;
+                    $labelOptionsEmpty=empty($labelOptions);
+                    $nothingSetByUser=($labelNull && $labelOptionsEmpty);
+                    $label=$nothingSetByUser?false:$label;
+                    
+                    return $field->checkbox($options)->label($label,$labelOptions);
                 }
             },
             'textarea' => function($field, $options, $labelOptions, $label){

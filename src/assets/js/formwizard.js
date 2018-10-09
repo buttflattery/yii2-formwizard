@@ -17,7 +17,6 @@ $.formwizard = {
             }, 1000 );
         },
         appendButtons : function ( options ) {
-//            form, labelNext, labelPrev, labelFinish
             // Toolbar next, previous and finish custom buttons
             var formwizardBtnNext = $( '<button class="formwizard-next"></button>' ).html( options.labelNext )
                     .addClass( options.classNext );
@@ -36,8 +35,7 @@ $.formwizard = {
 
             $( combined ).on( 'click', function ( e ) {
                 e.preventDefault();
-
-                if( $(options.form).yiiActiveForm('data').attributes.length) {
+                if( $( options.form ).yiiActiveForm( 'data' ).attributes.length ) {
                     return $.formwizard.validation.run( options.form, e );
                 }
                 if( $( e.target ).hasClass( 'formwizard-finish' ) ) {
@@ -81,9 +79,9 @@ $.formwizard = {
         bindAfterValidate : function ( form ) {
             $( form ).on( 'afterValidate', function ( event, messages, errorAttributes ) {
                 event.preventDefault();
+                let formName = $( this ).attr( 'id' );
                 let currentIndex = $.formwizard.helper.currentIndex( form );
-                let res = $.formwizard.fields[currentIndex].diff( messages );
-
+                let res = $.formwizard.fields[formName][currentIndex].diff( messages );
                 if( !res.length ) {
                     //check if last step then submit form
                     let isLastStep = currentIndex == $( form + ' .step-anchor' ).find( 'li' ).length - 1;
@@ -106,6 +104,22 @@ $.formwizard = {
                 }
                 return false;
             } );
+        },
+        isValid : function ( messages ) {
+            for( var i in messages ) {
+                if( messages[i].length > 0 ) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        updateErrorMessages : function ( form, messages ) {
+            for( var i in messages ) {
+                if( messages[i].length ) {
+                    let attribute = i.replace( /\-([0-9]+)/g, '' );
+                    $( form ).yiiActiveForm( 'updateAttribute', attribute, messages[i] );
+                }
+            }
         }
     },
     formNavigation : {
@@ -154,6 +168,7 @@ $.formwizard = {
 };
 
 Array.prototype.diff = function ( arr2 ) {
+
     var ret = [];
     for( var i in this ) {
         if( this.hasOwnProperty( i ) ) {
