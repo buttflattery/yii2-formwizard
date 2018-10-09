@@ -7,7 +7,7 @@ class ThemeArrowsAsset extends ThemeBase
 {
 
     public $css = [
-        'css/theme/smart_wizard_theme_arrows.css',
+        'css/theme/smart_wizard_theme_arrows.min.css',
     ];
 
     public function init()

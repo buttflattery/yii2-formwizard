@@ -7,7 +7,7 @@ class ThemeDotsAsset extends ThemeBase
 {
 
     public $css = [
-        'css/theme/smart_wizard_theme_dots.css',
+        'css/theme/smart_wizard_theme_dots.min.css',
     ];
 
     public function init()

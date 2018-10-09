@@ -7,7 +7,7 @@ class ThemeCirclesAsset extends ThemeBase
 {
 
     public $css = [
-        'css/theme/smart_wizard_theme_circles.css',
+        'css/theme/smart_wizard_theme_circles.min.css',
     ];
 
     public function init()
