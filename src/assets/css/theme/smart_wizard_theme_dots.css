@@ -47,6 +47,7 @@
     background: #fff;
     border: 0px solid #ccc !important;
     list-style: none;
+    margin-bottom: 40px;
 }
 
 .sw-theme-dots > ul.step-anchor:before {
