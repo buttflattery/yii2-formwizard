@@ -9,6 +9,7 @@ use yii\base\Widget;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\helpers\ArrayHelper;
 use yii\web\JsExpression;
 use yii\web\View;
 
@@ -20,7 +21,6 @@ class FormWizard extends Widget {
     public $wizardContainerId;
     public $steps = [];
     public $formOptions = [];
-    
     //plugin options
     public $theme = 'default';
     public $transitionEffect = 'slide';
@@ -71,22 +71,20 @@ class FormWizard extends Widget {
         if( empty($this->steps) ){
             throw new InvalidArgumentException('You must provide steps for the form.');
         }
-        
+
         //set the form id for the form if not set by the user
         if( !isset($this->formOptions['id']) ){
             $this->formOptions['id'] = $this->getId() . '_form_wizard';
-        }else{
-            preg_match('/\b(\w+)\b/', $this->formOptions['id'],$matches);
-            
-            if($matches[0]!==$this->formOptions['id']){
+        } else{
+            preg_match('/\b(\w+)\b/', $this->formOptions['id'], $matches);
+
+            if( $matches[0] !== $this->formOptions['id'] ){
                 throw new InvalidArgumentException('You must provide the id for the form that matches any word character (equal to [a-zA-Z0-9_])');
             }
         }
-        
+
         //set default action of the form to the current controller/actio if not set by user
-        if( !isset($this->formOptions['action']) ){
-            $this->formOptions['action'] = Url::to(['/' . Yii::$app->controller->id . '/' . Yii::$app->controller->action->id]);
-        }
+        $this->formOptions['action'] = ArrayHelper::getValue($this->formOptions, 'action', Url::to(['/' . Yii::$app->controller->id . '/' . Yii::$app->controller->action->id]));
 
         //widget container ID
         if( !isset($this->wizardContainerId) ){
@@ -224,7 +222,7 @@ JS;
             $htmlTabs .= $tabs;
             $htmlSteps .= $steps;
         }
-        
+
         //end tabs html
         $htmlTabs .= Html::endTag('ul');
 
@@ -243,15 +241,15 @@ JS;
      */
     public function createStep($index, $step) {
         //step title
-        $stepTitle = !isset($step['title']) ? 'Step-' . ($index + 1) : $step['title'];
+        $stepTitle = ArrayHelper::getValue($step, 'title','Step-' . ($index + 1));//!isset($step['title']) ? 'Step-' . ($index + 1) : $step['title'];
 
         //step description
-        $stepDescription = !isset($step['description']) ? 'Sample Description' : $step['description'];
+        $stepDescription = ArrayHelper::getValue($step, 'description','Description');//!isset($step['description']) ? 'Sample Description' : $step['description'];
 
         $model = $step['model'];
 
         //form body info text
-        $formInfoText = !isset($step['formInfoText']) ? 'Add ' . basename(get_class($model)) . ' details below' : $step['formInfoText'];
+        $formInfoText = ArrayHelper::getValue($step,'formInfoText','Add ' . basename(get_class($model)) . ' details below');//!isset($step['formInfoText']) ? 'Add ' . basename(get_class($model)) . ' details below' : $step['formInfoText'];
 
         //get html tabs
         $htmlTabs = $this->createTabs($index, $stepDescription, $stepTitle);
@@ -297,7 +295,7 @@ JS;
         $html .= Html::beginTag('div', ['id' => 'step-' . $index]);
         $html .= Html::tag('h3', $formInfoText, ['class' => 'border-bottom border-gray pb-2']);
         $html .= Html::beginTag('div');
-        $html .= $this->createStepFields($index,$step);
+        $html .= $this->createStepFields($index, $step);
         $html .= Html::endTag('div');
         $html .= Html::endTag('div');
         return $html;
@@ -308,19 +306,18 @@ JS;
      * @param type $step
      * @return type
      */
-    public function createStepFields($index,$step) {
+    public function createStepFields($index, $step) {
         $model = $step['model'];
         $htmlFields = '';
 
-
         //field configurations
-        $fieldConfig = !isset($step['fieldConfig']) ? false : $step['fieldConfig'];
+        $fieldConfig = ArrayHelper::getValue($step,'fieldConfig',false);//!isset($step['fieldConfig']) ? false : $step['fieldConfig'];
 
         //disabled fields
-        $disabledFields = isset($fieldConfig['disabled']) ? $fieldConfig['disabled'] : [];
+        $disabledFields = ArrayHelper::getValue($fieldConfig, 'disabled',[]);//isset($fieldConfig['disabled']) ? $fieldConfig['disabled'] : [];
 
         //only fields
-        $onlyFields = isset($fieldConfig['only']) ? $fieldConfig['only'] : [];
+        $onlyFields = ArrayHelper::getValue($fieldConfig,'only',[]);//isset($fieldConfig['only']) ? $fieldConfig['only'] : [];
 
         //get safe attributes
         $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
@@ -329,7 +326,7 @@ JS;
         $this->allFields[$index] = array_map(function ($element) use ($model){
             return Html::getInputId($model, $element);
         }, $attributes);
-        
+
         //iterate all fields associated to the relevant model
         foreach( $attributes as $attribute ){
 
@@ -379,33 +376,33 @@ JS;
      */
     public function createCustomizedField($model, $attribute, $fieldConfig) {
         //options
-        $options = isset($fieldConfig['options']) ? $fieldConfig['options'] : [];
+        $options = ArrayHelper::getValue($fieldConfig,'options',[]);//isset($fieldConfig['options']) ? $fieldConfig['options'] : [];
 
         //field type
-        $fieldType = isset($options['type']) ? $options['type'] : 'text';
+        $fieldType = ArrayHelper::getValue($options,'type','text');//isset($options['type']) ? $options['type'] : 'text';
 
 
         //widget
-        $widget = isset($fieldConfig['widget']) ? $fieldConfig['widget'] : false;
+        $widget = ArrayHelper::getValue($fieldConfig, 'widget',false);//isset($fieldConfig['widget']) ? $fieldConfig['widget'] : false;
 
         //label configuration
-        $labelConfig = isset($fieldConfig['labelOptions']) ? $fieldConfig['labelOptions'] : null;
+        $labelConfig = ArrayHelper::getValue($fieldConfig,'labelOptions',null);//isset($fieldConfig['labelOptions']) ? $fieldConfig['labelOptions'] : null;
 
         //template
-        $template = isset($fieldConfig['template']) ? $fieldConfig['template'] : "{label}\n{input}\n{hint}\n{error}";
+        $template = ArrayHelper::getValue($fieldConfig, 'template',"{label}\n{input}\n{hint}\n{error}");//isset($fieldConfig['template']) ? $fieldConfig['template'] : "{label}\n{input}\n{hint}\n{error}";
 
         //container
-        $containerOptions = isset($fieldConfig['containerOptions']) ? $fieldConfig['containerOptions'] : [];
+        $containerOptions = ArrayHelper::getValue($fieldConfig, 'containerOptions',[]);//isset($fieldConfig['containerOptions']) ? $fieldConfig['containerOptions'] : [];
 
         //items list
-        $itemsList = isset($options['itemsList']) ? $options['itemsList'] : '';
+        $itemsList = ArrayHelper::getValue($options, 'itemsList','');//isset($options['itemsList']) ? $options['itemsList'] : '';
 
 
         //label text
-        $label = isset($labelConfig['label']) ? $labelConfig['label'] : null;
+        $label = ArrayHelper::getValue($labelConfig, 'label',null);//isset($labelConfig['label']) ? $labelConfig['label'] : null;
 
         //label options
-        $labelOptions = isset($labelConfig['options']) ? $labelConfig['options'] : [];
+        $labelOptions = ArrayHelper::getValue($labelConfig, 'options',[]);//isset($labelConfig['options']) ? $labelConfig['options'] : [];
 
         //create field
         $field = $this->createField($model, $attribute, ['template' => $template, 'options' => $containerOptions]);
@@ -437,12 +434,12 @@ JS;
                 if( is_array($itemsList) ){
                     return $field->checkboxList($itemsList, $options)->label($label, $labelOptions);
                 } else{
-                    $labelNull=$label===null;
-                    $labelOptionsEmpty=empty($labelOptions);
-                    $nothingSetByUser=($labelNull && $labelOptionsEmpty);
-                    $label=$nothingSetByUser?false:$label;
-                    
-                    return $field->checkbox($options)->label($label,$labelOptions);
+                    $labelNull = $label === null;
+                    $labelOptionsEmpty = empty($labelOptions);
+                    $nothingSetByUser = ($labelNull && $labelOptionsEmpty);
+                    $label = $nothingSetByUser ? false : $label;
+
+                    return $field->checkbox($options)->label($label, $labelOptions);
                 }
             },
             'textarea' => function($field, $options, $labelOptions, $label){
