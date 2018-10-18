@@ -25,9 +25,12 @@
     clear: both;
     min-width: 96%;
 }
-.sw-theme-material .step-anchor{
-    border:0px;
+
+.sw-theme-material .step-anchor {
+    border: 0px;
+    background-color: #f5f5f5;
 }
+
 .sw-theme-material .sw-container {
     min-height: 300px;
 }
@@ -60,32 +63,32 @@
     width: auto;
     padding: 1em 1em;
     text-decoration: none;
-    border:0px;
+    border: 0px;
 }
 
 .sw-theme-material ul.step-anchor>li a {
-    background-color: #009688;
-    background: #eee;
-    color: #aaa;
+
+    background: #eee !important;
+    color: #aaa !important;
     cursor: default;
-    border-radius: 0px;
+    border-radius: 0px !important;
 }
 
 .sw-theme-material ul.step-anchor>li.active a {
-    background-color: #009688;
-    color: #fff;
+    background-color: #009688 !important;
+    color: #fff !important;
     cursor: default;
     padding: 15px 130px 10px 10px;
 
 }
 
-.sw-theme-material ul.step-anchor li.done a{
+.sw-theme-material ul.step-anchor li.done a {
     background-color: rgba(92, 184, 92, 0.6);
-    color:#fff;
+    color: #fff;
 }
 
-.sw-theme-material .sw-container .step-content{
-    
+.sw-theme-material .sw-container .step-content {
+
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     -ms-border-radius: 0;
@@ -96,13 +99,13 @@
     overflow: hidden;
     position: relative;
     width: auto;
-    border-top:0px;
+    border-top: 0px;
     font-size: 14px;
     color: #555;
     padding: 20px;
 }
 
-.sw-theme-material .sw-toolbar{
+.sw-theme-material .sw-toolbar {
     padding: 5px;
     border: 1px solid #ddd;
     color: #555;
@@ -110,25 +113,25 @@
     position: relative;
     border-bottom: 1px solid rgba(204, 204, 204, 0.35);
 }
-.sw-theme-material .sw-toolbar button,.sw-theme-material .sw-toolbar input{
+
+.sw-theme-material .sw-toolbar button,
+.sw-theme-material .sw-toolbar input {
     border-radius: 0px;
 }
 
-.sw-theme-material .step-content h3{
-    font-size:1.3em;
+.sw-theme-material .step-content h3 {
+    font-size: 1.3em;
 }
-.sw-theme-material .step-content input{
+
+.sw-theme-material .step-content input {
     border-radius: 0px;
 }
-.sw-theme-material .step-content label{
+
+.sw-theme-material .step-content label {
     font-size: 12px;
-    font-weight:normal;
+    font-weight: normal;
 }
 
 
 /* Responsive CSS */
-@media screen and (max-width: 768px) {
-    
-}
-
-
+@media screen and (max-width: 768px) {}
