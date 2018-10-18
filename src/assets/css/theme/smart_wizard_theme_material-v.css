@@ -28,6 +28,7 @@
 
 .sw-theme-material-v .step-anchor {
     border: 0px;
+    background-color: #ffffff;
 }
 
 .sw-theme-material-v .sw-container {
@@ -37,9 +38,10 @@
     margin-left: 15px;
 }
 
-.sw-theme-material-v .sw-btn-group-extra{
-    float:right !important;
+.sw-theme-material-v .sw-btn-group-extra {
+    float: right !important;
 }
+
 .sw-theme-material-v .step-content {
 
     margin: 0;
@@ -75,7 +77,7 @@
     width: auto;
     padding: 1em 1em;
     text-decoration: none;
-    border: 0px;
+    border: 0px !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     background: #eee;
     color: #aaa;
@@ -85,7 +87,7 @@
 
 .sw-theme-material-v ul.step-anchor>li.active a {
     background-color: #4CAF50 !important;
-    color: #fff;
+    color: #fff !important;
     cursor: default;
     padding: 15px 130px 10px 10px;
 
@@ -118,7 +120,7 @@
     color: #555;
     padding: 10px 20px;
     position: relative;
-    
+
 }
 
 .sw-theme-material-v .sw-toolbar button,

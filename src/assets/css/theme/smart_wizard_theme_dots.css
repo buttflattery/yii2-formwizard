@@ -11,8 +11,7 @@
  */
 
 /* SmartWizard Theme: Dots */
-.sw-theme-dots {
-}
+.sw-theme-dots {}
 
 .sw-theme-dots .sw-container {
     min-height: 300px;
@@ -42,15 +41,15 @@
     border-bottom-color: #ddd !important;
 }
 
-.sw-theme-dots > ul.step-anchor {
+.sw-theme-dots>ul.step-anchor {
     position: relative;
-    background: #fff;
+    background: #fff !important;
     border: 0px solid #ccc !important;
     list-style: none;
     margin-bottom: 40px;
 }
 
-.sw-theme-dots > ul.step-anchor:before {
+.sw-theme-dots>ul.step-anchor:before {
     content: " ";
     position: absolute;
     top: 70px;
@@ -63,24 +62,25 @@
     z-index: 95;
 }
 
-.sw-theme-dots > ul.step-anchor > li {
+.sw-theme-dots>ul.step-anchor>li {
     border: none;
 }
+
 /* Anchors styles */
-.sw-theme-dots > ul.step-anchor > li > a {
+.sw-theme-dots>ul.step-anchor>li>a {
     position: relative;
     text-align: center;
     font-weight: bold;
     background: transparent;
-    border: none;
-    color: #ccc;
+    border: none !important;
+    color: #ccc !important;
     text-decoration: none;
     outline-style: none;
     z-index: 96;
     display: block;
 }
 
-.sw-theme-dots > ul.step-anchor > li > a:before {
+.sw-theme-dots>ul.step-anchor>li>a:before {
     content: ' ';
     position: absolute;
     bottom: 2px;
@@ -97,7 +97,7 @@
     z-index: 98;
 }
 
-.sw-theme-dots > ul.step-anchor > li > a:after {
+.sw-theme-dots>ul.step-anchor>li>a:after {
     content: ' ';
     position: relative;
     left: 43%;
@@ -111,59 +111,63 @@
     z-index: 99;
 }
 
-.sw-theme-dots > ul.step-anchor > li > a:hover {
+.sw-theme-dots>ul.step-anchor>li>a:hover {
     color: #ccc;
     background: transparent;
 }
 
-.sw-theme-dots > ul.step-anchor > li > a:focus {
+.sw-theme-dots>ul.step-anchor>li>a:focus {
     color: #ccc;
     border: none;
 }
 
-.sw-theme-dots > ul.step-anchor > li.clickable > a:hover {
+.sw-theme-dots>ul.step-anchor>li.clickable>a:hover {
     color: #999;
 }
+
 /* Active anchors */
-.sw-theme-dots > ul.step-anchor > li.active > a {
-    color: #5bc0de;
+.sw-theme-dots>ul.step-anchor>li.active>a {
+    color: #5bc0de !important;
 }
 
-.sw-theme-dots > ul.step-anchor > li.active > a:hover {
+.sw-theme-dots>ul.step-anchor>li.active>a:hover {
     border: none;
 }
 
-.sw-theme-dots > ul.step-anchor > li.active > a:after {
+.sw-theme-dots>ul.step-anchor>li.active>a:after {
     background: #5bc0de;
 }
+
 /* Done anchors */
-.sw-theme-dots > ul.step-anchor > li.done > a {
+.sw-theme-dots>ul.step-anchor>li.done>a {
     color: #5cb85c;
 }
 
-.sw-theme-dots > ul.step-anchor > li.done > a:after {
+.sw-theme-dots>ul.step-anchor>li.done>a:after {
     background: #5cb85c;
 }
+
 /* Danger anchors */
-.sw-theme-dots > ul.step-anchor > li.danger > a {
+.sw-theme-dots>ul.step-anchor>li.danger>a {
     color: #d9534f;
 }
 
-.sw-theme-dots > ul.step-anchor > li.danger > a:after {
+.sw-theme-dots>ul.step-anchor>li.danger>a:after {
     background: #d9534f;
 }
 
-.sw-theme-dots > ul.step-anchor > li.disabled > a, .sw-theme-dots > ul.step-anchor > li.disabled > a:hover {
+.sw-theme-dots>ul.step-anchor>li.disabled>a,
+.sw-theme-dots>ul.step-anchor>li.disabled>a:hover {
     color: #eee !important;
 }
 
-.sw-theme-dots > ul.step-anchor > li.disabled > a:after {
+.sw-theme-dots>ul.step-anchor>li.disabled>a:after {
     background: #eee;
 }
 
 /* Responsive CSS */
 @media screen and (max-width: 768px) {
-    .sw-theme-dots > ul.step-anchor:before {
+    .sw-theme-dots>ul.step-anchor:before {
         top: 0;
         bottom: 0;
         left: 10px;
@@ -174,26 +178,26 @@
         margin-right: 10px;
     }
 
-    .sw-theme-dots > ul.step-anchor > li {
+    .sw-theme-dots>ul.step-anchor>li {
         margin-left: 20px;
         display: block;
         clear: both;
     }
 
-    .sw-theme-dots > ul.step-anchor > li > a {
+    .sw-theme-dots>ul.step-anchor>li>a {
         text-align: left;
         margin-left: 0;
         display: block;
     }
 
-    .sw-theme-dots > ul.step-anchor > li > a:before {
+    .sw-theme-dots>ul.step-anchor>li>a:before {
         top: 5px;
         left: -23px;
         margin-right: 10px;
         display: block;
     }
 
-    .sw-theme-dots > ul.step-anchor > li > a:after {
+    .sw-theme-dots>ul.step-anchor>li>a:after {
         top: -38px;
         left: -31px;
         margin-right: 10px;
