@@ -314,7 +314,7 @@ JS;
         $fieldConfig = ArrayHelper::getValue($step,'fieldConfig',false);//!isset($step['fieldConfig']) ? false : $step['fieldConfig'];
 
         //disabled fields
-        $disabledFields = ArrayHelper::getValue($fieldConfig, 'disabled',[]);//isset($fieldConfig['disabled']) ? $fieldConfig['disabled'] : [];
+        $disabledFields = ArrayHelper::getValue($fieldConfig, 'except',[]);//isset($fieldConfig['disabled']) ? $fieldConfig['disabled'] : [];
 
         //only fields
         $onlyFields = ArrayHelper::getValue($fieldConfig,'only',[]);//isset($fieldConfig['only']) ? $fieldConfig['only'] : [];
