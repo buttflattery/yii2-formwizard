@@ -41,12 +41,12 @@ or add into the `composer.json` file under `require` section
     - `title (string)` : The title of the step to be displayed inside the step Tab.
     - `description (string)` : The short description for the step.
     - `formInfoText (text)` : The text to be displayed on the top of the form fields inside the step.
-    - `fieldConfig (array)` : This option is used mainly to customize the form fields for the step.    2 special options are recognized inside the `fieldConfig`, `disabled` and `only`. See below for the details
+    - `fieldConfig (array)` : This option is used mainly to customize the form fields for the step.    2 special options are recognized inside the `fieldConfig`, `except` and `only`. See below for the details
 
-        - `disabled (array)` : List of fields that should not be populated in the step or should be ignored, for example 
+        - `except (array)` : List of fields that should not be populated in the step or should be ignored, for example 
             ```
             'fieldConfig'=>[
-                'disabled'=>[
+                'except'=>[
                     'created_on','updated_on'
                 ]
             ]
