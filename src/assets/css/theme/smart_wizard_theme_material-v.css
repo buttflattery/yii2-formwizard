@@ -80,7 +80,7 @@
     border: 0px !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     background: #eee;
-    color: #aaa;
+    color: #aaa !important;
     cursor: default;
     border-radius: 0px;
 }
