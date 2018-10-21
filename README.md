@@ -25,6 +25,9 @@ or add into the `composer.json` file under `require` section
 ```
 "buttflattery/yii2-formwizard":"@dev"
 ```
+### Demos ###
+See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all options.
+
 
 ### Available Options ###
 
