@@ -1,7 +1,6 @@
 {
     "name": "buttflattery/yii2-formwizard",
     "description": "A yii2 widget for form wizard, to create a multistep form.",
-    "language": "Php",
     "type": "yii2-extension",
     "require": {
         "php": ">=5.4.0"
