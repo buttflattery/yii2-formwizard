@@ -50,12 +50,15 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 
         - `except (array)` : List of fields that should not be populated in the step or should be ignored, for example 
             ```
+            
             'fieldConfig'=>[
                 'except'=>[
                     'created_on','updated_on'
                 ]
             ]
+
             ``` 
+
             By default all the attributes that are safe to load value are populated, and the `id` or `primary_key` is ignored by default.
     
         - `only (array)` : list of the fields that should be populated for the step, only the fields specified in the list will be available and all other fields will be ignored.
@@ -63,6 +66,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
             Apart from the above options the `fieldConfig` recognizes some special options specific to every field separately when customizing a field, for example
 
             ```
+
             'fieldConfig'=>[
                 'username'=>[
                     'options'=>[
@@ -70,7 +74,9 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
                     ]
                 ]
             ]
+
             ```
+            
             you should specify the field name of the model and its customization settings in form of `name=>value` pairs. The following special options can be used when specifying the form/model `field_name`.
 
             - `options`
