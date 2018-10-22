@@ -6,6 +6,7 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 
 _Note : It uses limited features of the jquery plugin SmartWizard that suite the needs of the ActiveForm validation so not all options in the javascript plugin library are allowed to be changed or customized from within this plugin._
 
+![preview](https://yii2plugins.idowstech.com/theme/assets/img/form-wizard.jpg) 
 
 ### External Libraries Used ###
 * [Smart Wizard](https://github.com/mstratman/jQuery-Smart-Wizard).
