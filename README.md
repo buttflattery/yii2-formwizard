@@ -49,6 +49,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
     - `fieldConfig (array)` : This option is used mainly to customize the form fields for the step.    2 special options are recognized inside the `fieldConfig`, `except` and `only`. See below for the details
 
         - `except (array)` : List of fields that should not be populated in the step or should be ignored, for example 
+        
             ```
             
             'fieldConfig'=>[
@@ -76,7 +77,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
             ]
 
             ```
-            
+
             you should specify the field name of the model and its customization settings in form of `name=>value` pairs. The following special options can be used when specifying the form/model `field_name`.
 
             - `options`
