@@ -42,7 +42,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 - `classPrev` : css classes for the button Prev.
 - `classFinish` : css classes for the button Finish.
 - `steps (array)` : An array of the steps(`array`), the steps can  have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
-    - `model (object)` : The `\yii\model\ActiveRecord` model object to create step fields.
+    - `model (object | array of models)` : The `\yii\model\ActiveRecord` model object or array of models to create step fields.
     - `title (string)` : The title of the step to be displayed inside the step Tab.
     - `description (string)` : The short description for the step.
     - `formInfoText (text)` : The text to be displayed on the top of the form fields inside the step.
