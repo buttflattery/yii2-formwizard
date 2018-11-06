@@ -85,6 +85,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
             - `template`
             - `labelOptions`
             - `widget`
+            - `multifield (boolean)` 
 
             Details
             - `options (array)` : You can specify the HTML attributes (name-value pairs) for the field 
@@ -109,6 +110,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
             - `template (string)` : The template used for the field the default value used is `{label}\n{input}\n{hint}\n{error}`.
             - `containerOptions (array)` : HTML atrtibutes for the cotnainer tag used as `name=>value` pairs.
             - `widget` :  This option can be used if you want to use a widget instead of the the default fields, you can specify the widget class name `'widget'=>widget::class`, and the options for the widget will be provided in the `options` option.
+            - `multifield (boolean)` : a boolean which decides if the field name should consist of an array or not, for example using multi file upload widgets require the `name` attribute for the field to be declared as an array like `filed_name[]` instead of `field_name`. you can pass this option as true by default it is false.
 
 #### Widget Plugin (SmartWizard) Options ####
 Only the following options of the plugin SmartWizard are allowed to be customized
