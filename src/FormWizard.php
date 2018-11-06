@@ -381,6 +381,9 @@ JS;
     public function createCustomizedField($model, $attribute, $fieldConfig) {
         //options
         $options = ArrayHelper::getValue($fieldConfig, 'options', []); //isset($fieldConfig['options']) ? $fieldConfig['options'] : [];
+        //is multi field name
+        $isMultiField = Arrayhelper::getValue($fieldConfig, 'multifield', false);
+
         //field type
         $fieldType = ArrayHelper::getValue($options, 'type', 'text'); //isset($options['type']) ? $options['type'] : 'text';
         //widget
@@ -398,7 +401,7 @@ JS;
         //label options
         $labelOptions = ArrayHelper::getValue($labelConfig, 'options', []); //isset($labelConfig['options']) ? $labelConfig['options'] : [];
         //create field
-        $field = $this->createField($model, $attribute, ['template' => $template, 'options' => $containerOptions]);
+        $field = $this->createField($model, $attribute, ['template' => $template, 'options' => $containerOptions], $isMultiField);
 
         //remove the type and itemList from options
         unset($options['type']);
@@ -438,6 +441,9 @@ JS;
             'textarea' => function ($field, $options, $labelOptions, $label){
                 return $field->textarea($options)->label($label, $labelOptions);
             },
+            'file' => function ($field, $options, $labelOptions, $label){
+                return $field->fileInput($options)->label($label, $labelOptions);
+            }
         ];
 
         //create field depending on the type of the value provided
@@ -453,26 +459,9 @@ JS;
      * @return type
      */
     public function createDefaultField($model, $attribute) {
-        $columnMapping = [
-            'string' => function ($field){
-                return $field->textInput()->label(null, ['class' => 'form-label']);
-            },
-            'integer' => function ($field){
-                return $field->textInput()->label(null, ['class' => 'form-label']);
-            },
-        ];
-
-        //get column schema
-        $columnSchema = $model->getTableSchema()->getColumn($attribute);
-
         //create field
         $field = $this->createField($model, $attribute);
-
-        if( isset($columnMapping[$columnSchema->phpType]) ){
-            return $columnMapping[$columnSchema->phpType]($field);
-        } else{
-            // throw new InvalidParamException("The Field Type {$columnSchema->type} Provided for the column {$attribute} is invalid");
-        }
+        return $field->textInput()->label(null, ['class' => 'form-label']);
     }
 
     /**
@@ -482,8 +471,8 @@ JS;
      * @param type $fieldOptions
      * @return type
      */
-    public function createField($model, $attribute, $fieldOptions = []) {
-        return $this->form->field($model, $attribute, $fieldOptions);
+    public function createField($model, $attribute, $fieldOptions = [], $isMulti = false) {
+        return $this->form->field($model, $attribute . ($isMulti ? '[]' : ''), $fieldOptions);
     }
 
     /**
