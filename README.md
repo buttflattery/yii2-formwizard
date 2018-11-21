@@ -100,7 +100,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
                 
                 can be used with-in the `options` option. The following 2 options are specially recognized by this widget when used with-in the `options`.
 
-                - `type (string)`: The type of the form field to be created, this can be `text`, `dropdown`,`checkbox`, `radio` or `textarea`. Default value for this option is `text`.
+                - `type (string)`: The type of the form field to be created, this can be `text`, `dropdown`,`checkbox`, `radio`, `textarea`, `file`, `password`, `hidden`. Default value for this option is `text`.
 
                 - `itemsList (string/array)` : This option can be used with a `dropdown`, `checkboxList` or `radioList`. It is used in combination of the the option `type`. If you provide the `itemsList` an array and use the `'type'=>'checkbox'` , it will call `checkboxList()`, and a `checkbox()` if you provide string, same goes for the radioList and radio.
 
