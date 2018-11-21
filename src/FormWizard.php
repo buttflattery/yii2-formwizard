@@ -157,6 +157,7 @@ JS;
         echo Html::beginTag('div', ['id' => $wizardContainerId]);
         //draw form steps
         echo $this->createFormWizard();
+
         //end container div tag
         echo Html::endTag('div');
 
@@ -443,6 +444,12 @@ JS;
             },
             'file' => function ($field, $options, $labelOptions, $label){
                 return $field->fileInput($options)->label($label, $labelOptions);
+            },
+            'hidden'=>function ($field,$options){
+                return $field->hiddenInput($options)->label(false);
+            },
+            'password'=>function ($field,$options,$labelOptions,$label){
+                return $field->passwordInput($options)->label($label,$labelOptions);
             }
         ];
 
