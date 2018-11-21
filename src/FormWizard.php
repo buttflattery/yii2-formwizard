@@ -9,11 +9,12 @@ use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
-use yii\helpers\Url;
 use yii\web\JsExpression;
 use yii\web\View;
+use yii\widgets\ActiveForm;
 
-class FormWizard extends Widget {
+class FormWizard extends Widget
+{
 
     private $form;
     private $allFields = [];
@@ -58,7 +59,8 @@ class FormWizard extends Widget {
     /**
      *
      */
-    public function init() {
+    public function init()
+    {
         parent::init();
         $this->setDefaults();
     }
@@ -67,32 +69,30 @@ class FormWizard extends Widget {
      *
      * @throws InvalidArgumentException
      */
-    private function setDefaults() {
-        if( empty($this->steps) ){
+    private function setDefaults()
+    {
+        if (empty($this->steps)) {
             throw new InvalidArgumentException('You must provide steps for the form.');
         }
 
         //set the form id for the form if not set by the user
-        if( !isset($this->formOptions['id']) ){
+        if (!isset($this->formOptions['id'])) {
             $this->formOptions['id'] = $this->getId() . '_form_wizard';
-        } else{
+        } else {
             preg_match('/\b(\w+)\b/', $this->formOptions['id'], $matches);
 
-            if( $matches[0] !== $this->formOptions['id'] ){
+            if ($matches[0] !== $this->formOptions['id']) {
                 throw new InvalidArgumentException('You must provide the id for the form that matches any word character (equal to [a-zA-Z0-9_])');
             }
         }
 
-        //set default action of the form to the current controller/actio if not set by user
-        $this->formOptions['action'] = ArrayHelper::getValue($this->formOptions, 'action', Url::to(['/' . Yii::$app->controller->id . '/' . Yii::$app->controller->action->id]));
-
         //widget container ID
-        if( !isset($this->wizardContainerId) ){
+        if (!isset($this->wizardContainerId)) {
             $this->wizardContainerId = $this->getId() . '-form_wizard_container';
         }
 
         //theme buttons material
-        if( $this->theme == self::THEME_MATERIAL || $this->theme == self::THEME_MATERIAL_V ){
+        if ($this->theme == self::THEME_MATERIAL || $this->theme == self::THEME_MATERIAL_V) {
             $this->classNext = 'btn bg-teal waves-effect';
             $this->classPrev = 'btn bg-teal waves-effect';
             $this->classFinish = 'btn bg-green waves-effect';
@@ -105,7 +105,8 @@ class FormWizard extends Widget {
      *
      * @return type
      */
-    public function getPluginOptions() {
+    public function getPluginOptions()
+    {
         return [
             'selected' => 0,
             'theme' => $this->theme,
@@ -131,7 +132,8 @@ class FormWizard extends Widget {
     /**
      *
      */
-    public function run() {
+    public function run()
+    {
         parent::run();
 
         $wizardContainerId = $this->wizardContainerId;
@@ -151,7 +153,7 @@ JS;
         $pluginOptions['toolbarSettings']['toolbarExtraButtons'] = new JsExpression($jsButton);
 
         //start ActiveForm tag
-        $this->form = \yii\widgets\ActiveForm::begin($this->formOptions);
+        $this->form = ActiveForm::begin($this->formOptions);
 
         //start container tag
         echo Html::beginTag('div', ['id' => $wizardContainerId]);
@@ -206,7 +208,8 @@ JS;
      *
      * @return type
      */
-    public function createFormWizard() {
+    public function createFormWizard()
+    {
         //get the steps
         $steps = $this->steps;
 
@@ -217,7 +220,7 @@ JS;
         $htmlSteps = Html::beginTag('div');
 
         //loop thorugh all the steps
-        foreach( $steps as $index => $step ){
+        foreach ($steps as $index => $step) {
             //create wizard steps
             list($tabs, $steps) = $this->createStep($index, $step);
             $htmlTabs .= $tabs;
@@ -240,7 +243,8 @@ JS;
      * @param type $step
      * @return type
      */
-    public function createStep($index, $step) {
+    public function createStep($index, $step)
+    {
         //step title
         $stepTitle = ArrayHelper::getValue($step, 'title', 'Step-' . ($index + 1)); //!isset($step['title']) ? 'Step-' . ($index + 1) : $step['title'];
         //step description
@@ -264,7 +268,8 @@ JS;
      * @param type $stepTitle
      * @return type
      */
-    public function createTabs($index, $stepDescription, $stepTitle) {
+    public function createTabs($index, $stepDescription, $stepTitle)
+    {
         $html = '';
 
         //make tabs
@@ -285,7 +290,8 @@ JS;
      * @param type $step
      * @return type
      */
-    public function createBody($index, $formInfoText, $step) {
+    public function createBody($index, $formInfoText, $step)
+    {
         $html = '';
         //make steps
         $html .= Html::beginTag('div', ['id' => 'step-' . $index]);
@@ -302,8 +308,8 @@ JS;
      * @param type $step
      * @return type
      */
-    public function createStepFields($index, $step) {
-
+    public function createStepFields($index, $step)
+    {
 
         $htmlFields = '';
 
@@ -314,42 +320,41 @@ JS;
         //only fields
         $onlyFields = ArrayHelper::getValue($fieldConfig, 'only', []); //isset($fieldConfig['only']) ? $fieldConfig['only'] : [];'
 
-        if( !is_array($step['model']) ){
+        if (!is_array($step['model'])) {
             $models = [$step['model']];
-        } else{
+        } else {
             $models = $step['model'];
         }
 
-        foreach( $models as $model ){
+        foreach ($models as $model) {
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
 
             //add all the field ids to array
-            $this->allFields[$index] = array_map(function ($element) use ($model){
+            $this->allFields[$index] = array_map(function ($element) use ($model) {
                 return Html::getInputId($model, $element);
             }, $attributes);
 
             //iterate all fields associated to the relevant model
-            foreach( $attributes as $attribute ){
+            foreach ($attributes as $attribute) {
 
-                if( $fieldConfig && isset($fieldConfig[$attribute]) ){
+                if ($fieldConfig && isset($fieldConfig[$attribute])) {
                     //if filtered field
                     $isFilteredField = $fieldConfig[$attribute] === false;
 
                     //skip the field and go to next
-                    if( $isFilteredField ){
+                    if ($isFilteredField) {
                         continue;
                     }
 
                     //custom field population
                     $htmlFields .= $this->createCustomizedField($model, $attribute, $fieldConfig[$attribute]);
-                } else{
+                } else {
                     //default field population
                     $htmlFields .= $this->createDefaultField($model, $attribute);
                 }
             }
         }
-
 
         return $htmlFields;
     }
@@ -361,13 +366,14 @@ JS;
      * @param type $disabledFields
      * @return type
      */
-    public function getStepFields($model, $onlyFields, $disabledFields) {
-        if( !empty($onlyFields) ){
-            return array_values(array_filter(array_keys($model->getAttributes($model->safeAttributes())), function ($item) use ($onlyFields){
-                        return in_array($item, $onlyFields);
-                    }));
+    public function getStepFields($model, $onlyFields, $disabledFields)
+    {
+        if (!empty($onlyFields)) {
+            return array_values(array_filter(array_keys($model->getAttributes($model->safeAttributes())), function ($item) use ($onlyFields) {
+                return in_array($item, $onlyFields);
+            }));
         }
-        return array_filter(array_keys($model->getAttributes($model->safeAttributes())), function ($item) use ($disabledFields){
+        return array_filter(array_keys($model->getAttributes($model->safeAttributes())), function ($item) use ($disabledFields) {
             return !in_array($item, $disabledFields);
         });
     }
@@ -379,7 +385,8 @@ JS;
      * @param type $fieldConfig
      * @return type
      */
-    public function createCustomizedField($model, $attribute, $fieldConfig) {
+    public function createCustomizedField($model, $attribute, $fieldConfig)
+    {
         //options
         $options = ArrayHelper::getValue($fieldConfig, 'options', []); //isset($fieldConfig['options']) ? $fieldConfig['options'] : [];
         //is multi field name
@@ -409,28 +416,28 @@ JS;
         unset($options['itemsList']);
 
         //widget
-        if( $widget ){
+        if ($widget) {
             return $field->widget($widget, $options)->label($label, $labelOptions);
         }
 
         $defaultFieldTypes = [
-            'text' => function ($field, $options, $labelOptions, $label){
+            'text' => function ($field, $options, $labelOptions, $label) {
                 return $field->textInput($options)->label($label, $labelOptions);
             },
-            'dropdown' => function ($field, $options, $labelOptions, $label, $itemsList){
+            'dropdown' => function ($field, $options, $labelOptions, $label, $itemsList) {
                 return $field->dropDownList($itemsList, $options)->label($label, $labelOptions);
             },
-            'radio' => function ($field, $options, $labelOptions, $label, $itemsList){
-                if( is_array($itemsList) ){
+            'radio' => function ($field, $options, $labelOptions, $label, $itemsList) {
+                if (is_array($itemsList)) {
                     return $field->radioList($itemsList, $options)->label($label, $labelOptions);
-                } else{
+                } else {
                     return $field->radio($options);
                 }
             },
-            'checkbox' => function ($field, $options, $labelOptions, $label, $itemsList){
-                if( is_array($itemsList) ){
+            'checkbox' => function ($field, $options, $labelOptions, $label, $itemsList) {
+                if (is_array($itemsList)) {
                     return $field->checkboxList($itemsList, $options)->label($label, $labelOptions);
-                } else{
+                } else {
                     $labelNull = $label === null;
                     $labelOptionsEmpty = empty($labelOptions);
                     $nothingSetByUser = ($labelNull && $labelOptionsEmpty);
@@ -439,22 +446,22 @@ JS;
                     return $field->checkbox($options)->label($label, $labelOptions);
                 }
             },
-            'textarea' => function ($field, $options, $labelOptions, $label){
+            'textarea' => function ($field, $options, $labelOptions, $label) {
                 return $field->textarea($options)->label($label, $labelOptions);
             },
-            'file' => function ($field, $options, $labelOptions, $label){
+            'file' => function ($field, $options, $labelOptions, $label) {
                 return $field->fileInput($options)->label($label, $labelOptions);
             },
-            'hidden'=>function ($field,$options){
+            'hidden' => function ($field, $options) {
                 return $field->hiddenInput($options)->label(false);
             },
-            'password'=>function ($field,$options,$labelOptions,$label){
-                return $field->passwordInput($options)->label($label,$labelOptions);
-            }
+            'password' => function ($field, $options, $labelOptions, $label) {
+                return $field->passwordInput($options)->label($label, $labelOptions);
+            },
         ];
 
         //create field depending on the type of the value provided
-        if( isset($defaultFieldTypes[$fieldType]) ){
+        if (isset($defaultFieldTypes[$fieldType])) {
             return $defaultFieldTypes[$fieldType]($field, $options, $labelOptions, $label, $itemsList);
         }
     }
@@ -465,7 +472,8 @@ JS;
      * @param type $attribute
      * @return type
      */
-    public function createDefaultField($model, $attribute) {
+    public function createDefaultField($model, $attribute)
+    {
         //create field
         $field = $this->createField($model, $attribute);
         return $field->textInput()->label(null, ['class' => 'form-label']);
@@ -478,14 +486,16 @@ JS;
      * @param type $fieldOptions
      * @return type
      */
-    public function createField($model, $attribute, $fieldOptions = [], $isMulti = false) {
+    public function createField($model, $attribute, $fieldOptions = [], $isMulti = false)
+    {
         return $this->form->field($model, $attribute . ($isMulti ? '[]' : ''), $fieldOptions);
     }
 
     /**
      *
      */
-    public function registerScripts() {
+    public function registerScripts()
+    {
         $view = $this->getView();
 
         //register plugin assets
@@ -495,7 +505,7 @@ JS;
         $themeSelected = $this->theme;
 
         //is supported theme
-        if( in_array($themeSelected, array_keys($this->themesSupported)) ){
+        if (in_array($themeSelected, array_keys($this->themesSupported))) {
             $themeAsset = __NAMESPACE__ . '\Theme' . $this->themesSupported[$themeSelected] . 'Asset';
             $themeAsset::register($view);
         }
