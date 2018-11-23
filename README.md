@@ -35,19 +35,20 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 
 #### Widget options ####
 - `wizardContainerId (string)`: Id of the main container for the wizard.
-- `labelNext` : Next button label.
-- `labelPrev` : Previuos button label.
-- `labelFinish` : Finish button label.
-- `classNext` : css classes for the button Next.
-- `classPrev` : css classes for the button Prev.
-- `classFinish` : css classes for the button Finish.
+- `formOptions (array)`: specify the [ActiveForm](https://www.yiiframework.com/doc/api/2.0/yii-widgets-activeform) properties.
+- `labelNext` : Next button label, default value `Next`.
+- `labelPrev` : Previous button label, default value `Previous`.
+- `labelFinish` : Finish button label, default value `Finish`.
+- `classNext` : css classes for the button Next, default `btn btn-info`.
+- `classPrev` : css classes for the button Previous, default `btn btn-info`.
+- `classFinish` : css classes for the button Finish, default `btn btn-success`.
 - `steps (array)` : An array of the steps(`array`), the steps can  have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
     - `model (object | array of models)` : The `\yii\model\ActiveRecord` model object or array of models to create step fields.
     - `title (string)` : The title of the step to be displayed inside the step Tab.
     - `description (string)` : The short description for the step.
     - `formInfoText (text)` : The text to be displayed on the top of the form fields inside the step.
     - `fieldOrder (array)` : The default order of the fields in the steps, if specified then the fields will be populated according to the order of the fields in the array, if not then the fields will be ordered according to the order in the  `fieldConfig` option, and if `fieldConfig` option is not specified then the default order in which the attributes are returned from the model will be used. 
-    - `fieldConfig (array)` : This option is used mainly to customize the form fields for the step. 2 special options are recognized inside the `fieldConfig`, `except` and `only`. See below for the details
+    - `fieldConfig (array)` : This option is used mainly to customize the form fields for the step. 3 options are recognized inside the `fieldConfig`, 2 of them are `except` and `only`. See below for the details
 
         - `except (array)` : List of fields that should not be populated in the step or should be ignored, for example 
         
