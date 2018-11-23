@@ -1,16 +1,21 @@
 /*!
- * SmartWizard v4.3.x
- * jQuery Wizard Plugin
- * http://www.techlaboratory.net/smartwizard
- *
- * Created by Dipu Raj
- * http://dipuraj.me
- *
- * Licensed under the terms of MIT License
- * https://github.com/techlab/SmartWizard/blob/master/LICENSE
- */
+* SmartWizard v4.3.x
+* jQuery Wizard Plugin
+* http://www.techlaboratory.net/smartwizard
+*
+* Created by Dipu Raj
+* http://dipuraj.me
+*
+* Licensed under the terms of MIT License
+* https://github.com/techlab/SmartWizard/blob/master/LICENSE
+*/
 
-/* SmartWizard Theme: Arrows */
+/* / SmartWizard Theme: Arrows /  */
+.sw-container,
+.sw-main {
+    background: #fff;
+}
+
 .sw-theme-arrows {
     border-radius: 5px;
     border: 1px solid #ddd;
@@ -30,6 +35,7 @@
 .sw-theme-arrows .sw-toolbar {
     padding: 10px;
     margin-bottom: 0 !important;
+    background: #fff;
 }
 
 .sw-theme-arrows>.sw-toolbar-top {}
@@ -87,7 +93,6 @@
     width: 0;
     height: 0;
     border-top: 50px solid transparent;
-    /* Go big on the size, and let overflow hide */
     border-bottom: 50px solid transparent;
     border-left: 30px solid #ddd;
     position: absolute;
@@ -133,15 +138,13 @@
 
 .sw-theme-arrows>ul.step-anchor>li.done>a {
     border-color: #b1dfbb !important;
-    /*  #5cb85c */
     color: #fff !important;
     background: #b1dfbb !important;
 }
 
 .sw-theme-arrows>ul.step-anchor>li.done>a:after {
     border-left: 30px solid #b1dfbb;
-    /* c3e6cb */
-    ;
+
 }
 
 .sw-theme-arrows>ul.step-anchor>li.danger>a {
@@ -159,7 +162,11 @@
     color: #eee !important;
 }
 
-/* Responsive CSS */
+.sw-theme-arrows ul.nav-tabs li {
+    top: 0 !important;
+}
+
+/* / Responsive CSS /  */
 @media screen and (max-width: 768px) {
     .sw-theme-arrows>ul.step-anchor {
         border: 0;
@@ -184,7 +191,6 @@
     }
 }
 
-/* Loader Custom Style */
 .sw-theme-arrows::before {
     border: 10px solid #f3f3f3;
     border-top: 10px solid #5cb85c;

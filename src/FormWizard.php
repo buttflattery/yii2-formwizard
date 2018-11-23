@@ -319,7 +319,9 @@ JS;
         $disabledFields = ArrayHelper::getValue($fieldConfig, 'except', []); //isset($fieldConfig['disabled']) ? $fieldConfig['disabled'] : [];
         //only fields
         $onlyFields = ArrayHelper::getValue($fieldConfig, 'only', []); //isset($fieldConfig['only']) ? $fieldConfig['only'] : [];'
-
+        
+       
+       
         if (!is_array($step['model'])) {
             $models = [$step['model']];
         } else {
@@ -329,6 +331,9 @@ JS;
         foreach ($models as $model) {
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
+            
+            //field order
+            $this->getFieldsOrder($fieldConfig,$attributes,$step);
 
             //add all the field ids to array
             $this->allFields[$index] = array_map(function ($element) use ($model) {
@@ -357,6 +362,33 @@ JS;
         }
 
         return $htmlFields;
+    }
+
+    private function getFieldsOrder($fieldConfig,&$attributes,$step){
+        $defaultOrder=$fieldConfig!==FALSE?array_keys($fieldConfig):FALSE;
+        $fieldOrder =ArrayHelper::getValue($step,'fieldOrder',$defaultOrder);
+
+        if($fieldOrder){
+            $orderedAttributes = [];
+            $unorderedAttributes = [];
+
+            array_walk($attributes, function (&$item, $index, $fieldOrder) use (&$orderedAttributes, &$unorderedAttributes) {
+                $moveToIndex = array_search($item, $fieldOrder);
+
+                if ($moveToIndex !== false) {
+                    $orderedAttributes[$moveToIndex] = $item;
+                } else {
+                    $unorderedAttributes[] = $item;
+                }
+
+            }, $fieldOrder);
+            //sort new order according to keys
+            ksort($orderedAttributes);
+
+            //merge array with unordered attributes
+            $attributes = array_merge($orderedAttributes, $unorderedAttributes);
+        }
+        
     }
 
     /**
@@ -402,6 +434,8 @@ JS;
         $template = ArrayHelper::getValue($fieldConfig, 'template', "{label}\n{input}\n{hint}\n{error}"); //isset($fieldConfig['template']) ? $fieldConfig['template'] : "{label}\n{input}\n{hint}\n{error}";
         //container
         $containerOptions = ArrayHelper::getValue($fieldConfig, 'containerOptions', []); //isset($fieldConfig['containerOptions']) ? $fieldConfig['containerOptions'] : [];
+        //inputOptions
+        $inputOptions = ArrayHelper::getValue($fieldConfig, 'inputOptions', []);
         //items list
         $itemsList = ArrayHelper::getValue($options, 'itemsList', ''); //isset($options['itemsList']) ? $options['itemsList'] : '';
         //label text
@@ -409,7 +443,7 @@ JS;
         //label options
         $labelOptions = ArrayHelper::getValue($labelConfig, 'options', []); //isset($labelConfig['options']) ? $labelConfig['options'] : [];
         //create field
-        $field = $this->createField($model, $attribute, ['template' => $template, 'options' => $containerOptions], $isMultiField);
+        $field = $this->createField($model, $attribute, ['template' => $template, 'options' => $containerOptions, 'inputOptions' => $inputOptions], $isMultiField);
 
         //remove the type and itemList from options
         unset($options['type']);

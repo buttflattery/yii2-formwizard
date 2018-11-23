@@ -46,7 +46,8 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
     - `title (string)` : The title of the step to be displayed inside the step Tab.
     - `description (string)` : The short description for the step.
     - `formInfoText (text)` : The text to be displayed on the top of the form fields inside the step.
-    - `fieldConfig (array)` : This option is used mainly to customize the form fields for the step.    2 special options are recognized inside the `fieldConfig`, `except` and `only`. See below for the details
+    - `fieldOrder (array)` : The default order of the fields in the steps, if specified then the fields will be populated according to the order of the fields in the array, if not then the fields will be ordered according to the order in the  `fieldConfig` option, and if `fieldConfig` option is not specified then the default order in which the attributes are returned from the model will be used. 
+    - `fieldConfig (array)` : This option is used mainly to customize the form fields for the step. 2 special options are recognized inside the `fieldConfig`, `except` and `only`. See below for the details
 
         - `except (array)` : List of fields that should not be populated in the step or should be ignored, for example 
         
@@ -82,6 +83,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 
             - `options`
             - `containerOptions`
+            - `inputOptions`
             - `template`
             - `labelOptions`
             - `widget`
@@ -110,6 +112,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
             - `template (string)` : The template used for the field the default value used is `{label}\n{input}\n{hint}\n{error}`.
             - `containerOptions (array)` : HTML atrtibutes for the cotnainer tag used as `name=>value` pairs.
             - `widget` :  This option can be used if you want to use a widget instead of the the default fields, you can specify the widget class name `'widget'=>widget::class`, and the options for the widget will be provided in the `options` option.
+            -`inputOptions (array)` : this is same as the `inputOptions` used by the ActiveForm `field()` method.
             - `multifield (boolean)` : a boolean which decides if the field name should consist of an array or not, for example using multi file upload widgets require the `name` attribute for the field to be declared as an array like `filed_name[]` instead of `field_name`. you can pass this option as true by default it is false.
 
 #### Widget Plugin (SmartWizard) Options ####
