@@ -21,9 +21,16 @@
     -moz-border-radius: 2px;
     -ms-border-radius: 2px;
     border-radius: 2px;
-    float: left;
-    clear: both;
+    /* float: left; */
+    /* clear: both; */
     min-width: 96%;
+}
+
+.sw-theme-material .formwizard-next,
+.sw-theme-material .formwizard-prev,
+.sw-theme-material .formwizard-finish {
+    font-family: inherit !important;
+    background-color: teal;
 }
 
 .sw-theme-material .step-anchor {
@@ -78,7 +85,7 @@
     background-color: #009688 !important;
     color: #fff !important;
     cursor: default;
-    padding: 15px 130px 10px 10px;
+    padding: 1em 3em;
 
 }
 

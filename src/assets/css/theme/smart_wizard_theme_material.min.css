@@ -12,6 +12,7 @@
 
 /* SmartWizard Theme: Dots */
 .sw-theme-material {
+    font-family: 'Montserrat', sans-serif !important;
     background: #fff;
     min-height: 50px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -21,9 +22,16 @@
     -moz-border-radius: 2px;
     -ms-border-radius: 2px;
     border-radius: 2px;
-    float: left;
-    clear: both;
+    /* float: left; */
+    /* clear: both; */
     min-width: 96%;
+}
+
+.sw-theme-material .formwizard-next,
+.sw-theme-material .formwizard-prev,
+.sw-theme-material .formwizard-finish {
+    font-family: inherit !important;
+    background-color: teal;
 }
 
 .sw-theme-material .step-anchor {
@@ -52,6 +60,13 @@
     float: left;
     display: block;
     padding: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.justify-content-end {
+    -ms-flex-pack: end !important;
+    justify-content: flex-end !important;
+    display: flex;
 }
 
 .sw-theme-material .step-anchor a {
@@ -78,7 +93,7 @@
     background-color: #009688 !important;
     color: #fff !important;
     cursor: default;
-    padding: 15px 130px 10px 10px;
+    padding: 1em 3em;
 
 }
 
