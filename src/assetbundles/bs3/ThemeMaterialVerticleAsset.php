@@ -1,7 +1,7 @@
 <?php
-namespace buttflattery\formwizard;
+namespace buttflattery\formwizard\assetbundles\bs3;
 
-use buttflattery\formwizard\ThemeBase;
+use buttflattery\formwizard\assetbundles\bs3\ThemeBase;
 
 class ThemeMaterialVerticleAsset extends ThemeBase
 {
@@ -18,6 +18,6 @@ class ThemeMaterialVerticleAsset extends ThemeBase
     public function init()
     {
         parent::init();
-        array_push($this->depends, 'buttflattery\formwizard\FormWizardAsset');
+        array_push($this->depends, 'buttflattery\formwizard\assetbundles\bs3\FormWizardAsset');
     }
 }
