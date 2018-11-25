@@ -1,11 +1,11 @@
 <?php
-namespace buttflattery\formwizard;
+namespace buttflattery\formwizard\assetbundles\bs3;
 
 use yii\web\AssetBundle;
 
 class ThemeBase extends AssetBundle
 {
-    public $sourcePath = __DIR__ . '/assets/';
+    public $sourcePath = __DIR__ . '/../../assets/';
     public $baseUrl = '@web';
 
     public $depends = [
