@@ -36,13 +36,26 @@ class FormWizard extends Widget
     public $markAllPreviousStepsAsDone = true;
     public $removeDoneStepOnNavigateBack = false;
     public $enableAnchorOnDoneStep = true;
+    
     public $labelNext = 'Next';
     public $labelPrev = 'Previous';
     public $labelFinish = 'Finish';
+
+    public $iconNext=self::ICON_NEXT;
+    public $iconPrev=self::ICON_PREV;
+    public $iconFinish=self::ICON_FINISH;
+    
     public $classNext = 'btn btn-info';
     public $classPrev = 'btn btn-info';
     public $classFinish = 'btn btn-success';
+
+    /**ICONS */
     
+    const ICON_NEXT='<i class="formwizard-arrow-right-alt1-ico"></i>';
+    const ICON_PREV='<i class="formwizard-arrow-left-alt1-ico"></i>';
+    const ICON_FINISH='<i class="formwizard-check-alt-ico"></i>';
+
+    /**THEMES */
     const THEME_DEFAULT = 'default';
     const THEME_DOTS = 'dots';
     const THEME_ARROWS = 'arrows';
@@ -95,15 +108,15 @@ class FormWizard extends Widget
 
         //theme buttons material
         if ($this->theme == self::THEME_MATERIAL || $this->theme == self::THEME_MATERIAL_V) {
-            $this->classNext = 'btn bg-teal waves-effect';
-            $this->classPrev = 'btn bg-teal waves-effect';
-            $this->classFinish = 'btn bg-green waves-effect';
+            $this->classNext .= 'waves-effect';
+            $this->classPrev .= 'waves-effect';
+            $this->classFinish .= 'waves-effect';
             // $this->labelNext = '<i class="glyphicon glyphicon-menu-right"></i>';
             // $this->labelPrev = '<i class="glyphicon glyphicon-menu-left"></i>';
         }
 
         //is bs4 version 
-        $isBs4=class_exists(yii\bootstrap4\BootstrapAsset::class);
+        $isBs4=class_exists(\yii\bootstrap4\BootstrapAsset::class);
         $this->bsVersion=$isBs4?4:3;
     }
 
@@ -147,13 +160,16 @@ class FormWizard extends Widget
         $pluginOptions = $this->getPluginOptions();
         $jsButton = <<< JS
         $.formwizard.helper.appendButtons({
-            form:'#{$this->formOptions['id']}',
+            form:'#{$this->formOptions["id"]}',
             labelNext:'{$this->labelNext}',
             labelPrev:'{$this->labelPrev}',
             labelFinish:'{$this->labelFinish}',
+            iconNext:'{$this->iconNext}',
+            iconPrev:'{$this->iconPrev}',
+            iconFinish:'{$this->iconFinish}',
             classNext:'{$this->classNext}',
             classPrev:'{$this->classPrev}',
-            classFinish:'{$this->classFinish}'
+            classFinish:'{$this->classFinish}',
         }).concat({$pluginOptions['toolbarSettings']['toolbarExtraButtons']})
 JS;
         $pluginOptions['toolbarSettings']['toolbarExtraButtons'] = new JsExpression($jsButton);
