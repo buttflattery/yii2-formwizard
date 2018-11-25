@@ -2,7 +2,6 @@
 
 namespace buttflattery\formwizard;
 
-use buttflattery\formwizard\FormWizardAsset;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\Widget;
@@ -12,12 +11,15 @@ use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\web\View;
 use yii\widgets\ActiveForm;
+use buttflattery\formwizard\assetbundles\bs3\FormWizardAsset as Bs3Assets;
+use buttflattery\formwizard\assetbundles\bs4\FormWizardAsset as Bs4Assets;
 
 class FormWizard extends Widget
 {
 
     private $form;
     private $allFields = [];
+    private $bsVersion;
     //options widget
     public $wizardContainerId;
     public $steps = [];
@@ -40,7 +42,7 @@ class FormWizard extends Widget
     public $classNext = 'btn btn-info';
     public $classPrev = 'btn btn-info';
     public $classFinish = 'btn btn-success';
-
+    
     const THEME_DEFAULT = 'default';
     const THEME_DOTS = 'dots';
     const THEME_ARROWS = 'arrows';
@@ -96,9 +98,13 @@ class FormWizard extends Widget
             $this->classNext = 'btn bg-teal waves-effect';
             $this->classPrev = 'btn bg-teal waves-effect';
             $this->classFinish = 'btn bg-green waves-effect';
-            $this->labelNext = '<i class="glyphicon glyphicon-menu-right"></i>';
-            $this->labelPrev = '<i class="glyphicon glyphicon-menu-left"></i>';
+            // $this->labelNext = '<i class="glyphicon glyphicon-menu-right"></i>';
+            // $this->labelPrev = '<i class="glyphicon glyphicon-menu-left"></i>';
         }
+
+        //is bs4 version 
+        $isBs4=class_exists(yii\bootstrap4\BootstrapAsset::class);
+        $this->bsVersion=$isBs4?4:3;
     }
 
     /**
@@ -151,9 +157,9 @@ class FormWizard extends Widget
         }).concat({$pluginOptions['toolbarSettings']['toolbarExtraButtons']})
 JS;
         $pluginOptions['toolbarSettings']['toolbarExtraButtons'] = new JsExpression($jsButton);
-
+        $activeForm=$this->bsVersion==3?\yii\bootstrap\ActiveForm::class:\yii\bootstrap4\ActiveForm::class;
         //start ActiveForm tag
-        $this->form = ActiveForm::begin($this->formOptions);
+        $this->form = $activeForm::begin($this->formOptions);
 
         //start container tag
         echo Html::beginTag('div', ['id' => $wizardContainerId]);
@@ -532,15 +538,15 @@ JS;
     {
         $view = $this->getView();
 
-        //register plugin assets
-        FormWizardAsset::register($view);
-
         //register theme specific files
         $themeSelected = $this->theme;
 
+        //register plugin assets
+        $this->bsVersion==3?Bs3Assets::register($view):Bs4Assets::register($view);
+        
         //is supported theme
         if (in_array($themeSelected, array_keys($this->themesSupported))) {
-            $themeAsset = __NAMESPACE__ . '\Theme' . $this->themesSupported[$themeSelected] . 'Asset';
+            $themeAsset = __NAMESPACE__ . '\assetbundles\bs'.$this->bsVersion.'\Theme' . $this->themesSupported[$themeSelected] . 'Asset';
             $themeAsset::register($view);
         }
     }
