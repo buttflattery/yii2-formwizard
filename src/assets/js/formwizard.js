@@ -18,17 +18,17 @@ $.formwizard = {
         },
         appendButtons: function (options) {
             // Toolbar next, previous and finish custom buttons
-            var formwizardBtnNext = $('<button class="formwizard-next"></button>').html(options.labelNext)
+            var formwizardBtnNext = $('<button class="formwizard-next"></button>').html(options.iconNext + '&nbsp' + options.labelNext)
                 .addClass(options.classNext);
 
-            var formwizardBtnPrev = $('<button class="formwizard-prev"></button>').html(options.labelPrev)
+            var formwizardBtnPrev = $('<button class="formwizard-prev"></button>').html(options.iconPrev + '&nbsp;' + options.labelPrev)
                 .addClass(options.classPrev)
                 .on('click', function (e) {
                     e.preventDefault();
                     $.formwizard.formNavigation.previous(e.target);
                 });
 
-            var formwizardBtnFinish = $('<input class="formwizard-finish" type="submit"/>').val(options.labelFinish)
+            var formwizardBtnFinish = $('<button class="formwizard-finish" type="submit"/></button>').html(options.iconFinish + '&nbsp;' + options.labelFinish)
                 .addClass(options.classFinish);
 
             var combined = formwizardBtnNext.add(formwizardBtnFinish);
@@ -49,7 +49,7 @@ $.formwizard = {
         updateButtons: function (wizardContainerId) {
             $(wizardContainerId).on("showStep", function (e, anchorObject, stepNumber, stepDirection, stepPosition) {
                 let btnPrev = $(wizardContainerId + " > .sw-toolbar > .sw-btn-group-extra button.formwizard-prev");
-                let btnFinish = $(wizardContainerId + " > .sw-toolbar > .sw-btn-group-extra >input.formwizard-finish");
+                let btnFinish = $(wizardContainerId + " > .sw-toolbar > .sw-btn-group-extra >button.formwizard-finish");
                 let btnNext = $(wizardContainerId + " > .sw-toolbar > .sw-btn-group-extra >button.formwizard-next ");
 
                 if (stepPosition === 'first') {

@@ -15,5 +15,6 @@ class FormWizardAsset extends ThemeBase
         'css/animate.css',
         'css/shake.css',
         'css/smart_wizard.css',
+        'css/icons-theme.css',
     ];
 }
