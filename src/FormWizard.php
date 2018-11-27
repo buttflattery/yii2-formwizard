@@ -128,6 +128,8 @@ class FormWizard extends Widget
     {
         return [
             'selected' => 0,
+            'keyNavigation'=>false,
+            'backButtonSupport'=>false,
             'theme' => $this->theme,
             'transitionEffect' => $this->transitionEffect,
             'showStepURLhash' => $this->showStepURLhash,
