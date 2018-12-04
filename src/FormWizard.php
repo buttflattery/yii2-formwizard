@@ -2,24 +2,41 @@
 
 namespace buttflattery\formwizard;
 
+use buttflattery\formwizard\assetbundles\bs3\FormWizardAsset as Bs3Assets;
+use buttflattery\formwizard\assetbundles\bs4\FormWizardAsset as Bs4Assets;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\Widget;
+use yii\bootstrap4\ActiveForm as BS4ActiveForm;
+use yii\bootstrap4\BootstrapAsset as BS4Asset;
+use yii\bootstrap\ActiveForm as BS3ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\web\View;
 use yii\widgets\ActiveForm;
-use buttflattery\formwizard\assetbundles\bs3\FormWizardAsset as Bs3Assets;
-use buttflattery\formwizard\assetbundles\bs4\FormWizardAsset as Bs4Assets;
 
+/**
+ * A Yii2 plugin used for creating stepped form or form wizard using
+ * yii\widgets\ActiveForm and \yii\db\ActiveRecord, it uses smart wizard
+ * library for creating the form interface that uses 3 builtin and 2 extra themes,
+ * moreover you can also create your own customized theme too.
+ *
+ * @category  Yii2-Plugin
+ * @package   Yii2-formwizard
+ * @author    Muhammad Omer Aslam <author@example.com>
+ * @copyright 2018 IdowsTECH
+ * @license   https://github.com/buttflattery/yii2-formwizard/blob/master/LICENSE  BSD License 3.01
+ * @version   Release: 1.0
+ * @link      https://github.com/buttflattery/yii2-formwizard
+ */
 class FormWizard extends Widget
 {
 
-    private $form;
-    private $allFields = [];
-    private $bsVersion;
+    private $_form;
+    private $_allFields = [];
+    private $_bsVersion;
     //options widget
     public $wizardContainerId;
     public $steps = [];
@@ -36,24 +53,24 @@ class FormWizard extends Widget
     public $markAllPreviousStepsAsDone = true;
     public $removeDoneStepOnNavigateBack = false;
     public $enableAnchorOnDoneStep = true;
-    
+
     public $labelNext = 'Next';
     public $labelPrev = 'Previous';
     public $labelFinish = 'Finish';
 
-    public $iconNext=self::ICON_NEXT;
-    public $iconPrev=self::ICON_PREV;
-    public $iconFinish=self::ICON_FINISH;
-    
+    public $iconNext = self::ICON_NEXT;
+    public $iconPrev = self::ICON_PREV;
+    public $iconFinish = self::ICON_FINISH;
+
     public $classNext = 'btn btn-info';
     public $classPrev = 'btn btn-info';
     public $classFinish = 'btn btn-success';
 
     /**ICONS */
-    
-    const ICON_NEXT='<i class="formwizard-arrow-right-alt1-ico"></i>';
-    const ICON_PREV='<i class="formwizard-arrow-left-alt1-ico"></i>';
-    const ICON_FINISH='<i class="formwizard-check-alt-ico"></i>';
+
+    const ICON_NEXT = '<i class="formwizard-arrow-right-alt1-ico"></i>';
+    const ICON_PREV = '<i class="formwizard-arrow-left-alt1-ico"></i>';
+    const ICON_FINISH = '<i class="formwizard-check-alt-ico"></i>';
 
     /**THEMES */
     const THEME_DEFAULT = 'default';
@@ -72,19 +89,23 @@ class FormWizard extends Widget
     ];
 
     /**
+     * Initializes the plugin
      *
+     * @return null
      */
     public function init()
     {
         parent::init();
-        $this->setDefaults();
+        $this->_setDefaults();
     }
 
     /**
+     * Sets the defaults for the widget and detects to use which version of Bootstrap.
      *
+     * @return null
      * @throws InvalidArgumentException
      */
-    private function setDefaults()
+    private function _setDefaults()
     {
         if (empty($this->steps)) {
             throw new InvalidArgumentException('You must provide steps for the form.');
@@ -111,25 +132,24 @@ class FormWizard extends Widget
             $this->classNext .= 'waves-effect';
             $this->classPrev .= 'waves-effect';
             $this->classFinish .= 'waves-effect';
-            // $this->labelNext = '<i class="glyphicon glyphicon-menu-right"></i>';
-            // $this->labelPrev = '<i class="glyphicon glyphicon-menu-left"></i>';
         }
 
-        //is bs4 version 
-        $isBs4=class_exists(\yii\bootstrap4\BootstrapAsset::class);
-        $this->bsVersion=$isBs4?4:3;
+        //is bs4 version
+        $isBs4 = class_exists(BS4Asset::class);
+        $this->_bsVersion = $isBs4 ? 4 : 3;
     }
 
     /**
+     * Retrives the plugin default options to be initiazed with
      *
-     * @return type
+     * @return array $options
      */
     public function getPluginOptions()
     {
         return [
             'selected' => 0,
-            'keyNavigation'=>false,
-            'backButtonSupport'=>false,
+            'keyNavigation' => false,
+            'backButtonSupport' => false,
             'theme' => $this->theme,
             'transitionEffect' => $this->transitionEffect,
             'showStepURLhash' => $this->showStepURLhash,
@@ -151,7 +171,10 @@ class FormWizard extends Widget
     }
 
     /**
+     * Runs the widget.
      *
+     * @return string
+     * @throws NotFoundHttpException
      */
     public function run()
     {
@@ -175,9 +198,16 @@ class FormWizard extends Widget
         }).concat({$pluginOptions['toolbarSettings']['toolbarExtraButtons']})
 JS;
         $pluginOptions['toolbarSettings']['toolbarExtraButtons'] = new JsExpression($jsButton);
-        $activeForm=$this->bsVersion==3?\yii\bootstrap\ActiveForm::class:\yii\bootstrap4\ActiveForm::class;
+        $isBs3 = $this->_bsVersion == 3;
+
+        if ($isBs3) {
+            $activeForm = BS3ActiveForm::class;
+        } else {
+            $activeForm = BS4ActiveForm::class;
+        }
+
         //start ActiveForm tag
-        $this->form = $activeForm::begin($this->formOptions);
+        $this->_form = $activeForm::begin($this->formOptions);
 
         //start container tag
         echo Html::beginTag('div', ['id' => $wizardContainerId]);
@@ -188,13 +218,13 @@ JS;
         echo Html::endTag('div');
 
         //end form tag
-        $this->form->end();
+        $this->_form->end();
 
         //get current view object
         $view = $this->getView();
 
         //get all fields json for javascript processing
-        $fieldsJSON = Json::encode($this->allFields);
+        $fieldsJSON = Json::encode($this->_allFields);
 
         //encode plugin options
         $pluginOptionsJson = Json::encode($pluginOptions);
@@ -203,7 +233,8 @@ JS;
 
         //init script for the wizard
         $js = <<< JS
-        //start observer for the smart wizard to run the script when the child HTMl elements are populated
+        //start observer for the smart wizard to run the script
+        //when the child HTMl elements are populated
         if('{$this->theme}'=='material' || '{$this->theme}'=='material-v'){
             $.formwizard.observer.start('#{$wizardContainerId}');
         }
@@ -229,8 +260,9 @@ JS;
     }
 
     /**
+     * Creates the form wizard
      *
-     * @return type
+     * @return HTML
      */
     public function createFormWizard()
     {
@@ -262,10 +294,12 @@ JS;
     }
 
     /**
+     * Creates the single step in the form wizard
      *
-     * @param type $index
-     * @param type $step
-     * @return type
+     * @param int   $index index of the current step
+     * @param array $step  config for the current step
+     *
+     * @return array
      */
     public function createStep($index, $step)
     {
@@ -286,11 +320,13 @@ JS;
     }
 
     /**
+     * Creates the tabs for the formwizard
      *
-     * @param type $index
-     * @param type $stepDescription
-     * @param type $stepTitle
-     * @return type
+     * @param int    $index           index of the current step
+     * @param string $stepDescription description text for the tab
+     * @param string $stepTitle       step title to be displayed inside the tab
+     *
+     * @return HTML
      */
     public function createTabs($index, $stepDescription, $stepTitle)
     {
@@ -308,11 +344,13 @@ JS;
     }
 
     /**
+     * Create the body for the Step
      *
-     * @param type $index
-     * @param type $formInfoText
-     * @param type $step
-     * @return type
+     * @param int    $index        index of the current step
+     * @param string $formInfoText description of the for displayed on top of the fields
+     * @param array  $step         the config for the current step
+     *
+     * @return HTML $html
      */
     public function createBody($index, $formInfoText, $step)
     {
@@ -328,9 +366,12 @@ JS;
     }
 
     /**
+     * Creates the fields for the current step
      *
-     * @param type $step
-     * @return type
+     * @param int   $index index of the current step
+     * @param array $step  config for the current step
+     *
+     * @return HTML
      */
     public function createStepFields($index, $step)
     {
@@ -343,9 +384,7 @@ JS;
         $disabledFields = ArrayHelper::getValue($fieldConfig, 'except', []); //isset($fieldConfig['disabled']) ? $fieldConfig['disabled'] : [];
         //only fields
         $onlyFields = ArrayHelper::getValue($fieldConfig, 'only', []); //isset($fieldConfig['only']) ? $fieldConfig['only'] : [];'
-        
-       
-       
+
         if (!is_array($step['model'])) {
             $models = [$step['model']];
         } else {
@@ -355,14 +394,16 @@ JS;
         foreach ($models as $model) {
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
-            
+
             //field order
-            $this->getFieldsOrder($fieldConfig,$attributes,$step);
+            $this->_sortFields($fieldConfig, $attributes, $step);
 
             //add all the field ids to array
-            $this->allFields[$index] = array_map(function ($element) use ($model) {
-                return Html::getInputId($model, $element);
-            }, $attributes);
+            $this->_allFields[$index] = array_map(
+                function ($element) use ($model) {
+                    return Html::getInputId($model, $element);
+                }, $attributes
+            );
 
             //iterate all fields associated to the relevant model
             foreach ($attributes as $attribute) {
@@ -377,10 +418,10 @@ JS;
                     }
 
                     //custom field population
-                    $htmlFields .= $this->createCustomizedField($model, $attribute, $fieldConfig[$attribute]);
+                    $htmlFields .= $this->createCustomInput($model, $attribute, $fieldConfig[$attribute]);
                 } else {
                     //default field population
-                    $htmlFields .= $this->createDefaultField($model, $attribute);
+                    $htmlFields .= $this->createDefaultInput($model, $attribute);
                 }
             }
         }
@@ -388,86 +429,118 @@ JS;
         return $htmlFields;
     }
 
-    private function getFieldsOrder($fieldConfig,&$attributes,$step){
-        $defaultOrder=$fieldConfig!==FALSE?array_keys($fieldConfig):FALSE;
-        $fieldOrder =ArrayHelper::getValue($step,'fieldOrder',$defaultOrder);
+    /**
+     * Get the
+     *
+     * @param array $fieldConfig the active field configurations
+     * @param array $attributes  the attributes reference for the model
+     * @param array $step        the config for the current step
+     *
+     * @return null
+     */
+    private function _sortFields($fieldConfig, &$attributes, $step)
+    {
+        $defaultOrder = $fieldConfig !== false ? array_keys($fieldConfig) : false;
+        $fieldOrder = ArrayHelper::getValue($step, 'fieldOrder', $defaultOrder);
 
-        if($fieldOrder){
+        if ($fieldOrder) {
             $orderedAttributes = [];
             $unorderedAttributes = [];
 
-            array_walk($attributes, function (&$item, $index, $fieldOrder) use (&$orderedAttributes, &$unorderedAttributes) {
-                $moveToIndex = array_search($item, $fieldOrder);
+            array_walk(
+                $attributes, function (&$item, $index, $fieldOrder) use (&$orderedAttributes, &$unorderedAttributes) {
+                    $moveToIndex = array_search($item, $fieldOrder);
 
-                if ($moveToIndex !== false) {
-                    $orderedAttributes[$moveToIndex] = $item;
-                } else {
-                    $unorderedAttributes[] = $item;
-                }
+                    if ($moveToIndex !== false) {
+                        $orderedAttributes[$moveToIndex] = $item;
+                    } else {
+                        $unorderedAttributes[] = $item;
+                    }
 
-            }, $fieldOrder);
+                }, $fieldOrder
+            );
+
             //sort new order according to keys
             ksort($orderedAttributes);
 
             //merge array with unordered attributes
             $attributes = array_merge($orderedAttributes, $unorderedAttributes);
         }
-        
+
     }
 
     /**
+     * Filters the step fields for the `except` and `only` options if mentioned
      *
-     * @param type $model
-     * @param type $onlyFields
-     * @param type $disabledFields
-     * @return type
+     * @param object $model          instance of the model dedicated for the step
+     * @param array  $onlyFields     the field to be populated only
+     * @param array  $disabledFields the fields to be ignored
+     *
+     * @return array $fields
      */
     public function getStepFields($model, $onlyFields, $disabledFields)
     {
         if (!empty($onlyFields)) {
-            return array_values(array_filter(array_keys($model->getAttributes($model->safeAttributes())), function ($item) use ($onlyFields) {
-                return in_array($item, $onlyFields);
-            }));
+            return array_values(
+                array_filter(
+                    array_keys($model->getAttributes($model->safeAttributes())), function ($item) use ($onlyFields) {
+                        return in_array($item, $onlyFields);
+                    }
+                )
+            );
         }
-        return array_filter(array_keys($model->getAttributes($model->safeAttributes())), function ($item) use ($disabledFields) {
-            return !in_array($item, $disabledFields);
-        });
+        return array_filter(
+            array_keys($model->getAttributes($model->safeAttributes())), function ($item) use ($disabledFields) {
+                return !in_array($item, $disabledFields);
+            }
+        );
     }
 
     /**
+     * Creates a customized input field according to the
+     * structured option for the steps by user
      *
-     * @param type $model
-     * @param type $attribute
-     * @param type $fieldConfig
-     * @return type
+     * @param object $model       instance of the current model
+     * @param string $attribute   name of the current field
+     * @param array  $fieldConfig config for the current field
+     *
+     * @return \yii\widgets\ActiveField
      */
-    public function createCustomizedField($model, $attribute, $fieldConfig)
+    public function createCustomInput($model, $attribute, $fieldConfig)
     {
         //options
-        $options = ArrayHelper::getValue($fieldConfig, 'options', []); //isset($fieldConfig['options']) ? $fieldConfig['options'] : [];
+        $options = ArrayHelper::getValue($fieldConfig, 'options', []);
         //is multi field name
         $isMultiField = Arrayhelper::getValue($fieldConfig, 'multifield', false);
 
         //field type
-        $fieldType = ArrayHelper::getValue($options, 'type', 'text'); //isset($options['type']) ? $options['type'] : 'text';
+        $fieldType = ArrayHelper::getValue($options, 'type', 'text');
         //widget
-        $widget = ArrayHelper::getValue($fieldConfig, 'widget', false); //isset($fieldConfig['widget']) ? $fieldConfig['widget'] : false;
+        $widget = ArrayHelper::getValue($fieldConfig, 'widget', false);
         //label configuration
-        $labelConfig = ArrayHelper::getValue($fieldConfig, 'labelOptions', null); //isset($fieldConfig['labelOptions']) ? $fieldConfig['labelOptions'] : null;
+        $labelConfig = ArrayHelper::getValue($fieldConfig, 'labelOptions', null);
         //template
-        $template = ArrayHelper::getValue($fieldConfig, 'template', "{label}\n{input}\n{hint}\n{error}"); //isset($fieldConfig['template']) ? $fieldConfig['template'] : "{label}\n{input}\n{hint}\n{error}";
+        $template = ArrayHelper::getValue($fieldConfig, 'template', "{label}\n{input}\n{hint}\n{error}");
         //container
-        $containerOptions = ArrayHelper::getValue($fieldConfig, 'containerOptions', []); //isset($fieldConfig['containerOptions']) ? $fieldConfig['containerOptions'] : [];
+        $containerOptions = ArrayHelper::getValue($fieldConfig, 'containerOptions', []);
         //inputOptions
         $inputOptions = ArrayHelper::getValue($fieldConfig, 'inputOptions', []);
         //items list
-        $itemsList = ArrayHelper::getValue($options, 'itemsList', ''); //isset($options['itemsList']) ? $options['itemsList'] : '';
+        $itemsList = ArrayHelper::getValue($options, 'itemsList', '');
         //label text
-        $label = ArrayHelper::getValue($labelConfig, 'label', null); //isset($labelConfig['label']) ? $labelConfig['label'] : null;
+        $label = ArrayHelper::getValue($labelConfig, 'label', null);
         //label options
-        $labelOptions = ArrayHelper::getValue($labelConfig, 'options', []); //isset($labelConfig['options']) ? $labelConfig['options'] : [];
+        $labelOptions = ArrayHelper::getValue($labelConfig, 'options', []);
         //create field
-        $field = $this->createField($model, $attribute, ['template' => $template, 'options' => $containerOptions, 'inputOptions' => $inputOptions], $isMultiField);
+        $field = $this->createField(
+            $model, $attribute,
+            [
+                'template' => $template,
+                'options' => $containerOptions,
+                'inputOptions' => $inputOptions,
+            ],
+            $isMultiField
+        );
 
         //remove the type and itemList from options
         unset($options['type']);
@@ -525,12 +598,15 @@ JS;
     }
 
     /**
+     * Creates a default field for the steps if no fields under 
+     * the activefield config is provided
      *
-     * @param type $model
-     * @param type $attribute
-     * @return type
+     * @param object $model     instance of the current model
+     * @param string $attribute name of the attribute / field
+     * 
+     * @return \yii\widgets\ActiveField
      */
-    public function createDefaultField($model, $attribute)
+    public function createDefaultInput($model, $attribute)
     {
         //create field
         $field = $this->createField($model, $attribute);
@@ -538,20 +614,28 @@ JS;
     }
 
     /**
+     * Creates a default ActiveFieldObject
      *
-     * @param type $model
-     * @param type $attribute
-     * @param type $fieldOptions
-     * @return type
+     * @param object  $model        instance of the current model
+     * @param string  $attribute    name of the current field / attribute 
+     * @param array   $fieldOptions options for the field as in 
+     *                              \yii\widgets\ActiveField `fieldOptions`
+     * @param boolean $isMulti      determines if the field will be using array name 
+     *                              or not for example : first_name[] will be used 
+     *                              if true and first_name if false
+     * 
+     * @return \yii\widgets\ActiveField
      */
     public function createField($model, $attribute, $fieldOptions = [], $isMulti = false)
     {
-        return $this->form->field($model, $attribute . ($isMulti ? '[]' : ''), $fieldOptions);
+        return $this->_form->field($model, $attribute . ($isMulti ? '[]' : ''), $fieldOptions);
     }
 
     /**
-     *
-     */
+    * Registers the necessary AssetBundles for the widget 
+    * 
+    * @return null
+    */
     public function registerScripts()
     {
         $view = $this->getView();
@@ -560,11 +644,11 @@ JS;
         $themeSelected = $this->theme;
 
         //register plugin assets
-        $this->bsVersion==3?Bs3Assets::register($view):Bs4Assets::register($view);
-        
+        $this->_bsVersion == 3 ? Bs3Assets::register($view) : Bs4Assets::register($view);
+
         //is supported theme
         if (in_array($themeSelected, array_keys($this->themesSupported))) {
-            $themeAsset = __NAMESPACE__ . '\assetbundles\bs'.$this->bsVersion.'\Theme' . $this->themesSupported[$themeSelected] . 'Asset';
+            $themeAsset = __NAMESPACE__ . '\assetbundles\bs' . $this->_bsVersion . '\Theme' . $this->themesSupported[$themeSelected] . 'Asset';
             $themeAsset::register($view);
         }
     }
