@@ -25,7 +25,7 @@ use yii\widgets\ActiveForm;
  *
  * @category  Yii2-Plugin
  * @package   Yii2-formwizard
- * @author    Muhammad Omer Aslam <author@example.com>
+ * @author    Muhammad Omer Aslam <buttflattery@gmail.com>
  * @copyright 2018 IdowsTECH
  * @license   https://github.com/buttflattery/yii2-formwizard/blob/master/LICENSE  BSD License 3.01
  * @version   Release: 1.0
@@ -100,7 +100,8 @@ class FormWizard extends Widget
     }
 
     /**
-     * Sets the defaults for the widget and detects to use which version of Bootstrap.
+     * Sets the defaults for the widget and detects to 
+     * use which version of Bootstrap.
      *
      * @return null
      * @throws InvalidArgumentException
@@ -430,14 +431,19 @@ JS;
     }
 
     /**
-     * Get the
-     *
-     * @param array $fieldConfig the active field configurations
-     * @param array $attributes  the attributes reference for the model
-     * @param array $step        the config for the current step
-     *
-     * @return null
-     */
+    * Sorts the fields. If the `fieldOrder` option is specified then the
+    * order will be dependend on the order specified in the `fieldOrder`
+    * array. If not provided the order will be according to the order of
+    * the fields specified under the `fieldConfig` option, and if none of
+    * the above is given then it will fallback to the order in which they
+    * are retrieved from the model.
+    *
+    * @param array $fieldConfig the active field configurations array
+    * @param array $attributes  the attributes reference for the model
+    * @param array $step        the config for the current step
+    *
+    * @return null
+    */
     private function _sortFields($fieldConfig, &$attributes, $step)
     {
         $defaultOrder = $fieldConfig !== false ? array_keys($fieldConfig) : false;
@@ -542,15 +548,15 @@ JS;
             $isMultiField
         );
 
-        //remove the type and itemList from options
-        unset($options['type']);
-        unset($options['itemsList']);
-
         //widget
         if ($widget) {
             return $field->widget($widget, $options)->label($label, $labelOptions);
         }
 
+        //remove the type and itemList from options
+        unset($options['type']);
+        unset($options['itemsList']);
+        
         $defaultFieldTypes = [
             'text' => function ($field, $options, $labelOptions, $label) {
                 return $field->textInput($options)->label($label, $labelOptions);
