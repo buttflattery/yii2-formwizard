@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 
 
 <h3>Changed </h3>
+
 - Dec 6, 2018 [BUG:19c9619](https://github.com/buttflattery/yii2-formwizard/commit/19c96197bceb3767d4e9623897bd1f20ee3de02b) Added fix for kartik/depdrop widget Fixes #8
 
 - Nov 28, 2018 [BUG:142f4de](https://github.com/buttflattery/yii2-formwizard/commit/142f4de15aa8cfcdd55997dca3cfead295bcbd0a) Disabled form navigation on keyboard LEFT & RIGHT buttons as it skips the validation for the form and navigates to the next step change the default to `keyNavigation:false`.
