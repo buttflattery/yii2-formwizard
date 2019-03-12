@@ -45,7 +45,7 @@ use yii\widgets\ActiveForm;
 class FormWizard extends Widget
 {
 
-        /**
+    /**
      * Holds the ActiveForm object
      *
      * @var mixed
@@ -122,14 +122,25 @@ class FormWizard extends Widget
      */
     public $transitionEffect = 'slide';
 
-    
-    public $autoAdjustHeight=false;
+    /**
+     * Automatically adjust content height, default value is `true`.`
+     * 
+     * @var boolean
+     */
+    public $autoAdjustHeight=true;
+    /**
+     * An array of step numbers to show as disabled, 
+     * zero based array of step index ex: [2,4]
+     * 
+     * @var array
+     */
+    public $disabledSteps=[];
 
     /**
      * Wether to show the step URL Hash in the url hash based on step,
      * Default is `false`
      *
-     * @var mixed
+     * @var boolean
      */
     public $showStepURLhash = false;
 
@@ -354,6 +365,8 @@ class FormWizard extends Widget
         return [
             'selected' => 0,
             'keyNavigation' => false,
+            'autoAdjustHeight'=>$this->autoAdjustHeight,
+            'disabledSteps'=>$this->disabledSteps,
             'backButtonSupport' => false,
             'theme' => $this->theme,
             'transitionEffect' => $this->transitionEffect,
@@ -756,6 +769,10 @@ JS;
         $label = ArrayHelper::getValue($labelConfig, 'label', null);
         //label options
         $labelOptions = ArrayHelper::getValue($labelConfig, 'options', []);
+        //get the hint text for the field
+        $hintText = ArrayHelper::getValue($fieldConfig, 'hint', false);
+        
+
         //create field
         $field = $this->createField(
             $model, $attribute,
@@ -769,7 +786,8 @@ JS;
 
         //widget
         if ($widget) {
-            return $field->widget($widget, $options)->label($label, $labelOptions);
+            $field= $field->widget($widget, $options)->label($label, $labelOptions);
+            return (!$hintText) ? $field : $field->hint($hintText);
         }
 
         //remove the type and itemList from options
@@ -872,7 +890,8 @@ JS;
                 'label'=>$label, 
                 'itemsList'=>$itemsList
             ];
-            return $defaultFieldTypes[$fieldType]($fieldTypeOptions);
+            $field = $defaultFieldTypes[$fieldType]($fieldTypeOptions);
+            return (!$hintText)? $field : $field->hint($hintText);
         }
     }
 
