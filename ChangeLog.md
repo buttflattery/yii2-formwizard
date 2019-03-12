@@ -1,14 +1,14 @@
-
 <h1>Change Log</h1>
 All notable changes to this project will be documented in this file.
 
-<h1>1.0.0 - 22/10/2018</h1> 
+<h1>1.0.0 - 22/10/2018</h1>
 
 <h3>Added</h3>
+- March 13, 2019 [ENH:4e52390](https://github.com/buttflattery/yii2-formwizard/commit/4e523900e3f5312a1bc72e7561b5b43a731f1fb3) Added hint option for the inputs to provide customized text.
 
-- Nov 26, 2018 [ENH:bdcd340](https://github.com/buttflattery/yii2-formwizard/commit/bdcd34097f19ce9b37dfa63c065366c5ae3b3a52)  added bootstrap4 support and updated all the css and assets files.
+- Nov 26, 2018 [ENH:bdcd340](https://github.com/buttflattery/yii2-formwizard/commit/bdcd34097f19ce9b37dfa63c065366c5ae3b3a52) added bootstrap4 support and updated all the css and assets files.
 
-- Nov 25, 2018 [ENH:f27ec80](https://github.com/buttflattery/yii2-formwizard/commit/f27ec80b8f2f2b40200a9eb1b0ecda8e9e20b884)  updates for the bootstrap-4-compatibility.
+- Nov 25, 2018 [ENH:f27ec80](https://github.com/buttflattery/yii2-formwizard/commit/f27ec80b8f2f2b40200a9eb1b0ecda8e9e20b884) updates for the bootstrap-4-compatibility.
 
 - Nov 24, 2018 [ENH:6111316](https://github.com/buttflattery/yii2-formwizard/commit/61113161729a4ed1aa0aebd75dd1a8359ccfc789) added support for field order using `fieldOrder` under the `steps` options and a new option to specify `inputOptions` for the ActiveField under the `fieldConfig`, and updated the docs.
 
@@ -16,10 +16,9 @@ All notable changes to this project will be documented in this file.
 
 - Nov 7, 2018 [ENH:678be15](https://github.com/buttflattery/yii2-formwizard/commit/678be15d4a8be813653cf8a29dc8a05715e11ede) added support for array based field names by adding `multifield` option for the active fields.
 
--  Nov 6, 2018 [ENH:223dd53](https://github.com/buttflattery/yii2-formwizard/commit/223dd5379b1c34aeed41e0facd9b4259e5bd0c18) added support for multiple models in single step.
+- Nov 6, 2018 [ENH:223dd53](https://github.com/buttflattery/yii2-formwizard/commit/223dd5379b1c34aeed41e0facd9b4259e5bd0c18) added support for multiple models in single step.
 
 - Oct 7, 2018 [ENH:d8b14a6](https://github.com/buttflattery/yii2-formwizard/commit/d8b14a6de252bb0ff6e48963e2ecebdfbbeb9adf) updated the sections to customize all fields with `textarea`, `radio`, `checkbox`.
-
 
 <h3>Changed </h3>
 
@@ -39,7 +38,7 @@ All notable changes to this project will be documented in this file.
 
 - Oct 10, 2018 [BUG:628e1d4](https://github.com/buttflattery/yii2-formwizard/commit/628e1d4b1b20e05bfc52c4ec0669953da3f727d3) Updated material.js with correct selectors for the theme material to apply wave effects via `observer` once loaded.
 
--  Oct 10, 2018 [ENH:eece731](https://github.com/buttflattery/yii2-formwizard/commit/eece731284d336061eea6efb422043a03c46b9c1) added `margin-bottom:40px` in `smart_wizard_theme_dots.css`.
+- Oct 10, 2018 [ENH:eece731](https://github.com/buttflattery/yii2-formwizard/commit/eece731284d336061eea6efb422043a03c46b9c1) added `margin-bottom:40px` in `smart_wizard_theme_dots.css`.
 
 - Oct 10, 2018 [ENH:099416a](https://github.com/buttflattery/yii2-formwizard/commit/099416a43d50d38cb61b8661d070ca9a9761ad09) updated the section for css and added minified versions minify.
 
@@ -48,4 +47,3 @@ All notable changes to this project will be documented in this file.
 <h3>Removed</h3>
 
 - Nov 21, 2018 [BUG:30cd5d8](https://github.com/buttflattery/yii2-formwizard/commit/30cd5d85dc135084011b3e61407c940962a6ce95) remove manual setting of `formOptions['action']` in the `setDefaults()` method.
-
