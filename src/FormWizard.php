@@ -15,7 +15,7 @@ namespace buttflattery\formwizard;
 use buttflattery\formwizard\assetbundles\bs3\FormWizardAsset as Bs3Assets;
 use buttflattery\formwizard\assetbundles\bs4\FormWizardAsset as Bs4Assets;
 use Yii;
-use yii\base\ArgException as ArgException;
+use yii\base\InvalidArgumentException as ArgException;
 use yii\base\Widget;
 use yii\bootstrap4\ActiveForm as BS4ActiveForm;
 use yii\bootstrap4\BootstrapAsset as BS4Asset;
@@ -276,6 +276,10 @@ class FormWizard extends Widget
     const ICON_NEXT = '<i class="formwizard-arrow-right-alt1-ico"></i>';
     const ICON_PREV = '<i class="formwizard-arrow-left-alt1-ico"></i>';
     const ICON_FINISH = '<i class="formwizard-check-alt-ico"></i>';
+
+    /**STEP TYPES */
+    const STEP_TYPE_DEFAULT='default';
+    const STEP_TYPE_TABULAR='tabular';
 
     /**THEMES */
     const THEME_DEFAULT = 'default';
@@ -576,13 +580,26 @@ JS;
     public function createBody($index, $formInfoText, $step)
     {
         $html = '';
+
+        //get the step type
+        $stepType = ArrayHelper::getValue($step, 'type', self::STEP_TYPE_DEFAULT);
+
+        //check if tabular step
+        $isTabularStep = $stepType == self::STEP_TYPE_TABULAR;
+
+         //check if tabular step
+        if ($isTabularStep) {
+            $this->_checkTabularConstraints($step['model']);
+        }
+
         //make steps
         $html .= Html::beginTag('div', ['id' => 'step-' . $index]);
         $html .= Html::tag(
             'div', $formInfoText, ['class' => 'border-bottom border-gray pb-2']
         );
-        $html .= Html::beginTag('div');
-        $html .= $this->createStepFields($index, $step);
+        
+        $html .= Html::beginTag('div', ["class"=>$isTabularStep?"fields_container form-inline":"fields_container"]);
+        $html .= $this->createStepFields($index, $step, $isTabularStep);
         $html .= Html::endTag('div');
         $html .= Html::endTag('div');
         return $html;
@@ -591,45 +608,56 @@ JS;
     /**
      * Creates the fields for the current step
      *
-     * @param int   $index index of the current step
-     * @param array $step  config for the current step
-     *
+     * @param int     $index         index of the current step
+     * @param array   $step          config for the current step
+     * @param boolean $isTabularStep if the current step is tabular or not
+     * 
      * @return HTML
      */
-    public function createStepFields($index, $step)
+    public function createStepFields($index, $step, $isTabularStep)
     {
 
         $htmlFields = '';
 
         //field configurations
         $fieldConfig = ArrayHelper::getValue($step, 'fieldConfig', false); 
+        
         //disabled fields
         $disabledFields = ArrayHelper::getValue($fieldConfig, 'except', []); 
+
         //only fields
         $onlyFields = ArrayHelper::getValue($fieldConfig, 'only', []); 
 
-        if (!is_array($step['model'])) {
-            $models = [$step['model']];
-        } else {
-            $models = $step['model'];
-        }
+        //is array of models
+        $isArrayOfModels = is_array($step['model']);
 
-        foreach ($models as $model) {
+        $models = $step['model'];
+
+        if (!$isArrayOfModels) {
+            $models = [$step['model']];
+        } 
+
+        //iterate models
+        foreach ($models as $index=>$model) {
+            
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
-
+        
             //field order
             $this->_sortFields($fieldConfig, $attributes, $step);
 
             //add all the field ids to array
             $this->_allFields[$index] = array_map(
-                function ($element) use ($model) {
-                    return Html::getInputId($model, $element);
+                function ($element) use ($model, $isTabularStep, $index) {
+                    return Html::getInputId($model, ($isTabularStep)?"[$index]".$element:$element);
                 }, $attributes
             );
-
+            
             //iterate all fields associated to the relevant model
             foreach ($attributes as $attribute) {
+
+                //attribute name
+                $attributeName = ($isTabularStep) ? "[$index]" . $attribute : $attribute;
 
                 if ($fieldConfig && isset($fieldConfig[$attribute])) {
                     //if filtered field
@@ -642,16 +670,37 @@ JS;
 
                     //custom field population
                     $htmlFields .= $this->createCustomInput(
-                        $model, $attribute, $fieldConfig[$attribute]
+                        $model, $attributeName, $fieldConfig[$attribute], $isTabularStep
                     );
                 } else {
                     //default field population
-                    $htmlFields .= $this->createDefaultInput($model, $attribute);
+                    $htmlFields .= $this->createDefaultInput($model, $attributeName);
                 }
             }
         }
-
         return $htmlFields;
+    }
+
+    /**
+    * Check if tabular step has the multiple models if the same type or throw an exception
+    *
+    * @param array $models the model(s) of the step 
+    *
+    * @return null
+    * @throws ArgException
+    */
+    private function _checkTabularConstraints($models)
+    {
+        foreach ($models as $model) {
+            $classes[] = get_class($model);
+        }
+        $classes = array_unique($classes);
+        
+        //check if not a multiple model step with the type set to tabular
+        if (sizeof($classes)>1) {
+            throw new ArgException('You cannot have multiple models in a step when the "type" property is set to "tabular", you must provide only a single model or remove the step "type" property.');
+        }    
+        
     }
 
     /**
@@ -734,13 +783,14 @@ JS;
      * Creates a customized input field according to the
      * structured option for the steps by user
      *
-     * @param object $model       instance of the current model
-     * @param string $attribute   name of the current field
-     * @param array  $fieldConfig config for the current field
+     * @param object  $model         instance of the current model
+     * @param string  $attribute     name of the current field
+     * @param array   $fieldConfig   config for the current field
+     * @param boolean $isTabularStep if the current step is to be a tabular step
      *
      * @return \yii\widgets\ActiveField
      */
-    public function createCustomInput($model, $attribute, $fieldConfig)
+    public function createCustomInput($model, $attribute, $fieldConfig, $isTabularStep)
     {
         //options
         $options = ArrayHelper::getValue($fieldConfig, 'options', []);

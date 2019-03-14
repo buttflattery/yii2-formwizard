@@ -83,6 +83,7 @@ $.formwizard = {
                 let formName = $(this).attr('id');
                 let currentIndex = $.formwizard.helper.currentIndex(form);
                 let res = $.formwizard.fields[formName][currentIndex].diff(messages);
+                console.log(res, $.formwizard.fields);
                 if (!res.length) {
                     //check if last step then submit form
                     let isLastStep = currentIndex == $(form + ' .step-anchor').find('li').length - 1;
