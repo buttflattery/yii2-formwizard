@@ -11,6 +11,24 @@ $.formwizard = {
     fields: [],
     submit: false,
     helper: {
+        removeField: (element) => {
+            let formId = $(element).closest('form').attr('id');
+            let currentIndex = $.formwizard.helper.currentIndex("#" + formId);
+            let field = $(element).attr('id');
+            let currentStepFields = $.formwizard.fields[formId][currentIndex];
+
+            //update fields array for the current form wizard
+            $.formwizard.fields[formId][currentIndex] = $.grep(currentStepFields, function (value) {
+                return value != field;
+            });
+        },
+        addField: (element) => {
+            let formId = $(element).closest('form').attr('id');
+            let currentIndex = $.formwizard.helper.currentIndex("#" + formId);
+            let field = $(element).attr('id');
+            let currentStepFields = $.formwizard.fields[formId][currentIndex];
+            currentStepFields.push(field);
+        },
         shake: function (form) {
             $(form + " .sw-main").addClass("shake animated");
             setTimeout(function () {
@@ -159,11 +177,41 @@ $.formwizard = {
                 mutations.forEach(function (mutation) {
                     if (mutation.type == 'childList') {
                         $.themematerial.init();
+                        $.formwizard.init();
                         $.formwizard.observerObj.disconnect();
                     }
                 });
             });
         }
+    },
+    tabular: {
+        addRow: (element) => {
+            let currentContainer = $(element).closest('.fields_container');
+            let currentIndex = currentContainer.find('.tabular-row').length;
+            let documentFragment = document.createDocumentFragment();
+            let row = $(currentContainer)[0].firstChild;
+            documentFragment.appendChild(row.cloneNode(true));
+            documentFragment.querySelector("")
+            // documentFragment.appendChild();
+            console.log($(currentContainer)[0].firstChild);
+
+        },
+        removeRow: (rowid) => {
+            let rowContainer = $("#row_" + rowid);
+            rowContainer.find('textarea,input,select').each(function (index, element) {
+                $.formwizard.helper.removeField(element);
+            });
+            rowContainer.remove();
+        }
+    },
+    init: () => {
+        $(".remove-row").on('click', function (e) {
+            $.formwizard.tabular.removeRow($(this).data('rowid'));
+        });
+
+        $("#add_row").on('click', function (e) {
+            $.formwizard.tabular.addRow($(this));
+        });
     }
 
 };
