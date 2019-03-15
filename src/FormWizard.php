@@ -15,7 +15,7 @@ namespace buttflattery\formwizard;
 use buttflattery\formwizard\assetbundles\bs3\FormWizardAsset as Bs3Assets;
 use buttflattery\formwizard\assetbundles\bs4\FormWizardAsset as Bs4Assets;
 use Yii;
-use yii\base\ArgException as ArgException;
+use yii\base\InvalidArgumentException as ArgException;
 use yii\base\Widget;
 use yii\bootstrap4\ActiveForm as BS4ActiveForm;
 use yii\bootstrap4\BootstrapAsset as BS4Asset;
@@ -271,11 +271,22 @@ class FormWizard extends Widget
      */
     public $classFinish = 'btn btn-success';
 
+    /**
+     * The class for the Add Row button, default is btn btn-info
+     * 
+     * @var string
+     */
+    public $classAdd = 'btn btn-info';
+
     /**ICONS */
 
     const ICON_NEXT = '<i class="formwizard-arrow-right-alt1-ico"></i>';
     const ICON_PREV = '<i class="formwizard-arrow-left-alt1-ico"></i>';
     const ICON_FINISH = '<i class="formwizard-check-alt-ico"></i>';
+
+    /**STEP TYPES */
+    const STEP_TYPE_DEFAULT='default';
+    const STEP_TYPE_TABULAR='tabular';
 
     /**THEMES */
     const THEME_DEFAULT = 'default';
@@ -467,8 +478,8 @@ JS;
 
         //bind Yii ActiveForm event afterValidate to check
         //only current steps fields for validation and allow to next step
-        if($('#{$this->formOptions['id']}').yiiActiveForm('data').attributes.length){
-            $.formwizard.validation.bindAfterValidate('#{$this->formOptions['id']}');
+        if($('#{$this->formOptions["id"]}').yiiActiveForm('data').attributes.length){
+            $.formwizard.validation.bindAfterValidate('#{$this->formOptions["id"]}');
         }
 
         //fields list
@@ -576,13 +587,26 @@ JS;
     public function createBody($index, $formInfoText, $step)
     {
         $html = '';
+
+        //get the step type
+        $stepType = ArrayHelper::getValue($step, 'type', self::STEP_TYPE_DEFAULT);
+
+        //check if tabular step
+        $isTabularStep = $stepType == self::STEP_TYPE_TABULAR;
+
+         //check if tabular step
+        if ($isTabularStep) {
+            $this->_checkTabularConstraints($step['model']);
+        }
+
         //make steps
         $html .= Html::beginTag('div', ['id' => 'step-' . $index]);
         $html .= Html::tag(
             'div', $formInfoText, ['class' => 'border-bottom border-gray pb-2']
         );
-        $html .= Html::beginTag('div');
-        $html .= $this->createStepFields($index, $step);
+        
+        $html .= Html::beginTag('div', ["class"=>$isTabularStep?"fields_container form-inline":"fields_container"]);
+        $html .= $this->createStepFields($index, $step, $isTabularStep);
         $html .= Html::endTag('div');
         $html .= Html::endTag('div');
         return $html;
@@ -591,45 +615,67 @@ JS;
     /**
      * Creates the fields for the current step
      *
-     * @param int   $index index of the current step
-     * @param array $step  config for the current step
-     *
+     * @param int     $index         index of the current step
+     * @param array   $step          config for the current step
+     * @param boolean $isTabularStep if the current step is tabular or not
+     * 
      * @return HTML
      */
-    public function createStepFields($index, $step)
+    public function createStepFields($index, $step, $isTabularStep)
     {
 
         $htmlFields = '';
 
         //field configurations
         $fieldConfig = ArrayHelper::getValue($step, 'fieldConfig', false); 
+        
         //disabled fields
         $disabledFields = ArrayHelper::getValue($fieldConfig, 'except', []); 
+
         //only fields
         $onlyFields = ArrayHelper::getValue($fieldConfig, 'only', []); 
 
-        if (!is_array($step['model'])) {
-            $models = [$step['model']];
-        } else {
-            $models = $step['model'];
-        }
+        //is array of models
+        $isArrayOfModels = is_array($step['model']);
 
-        foreach ($models as $model) {
+        $models = $step['model'];
+
+        if (!$isArrayOfModels) {
+            $models = [$step['model']];
+        } 
+
+        //current step fields
+        $fields=[];
+
+        //iterate models
+        foreach ($models as $modelIndex=>$model) {
+            
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
-
+        
             //field order
             $this->_sortFields($fieldConfig, $attributes, $step);
 
             //add all the field ids to array
-            $this->_allFields[$index] = array_map(
-                function ($element) use ($model) {
-                    return Html::getInputId($model, $element);
-                }, $attributes
+            $fields = array_merge(
+                $fields, 
+                array_map(
+                    function ($element) use ($model, $isTabularStep, $modelIndex) {
+                        return Html::getInputId($model, ($isTabularStep)?"[$modelIndex]".$element:$element);
+                    }, $attributes
+                )
             );
 
+            //start row div 
+            if ($isTabularStep) {
+                $htmlFields.= Html::beginTag('div', ['id'=>'row_'.$modelIndex, 'class'=>'tabular-row']);
+            }
+           
             //iterate all fields associated to the relevant model
             foreach ($attributes as $attribute) {
+
+                //attribute name
+                $attributeName = ($isTabularStep) ? "[$modelIndex]" . $attribute : $attribute;
 
                 if ($fieldConfig && isset($fieldConfig[$attribute])) {
                     //if filtered field
@@ -642,16 +688,75 @@ JS;
 
                     //custom field population
                     $htmlFields .= $this->createCustomInput(
-                        $model, $attribute, $fieldConfig[$attribute]
+                        $model, $attributeName, $fieldConfig[$attribute]
                     );
                 } else {
                     //default field population
-                    $htmlFields .= $this->createDefaultInput($model, $attribute);
+                    $htmlFields .= $this->createDefaultInput($model, $attributeName);
                 }
+            }
+
+            //is tabular step
+            if ($isTabularStep) {
+
+                //add closing tags and the remove icons if necessary
+                $htmlFields .= $this->addTabularHtmlClosingTags($modelIndex);
             }
         }
 
+        //copy the fields to the javascript array for validation
+        $this->_allFields[$index] = $fields;
+
+        //Add Row Buton
+        if ($isTabularStep) {
+            $htmlFields .= Html::button('Add', ['class'=>$this->classAdd, 'id'=>'add_row']);
+        }
+
         return $htmlFields;
+    }
+
+    /**
+     * Adds closing tags for the tabular fields row and the remove icon if necessary
+     * 
+     * @param integer $modelIndex the index of the model
+     * 
+     * @return string $htmlFields
+     */
+    public function addTabularHtmlClosingTags($modelIndex)
+    {
+        $htmlFields='';
+
+        //if more than one model of same type
+        if ($modelIndex > 0) {
+            $htmlFields = Html::tag('i', '', ['class'=>'remove-row formwizard-x-ico', 'data'=>['rowid'=>$modelIndex]]);
+        }
+
+        //close row div
+        $htmlFields .= Html::endTag('div');
+
+        return $htmlFields;
+    }
+
+    /**
+    * Check if tabular step has the multiple models if the same type or throw an exception
+    *
+    * @param array $models the model(s) of the step 
+    *
+    * @return null
+    * @throws ArgException
+    */
+    private function _checkTabularConstraints($models)
+    {
+        foreach ($models as $model) {
+            $classes[] = get_class($model);
+        }
+        $classes = array_unique($classes);
+        
+        //check if not a multiple model step with the type set to tabular
+        if (sizeof($classes)>1) {
+            throw new ArgException('You cannot have multiple models in a step when the "type" property is set to "tabular", you must provide only a single model or remove the step "type" property.');
+        }
+        return true;
     }
 
     /**
@@ -796,29 +901,29 @@ JS;
         
         $defaultFieldTypes = [
             'text' => function ($params) {
-                $field=$params['field'];
-                $options=$params['options'];
-                $label=$params['label'];
-                $labelOptions=$params['labelOptions'];
+                $field = $params['field'];
+                $options = $params['options'];
+                $label = $params['label'];
+                $labelOptions = $params['labelOptions'];
                 
                 return $field->textInput($options)->label($label, $labelOptions);
             },
             'dropdown' => function ($params) {
-                $field=$params['field'];
-                $options=$params['options'];
-                $label=$params['label'];
-                $labelOptions=$params['labelOptions'];
-                $itemsList=$params['itemsList'];
+                $field = $params['field'];
+                $options = $params['options'];
+                $label = $params['label'];
+                $labelOptions = $params['labelOptions'];
+                $itemsList = $params['itemsList'];
 
                 return $field->dropDownList($itemsList, $options)
                     ->label($label, $labelOptions);
             },
             'radio' => function ($params) {
-                $field=$params['field'];
-                $options=$params['options'];
-                $label=$params['label'];
-                $labelOptions=$params['labelOptions'];
-                $itemsList=$params['itemsList'];
+                $field = $params['field'];
+                $options = $params['options'];
+                $label = $params['label'];
+                $labelOptions = $params['labelOptions'];
+                $itemsList = $params['itemsList'];
 
                 if (is_array($itemsList)) {
                     return $field->radioList($itemsList, $options)
@@ -827,11 +932,11 @@ JS;
                 return $field->radio($options);
             },
             'checkbox' => function ($params) {
-                $field=$params['field'];
-                $options=$params['options'];
-                $label=$params['label'];
-                $labelOptions=$params['labelOptions'];
-                $itemsList=$params['itemsList'];
+                $field = $params['field'];
+                $options = $params['options'];
+                $label = $params['label'];
+                $labelOptions = $params['labelOptions'];
+                $itemsList = $params['itemsList'];
 
                 //if checkboxList needs to be created
                 if (is_array($itemsList)) {
@@ -849,32 +954,32 @@ JS;
                 
             },
             'textarea' => function ($params) {
-                $field=$params['field'];
-                $options=$params['options'];
-                $label=$params['label'];
-                $labelOptions=$params['labelOptions'];
+                $field = $params['field'];
+                $options = $params['options'];
+                $label = $params['label'];
+                $labelOptions = $params['labelOptions'];
 
                 return $field->textarea($options)->label($label, $labelOptions);
             },
             'file' => function ($params) {
-                $field=$params['field'];
-                $options=$params['options'];
-                $label=$params['label'];
-                $labelOptions=$params['labelOptions'];
+                $field = $params['field'];
+                $options = $params['options'];
+                $label = $params['label'];
+                $labelOptions = $params['labelOptions'];
 
                 return $field->fileInput($options)->label($label, $labelOptions);
             },
             'hidden' => function ($params) {
-                $field=$params['field'];
-                $options=$params['options'];
+                $field = $params['field'];
+                $options = $params['options'];
 
                 return $field->hiddenInput($options)->label(false);
             },
             'password' => function ($params) {
-                $field=$params['field'];
-                $options=$params['options'];
-                $label=$params['label'];
-                $labelOptions=$params['labelOptions'];
+                $field = $params['field'];
+                $options = $params['options'];
+                $label = $params['label'];
+                $labelOptions = $params['labelOptions'];
 
                 return $field->passwordInput($options)->label($label, $labelOptions);
             },
@@ -883,7 +988,7 @@ JS;
         //create field depending on the type of the value provided
         if (isset($defaultFieldTypes[$fieldType])) {
             // initialize options
-            $fieldTypeOptions=[
+            $fieldTypeOptions = [
                 'field'=>$field, 
                 'options'=>$options, 
                 'labelOptions'=>$labelOptions, 
