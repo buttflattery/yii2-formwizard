@@ -251,6 +251,18 @@ class FormWizard extends Widget
     public $iconFinish = self::ICON_FINISH;
 
     /**
+     * The icon for the Add Row button you want to be shown inside the button.
+     * Default is `<i class="formwizard-check-alt-ico"></i>`.
+     *
+     * This can be an html string '<i class="fa fa-add"></i>'
+     * in case you are using FA, Material or Glyph icons, or an
+     * image tag like '<img src="/path/to/image" />'.
+     *
+     * @var mixed
+     */
+    public $iconAdd = self::ICON_ADD;
+
+    /**
      * The class for the Next button , default is `btn btn-info`
      *
      * @var string
@@ -283,6 +295,7 @@ class FormWizard extends Widget
     const ICON_NEXT = '<i class="formwizard-arrow-right-alt1-ico"></i>';
     const ICON_PREV = '<i class="formwizard-arrow-left-alt1-ico"></i>';
     const ICON_FINISH = '<i class="formwizard-check-alt-ico"></i>';
+    const ICON_ADD = '<i class="formwizard-plus-ico"></i>';
 
     /**STEP TYPES */
     const STEP_TYPE_DEFAULT='default';
@@ -464,12 +477,13 @@ JS;
 
         //init script for the wizard
         $js = <<< JS
+
         //start observer for the smart wizard to run the script
         //when the child HTMl elements are populated
-        if('{$this->theme}'=='material' || '{$this->theme}'=='material-v'){
-            $.formwizard.observer.start('#{$wizardContainerId}');
-        }
-
+        //necessary for material themes and the button 
+        //events for tabular row
+        $.formwizard.observer.start('#{$wizardContainerId}');
+        
         // Step show event
         $.formwizard.helper.updateButtons('#{$wizardContainerId}');
 
@@ -484,6 +498,20 @@ JS;
 
         //fields list
         $.formwizard.fields.{$this->formOptions['id']}={$fieldsJSON};
+
+        $.formwizard.options.{$this->formOptions["id"]}={
+            classAddRow:'{$this->classAdd}',
+            labelNext:'{$this->labelNext}',
+            labelPrev:'{$this->labelPrev}',
+            labelFinish:'{$this->labelFinish}',
+            iconNext:'{$this->iconNext}',
+            iconPrev:'{$this->iconPrev}',
+            iconFinish:'{$this->iconFinish}',
+            iconAdd:'{$this->iconAdd}',
+            classNext:'{$this->classNext}',
+            classPrev:'{$this->classPrev}',
+            classFinish:'{$this->classFinish}'
+        };
 JS;
 
         //register script
@@ -535,11 +563,11 @@ JS;
     public function createStep($index, $step)
     {
         //step title
-        $stepTitle = ArrayHelper::getValue($step, 'title', 'Step-' . ($index + 1)); //!isset($step['title']) ? 'Step-' . ($index + 1) : $step['title'];
+        $stepTitle = ArrayHelper::getValue($step, 'title', 'Step-' . ($index + 1)); 
         //step description
-        $stepDescription = ArrayHelper::getValue($step, 'description', 'Description'); //!isset($step['description']) ? 'Sample Description' : $step['description'];
+        $stepDescription = ArrayHelper::getValue($step, 'description', 'Description');
         //form body info text
-        $formInfoText = ArrayHelper::getValue($step, 'formInfoText', 'Add details below'); //!isset($step['formInfoText']) ? 'Add ' . basename(get_class($model)) . ' details below' : $step['formInfoText'];
+        $formInfoText = ArrayHelper::getValue($step, 'formInfoText', 'Add details below'); 
         //get html tabs
         $htmlTabs = $this->createTabs($index, $stepDescription, $stepTitle);
 
@@ -599,15 +627,38 @@ JS;
             $this->_checkTabularConstraints($step['model']);
         }
 
-        //make steps
-        $html .= Html::beginTag('div', ['id' => 'step-' . $index]);
-        $html .= Html::tag(
-            'div', $formInfoText, ['class' => 'border-bottom border-gray pb-2']
+        if (empty($step['model'])) {
+            throw new ArgException("The model property cannot be an empty array make sure you provide a new instance of the model in case you are editing/updating or using tabular step and there is not related model saved.");
+        }
+
+        //start step wrapper div
+        $html .= Html::beginTag(
+            'div', 
+            ['id' => 'step-' . $index]
         );
+        $html .= Html::tag('div', $formInfoText, ['class' => 'border-bottom border-gray pb-2']);
         
+        //Add Row Buton to add fields dynamically
+        if ($isTabularStep) {
+            $html .= Html::button(
+                $this->iconAdd.'&nbsp;Add', 
+                [
+                    'class'=>$this->classAdd.(($this->_bsVersion==3)?' pull-right':' float-right'), 
+                    'id'=>'add_row'
+                ]
+            );
+        }
+
+        //start field container tag <div class="fields_container">
         $html .= Html::beginTag('div', ["class"=>$isTabularStep?"fields_container form-inline":"fields_container"]);
+
+        //create step fields
         $html .= $this->createStepFields($index, $step, $isTabularStep);
+
+        //close the field container tag </div>
         $html .= Html::endTag('div');
+        
+        //close the step div </div>
         $html .= Html::endTag('div');
         return $html;
     }
@@ -670,7 +721,10 @@ JS;
             if ($isTabularStep) {
                 $htmlFields.= Html::beginTag('div', ['id'=>'row_'.$modelIndex, 'class'=>'tabular-row']);
             }
-           
+            
+            if ($modelIndex > 0) {
+                $htmlFields .= Html::tag('i', '', ['class'=>'remove-row formwizard-x-ico', 'data'=>['rowid'=>$modelIndex]]);
+            }
             //iterate all fields associated to the relevant model
             foreach ($attributes as $attribute) {
 
@@ -707,11 +761,6 @@ JS;
         //copy the fields to the javascript array for validation
         $this->_allFields[$index] = $fields;
 
-        //Add Row Buton
-        if ($isTabularStep) {
-            $htmlFields .= Html::button('Add', ['class'=>$this->classAdd, 'id'=>'add_row']);
-        }
-
         return $htmlFields;
     }
 
@@ -727,9 +776,9 @@ JS;
         $htmlFields='';
 
         //if more than one model of same type
-        if ($modelIndex > 0) {
-            $htmlFields = Html::tag('i', '', ['class'=>'remove-row formwizard-x-ico', 'data'=>['rowid'=>$modelIndex]]);
-        }
+        // if ($modelIndex > 0) {
+        //     $htmlFields .= Html::tag('i', '', ['class'=>'remove-row formwizard-x-ico', 'data'=>['rowid'=>$modelIndex]]);
+        // }
 
         //close row div
         $htmlFields .= Html::endTag('div');
@@ -747,6 +796,7 @@ JS;
     */
     private function _checkTabularConstraints($models)
     {
+        $classes = [];
         foreach ($models as $model) {
             $classes[] = get_class($model);
         }

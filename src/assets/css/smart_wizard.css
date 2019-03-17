@@ -42,6 +42,22 @@
     margin-left: 0
 }
 
+.sw-main .fields_container {
+    width: 80%;
+}
+
+.sw-main .fields_container .tabular-row {
+    margin-top: 10px;
+    border-top: 1px solid #c8c8c8;
+    padding: 5px;
+}
+
+.sw-main .tabular-row i.remove-row {
+    float: right;
+    clear: both;
+    color: #d9534f;
+}
+
 .sw-theme-default {
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
     box-shadow: 0 1px 3px rgba(0, 0, 0, .3)
