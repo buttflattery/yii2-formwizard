@@ -14,7 +14,11 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 - [jQuery v2.2.4](https://jquery.com/download/)
 - [Bootstrap v3.3.7](https://getbootstrap.com/docs/3.3/) && [Bootstrap v4](http://getbootstrap.com/)
 
-### UPDATE: About Bootstrap Version Usage
+### UPDATE 2 : Tabular Step Support
+
+A new feature for tabular steps has been added which will help you to configure adressbook like features into the formwizard, there have been several quries related to such feature where we need to add multiple adresses against a single user, or add multiple tags against any album and we need to be able to have a <kbd>Add New</kbd> button which should dynamically add the set of inputs as needed.
+
+### UPDATE : About Bootstrap Version Usage
 
 The extension detects if you are using the `yiisoft/yii2-bootstrap` or `yiisoft/yii2-bootstrap4` and loads the appropriate assets for the extension. It will check first the `"yiisoft/yii2-bootstrap4"` if it exists then it will load bootstrap4 resources otherwise it will fall back to use bootstrap3. So make sure you are following the correct guide to use the [`yiisoft/yii2-bootstrap4"`](https://github.com/yiisoft/yii2-bootstrap4) and remove the `"yiisoft/yii2-bootstrap": "~2.0.0",` from you `composer.json` and change the `minimum-stability:"dev"` here is the complete [guide](https://github.com/yiisoft/yii2-bootstrap4/blob/master/docs/guide/README.md).
 
@@ -42,90 +46,136 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 
 - `wizardContainerId (string)`: Id of the main container for the wizard.
 - `formOptions (array)`: specify the [ActiveForm](https://www.yiiframework.com/doc/api/2.0/yii-widgets-activeform) properties.
-- `labelNext` : Next button label, default value `Next`.
-- `labelPrev` : Previous button label, default value `Previous`.
-- `labelFinish` : Finish button label, default value `Finish`.
-- `classNext` : css classes for the button Next, default `btn btn-info`.
-- `classPrev` : css classes for the button Previous, default `btn btn-info`.
-- `classFinish` : css classes for the button Finish, default `btn btn-success`.
+- `labelNext (string)` : Next button label, default value `Next`.
+- `labelPrev (string)` : Previous button label, default value `Previous`.
+- `labelFinish (string)` : Finish button label, default value `Finish`.
+- `classNext (string)` : css classes for the button Next, default `btn btn-info`.
+- `iconNext (string)` : the html string for the Next button, defaults to `<i class="formwizard-arrow-right-alt1-ico"></i>`.
+- `classPrev (string)` : css classes for the button Previous, default `btn btn-info`.
+- `iconPrev (string)` : the html string for the prev icon, defaults to `<i class="formwizard-arrow-left-alt1-ico"></i>`.
+- `classFinish (string)` : css classes for the button Finish, default `btn btn-success`.
+- `iconFinish (string)` : the Html string for the icon, defaults to `<i class="formwizard-check-alt-ico"></i>`.
+- `classAdd (string)` : css class for Add Row Button default to `btn btn-info`
+- `iconAdd (string)` : the html string for the button default to `<i class="formwizard-plus-ico"></i>`
 - `steps (array)` : An array of the steps(`array`), the steps can have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
 
+  - `type (string)` : The type of the step, defaults to `default`. This option is used if you need to have tabular inputs for the step by specifying the type as `tabular`, you can use the provided constants like `FormWizard::STEP_TYPE_TABULAR` or `FormWizard::STEP_TYPE_DEFAULT`.
   - `model (object | array of models)` : The `\yii\model\ActiveRecord` model object or array of models to create step fields.
-  - `title (string)` : The title of the step to be displayed inside the step Tab.
-  - `description (string)` : The short description for the step.
-  - `formInfoText (text)` : The text to be displayed on the top of the form fields inside the step.
-  - `fieldOrder (array)` : The default order of the fields in the steps, if specified then the fields will be populated according to the order of the fields in the array, if not then the fields will be ordered according to the order in the `fieldConfig` option, and if `fieldConfig` option is not specified then the default order in which the attributes are returned from the model will be used.
-  - `fieldConfig (array)` : This option is used mainly to customize the form fields for the step. 3 options are recognized inside the `fieldConfig`, 2 of them are `except` and `only`. See below for the details
 
-    - `except (array)` : List of fields that should not be populated in the step or should be ignored, for example
+    **Note: After the addition of the feature Tabular Steps when using `'type'=>'tabular'` you must remember that you cannot provide different models, although you can provide multiple instances when in edit mode but for the same model only.**
 
-      ```
+    While adding a new record you can have like below
 
-      'fieldConfig'=>[
-          'except'=>[
-              'created_on','updated_on'
-          ]
+    ```
+    $addressModel = new Address();
+
+    "steps"=>[
+      [
+        'title'=>'Step Title',
+        'type' => FormWizard::STEP_TYPE_TABULAR,
+        'model'=> $addressModel
       ]
+    ]
+    ```
 
-      ```
+    When in Edit Mode you can provide the multiple instances of `Address`
 
-      By default all the attributes that are safe to load value are populated, and the `id` or `primary_key` is ignored by default.
+    ```
+    //either using model directly
+      $addressModel = Address::find()
+          ->where(
+            ['=','user_id',Yii::$app->user->id]
+          )->all();
 
-    - `only (array)` : list of the fields that should be populated for the step, only the fields specified in the list will be available and all other fields will be ignored.
+      //or using the model relation if you have `getAddress()` defined inside
+      //the `User` model. `$user` has the selected user in code below
+      $addressModel = $user->address;
 
-      Apart from the above options the `fieldConfig` recognizes some special options specific to every field separately when customizing a field, for example
-
-      ```
-
-      'fieldConfig'=>[
-          'username'=>[
-              'options'=>[
-                  'class'=>'my-class'
-              ]
-          ]
+    "steps"=>[
+      [
+          'title'=>'Step Title',
+          'type' => FormWizard::STEP_TYPE_TABULAR,
+          'model'=> $addressModel
       ]
+    ]
+
+    ```
+
+  * `title (string)` : The title of the step to be displayed inside the step Tab.
+  * `description (string)` : The short description for the step.
+  * `formInfoText (text)` : The text to be displayed on the top of the form fields inside the step.
+  * `fieldOrder (array)` : The default order of the fields in the steps, if specified then the fields will be populated according to the order of the fields in the array, if not then the fields will be ordered according to the order in the `fieldConfig` option, and if `fieldConfig` option is not specified then the default order in which the attributes are returned from the model will be used.
+  * `fieldConfig (array)` : This option is used mainly to customize the form fields for the step. 3 options are recognized inside the `fieldConfig`, 2 of them are `except` and `only`. See below for the details
+
+  - `except (array)` : List of fields that should not be populated in the step or should be ignored, for example
+
+    ```
+
+    'fieldConfig'=>[
+        'except'=>[
+            'created_on','updated_on'
+        ]
+    ]
+
+    ```
+
+    By default all the attributes that are safe to load value are populated, and the `id` or `primary_key` is ignored by default.
+
+  - `only (array)` : list of the fields that should be populated for the step, only the fields specified in the list will be available and all other fields will be ignored.
+
+    Apart from the above options the `fieldConfig` recognizes some special options specific to every field separately when customizing a field, for example
+
+    ```
+
+    'fieldConfig'=>[
+        'username'=>[
+            'options'=>[
+                'class'=>'my-class'
+            ]
+        ]
+    ]
+
+    ```
+
+    you should specify the field name of the model and its customization settings in form of `name=>value` pairs. The following special options can be used when specifying the form/model `field_name`.
+
+    - `options`
+    - `containerOptions`
+    - `inputOptions`
+    - `template`
+    - `labelOptions`
+    - `widget`
+    - `multifield (boolean)`
+    - `hint`
+
+    Details
+
+    - `options (array)` : You can specify the HTML attributes (name-value pairs) for the field
+
+      ```
+      'field_name'=>['options'=>['class'=>'my-class']]`
 
       ```
 
-      you should specify the field name of the model and its customization settings in form of `name=>value` pairs. The following special options can be used when specifying the form/model `field_name`.
+      All those special options that are recognized by the
 
-      - `options`
-      - `containerOptions`
-      - `inputOptions`
-      - `template`
-      - `labelOptions`
-      - `widget`
-      - `multifield (boolean)`
-      - `hint`
+      - `checkbox(), radio()` : `uncheck`, `label`, `labelOptions`
+      - `checkboxList(), radioList()` : `tag`, `unselect`, `encode`, `separator`, `itemOptions`, `item`.
 
-      Details
+      can be used with-in the `options` option. The following 2 options are specially recognized by this widget when used with-in the `options`.
 
-      - `options (array)` : You can specify the HTML attributes (name-value pairs) for the field
+      - `type (string)`: The type of the form field to be created, this can be `text`, `dropdown`,`checkbox`, `radio`, `textarea`, `file`, `password`, `hidden`. Default value for this option is `text`.
 
-        ```
-        'field_name'=>['options'=>['class'=>'my-class']]`
+      - `itemsList (string/array)` : This option can be used with a `dropdown`, `checkboxList` or `radioList`. It is used in combination of the the option `type`. If you provide the `itemsList` an array and use the `'type'=>'checkbox'` , it will call `checkboxList()`, and a `checkbox()` if you provide string, same goes for the radioList and radio.
 
-        ```
-
-        All those special options that are recognized by the
-
-        - `checkbox(), radio()` : `uncheck`, `label`, `labelOptions`
-        - `checkboxList(), radioList()` : `tag`, `unselect`, `encode`, `separator`, `itemOptions`, `item`.
-
-        can be used with-in the `options` option. The following 2 options are specially recognized by this widget when used with-in the `options`.
-
-        - `type (string)`: The type of the form field to be created, this can be `text`, `dropdown`,`checkbox`, `radio`, `textarea`, `file`, `password`, `hidden`. Default value for this option is `text`.
-
-        - `itemsList (string/array)` : This option can be used with a `dropdown`, `checkboxList` or `radioList`. It is used in combination of the the option `type`. If you provide the `itemsList` an array and use the `'type'=>'checkbox'` , it will call `checkboxList()`, and a `checkbox()` if you provide string, same goes for the radioList and radio.
-
-      - `lableOptions (array)`: The HTML and special options for customizing the field label, you can use the following settings
-        - `label (string)`: The label text.
-        - `options (array)` : The HTML attributes (name-value pairs) for the label.
-      - `template (string)` : The template used for the field the default value used is `{label}\n{input}\n{hint}\n{error}`.
-      - `containerOptions (array)` : HTML atrtibutes for the cotnainer tag used as `name=>value` pairs.
-      - `widget` : This option can be used if you want to use a widget instead of the the default fields, you can specify the widget class name `'widget'=>widget::class`, and the options for the widget will be provided in the `options` option. -`inputOptions (array)` : this is same as the `inputOptions` used by the ActiveForm `field()` method.
-      - `multifield (boolean)` : a boolean which decides if the field name should consist of an array or not, for example using multi file upload widgets require the `name` attribute for the field to be declared as an array like `filed_name[]` instead of `field_name`. you can pass this option as true by default it is false.
-      - `hint (string)` : it is used to provide a hint text for the field if you dont provide a custom hint text for any field it will attempt to show the custom hints that are provided inside the model by overriding the `attributeHints()`, otherwise it wont show any hint.
+    - `lableOptions (array)`: The HTML and special options for customizing the field label, you can use the following settings
+      - `label (string)`: The label text.
+      - `options (array)` : The HTML attributes (name-value pairs) for the label.
+    - `template (string)` : The template used for the field the default value used is `{label}\n{input}\n{hint}\n{error}`.
+    - `containerOptions (array)` : HTML atrtibutes for the cotnainer tag used as `name=>value` pairs.
+    - `widget` : This option can be used if you want to use a widget instead of the the default fields, you can specify the widget class name `'widget'=>widget::class`, and the options for the widget will be provided in the `options` option. -`inputOptions (array)` : this is same as the `inputOptions` used by the ActiveForm `field()` method.
+    - `multifield (boolean)` : a boolean which decides if the field name should consist of an array or not, for example using multi file upload widgets require the `name` attribute for the field to be declared as an array like `filed_name[]` instead of `field_name`. you can pass this option as true by default it is false.
+    - `hint (string)` : it is used to provide a hint text for the field if you dont provide a custom hint text for any field it will attempt to show the custom hints that are provided inside the model by overriding the `attributeHints()`, otherwise it wont show any hint.
 
 #### Widget Plugin (SmartWizard) Options
 
@@ -151,6 +201,28 @@ Only the following options of the plugin SmartWizard are allowed to be customize
 - `markAllPreviousStepsAsDone (boolean)`: When a step selected by url hash, all previous steps are marked done, default value is `true`.
 - `removeDoneStepOnNavigateBack (boolean)` : While navigate back done step after active step will be cleared, default value is `false`.
 - `enableAnchorOnDoneStep (boolean)` : Enable/Disable the done steps navigation, default value is `true`.
+
+### Widget Constants
+
+- Icons
+
+  - `FormWizard::ICON_NEXT` defaults to `'<i class="formwizard-arrow-right-alt1-ico"></i>'`.
+  - `FormWizard::ICON_PREV` defaults to `'<i class="formwizard-arrow-left-alt1-ico"></i>'`.
+  - `FormWizard::ICON_FINISH` defaults to `'<i class="formwizard-check-alt-ico"></i>'`.
+  - `FormWizard::ICON_ADD` defaults to `'<i class="formwizard-plus-ico"></i>'`.
+
+- Step Types
+
+  - `FormWizard::STEP_TYPE_DEFAULT` defaults to `'default'`.
+  - `FormWizard::STEP_TYPE_TABULAR` default to `'tabular'`.
+
+- Themes
+  - `FormWizard::THEME_DEFAULT` defaults to `'default'`.
+  - `FormWizard::THEME_DOTS` defaults to `'dots'`.
+  - `FormWizard::THEME_ARROWS` defaults to `'arrows'`.
+  - `FormWizard::THEME_CIRCLES` defaults to `'circles'`.
+  - `FormWizard::THEME_MATERIAL` defaults to `'material'`.
+  - `FormWizard::THEME_MATERIAL_V` defaults to `'material-v'`.
 
 ### Who do I talk to?
 

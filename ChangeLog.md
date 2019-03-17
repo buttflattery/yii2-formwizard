@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 <h1>1.0.0 - 22/10/2018</h1>
 
 <h3>Added</h3>
+- March 18, 2019 [FEATURE:5769d27](https://github.com/buttflattery/yii2-formwizard/commit/5769d27fc9059cf4d7d5f7348d0a67213678c8c9) Added new feature for the Tabular step
+
 - March 13, 2019 [ENH:4e52390](https://github.com/buttflattery/yii2-formwizard/commit/4e523900e3f5312a1bc72e7561b5b43a731f1fb3) Added hint option for the inputs to provide customized text.
 
 - Nov 26, 2018 [ENH:bdcd340](https://github.com/buttflattery/yii2-formwizard/commit/bdcd34097f19ce9b37dfa63c065366c5ae3b3a52) added bootstrap4 support and updated all the css and assets files.
