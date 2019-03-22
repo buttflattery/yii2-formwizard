@@ -112,7 +112,7 @@ class FormWizard extends Widget
      *
      * @var string
      */
-    public $theme = 'default';
+    public $theme = self::THEME_DEFAULT;
 
     /**
      * The transition effect that is to be used for the steps while changing.
@@ -192,6 +192,13 @@ class FormWizard extends Widget
      * @var mixed
      */
     public $enableAnchorOnDoneStep = true;
+
+    /**
+     * Enable Preview Step option
+     * 
+     * @var boolean
+     */
+    public $enablePreview;
 
     /**
      * The Text label for the Next button. Default is `Next`.
