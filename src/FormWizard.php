@@ -664,7 +664,7 @@ JS;
         }
 
         //start field container tag <div class="fields_container">
-        $html .= Html::beginTag('div', ["class"=>$isTabularStep?"fields_container form-inline":"fields_container"]);
+        $html .= Html::beginTag('div', ["class"=>"fields_container"]);
 
         //create step fields
         $html .= $this->createStepFields($index, $step, $isTabularStep);
