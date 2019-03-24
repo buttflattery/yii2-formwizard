@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - Oct 7, 2018 [ENH:d8b14a6](https://github.com/buttflattery/yii2-formwizard/commit/d8b14a6de252bb0ff6e48963e2ecebdfbbeb9adf) updated the sections to customize all fields with `textarea`, `radio`, `checkbox`.
 
 <h3>Changed </h3>
+- March 25, 2019 [BUG:9e44bf7](https://github.com/buttflattery/yii2-formwizard/commit/9e44bf7805f7c78f7a33d746a1d42bf736bfbdd6) Fixed the bug with the add row when using widgets, closes #14.
 
 - Dec 6, 2018 [BUG:19c9619](https://github.com/buttflattery/yii2-formwizard/commit/19c96197bceb3767d4e9623897bd1f20ee3de02b) Added fix for kartik/depdrop widget Fixes #8
 
