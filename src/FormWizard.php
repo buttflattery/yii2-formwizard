@@ -66,6 +66,13 @@ class FormWizard extends Widget
      */
     private $_bsVersion;
 
+    /**
+     * Used for collecting user provided custom Js for the formwizard.beforeClone event
+     * 
+     * @var mixed
+     */
+    private $_tabularEventJs;
+
     //options widget
 
     /**
@@ -455,6 +462,7 @@ JS;
 
         //start container tag
         echo Html::beginTag('div', ['id' => $wizardContainerId]);
+        
         //draw form steps
         echo $this->createFormWizard();
 
@@ -474,9 +482,10 @@ JS;
         $pluginOptionsJson = Json::encode($pluginOptions);
 
         $this->registerScripts();
+        $js = $this->_tabularEventJs;
 
         //init script for the wizard
-        $js = <<< JS
+        $js .= <<< JS
 
         //start observer for the smart wizard to run the script
         //when the child HTMl elements are populated
@@ -512,6 +521,7 @@ JS;
             classPrev:'{$this->classPrev}',
             classFinish:'{$this->classFinish}'
         };
+        
 JS;
 
         //register script
@@ -534,6 +544,8 @@ JS;
         //start Body steps html
         $htmlSteps = Html::beginTag('div');
 
+        $formId = $this->formOptions['id'];
+
         //loop thorugh all the steps
         foreach ($steps as $index => $step) {
             //create wizard steps
@@ -548,8 +560,10 @@ JS;
         //end steps html
         $htmlSteps .= Html::endTag('div');
 
+        $content = $htmlTabs . $htmlSteps;
+
         //return form wizard html
-        return $htmlTabs . $htmlSteps;
+        return $content;
     }
 
     /**
@@ -643,8 +657,8 @@ JS;
             $html .= Html::button(
                 $this->iconAdd.'&nbsp;Add', 
                 [
-                    'class'=>$this->classAdd.(($this->_bsVersion==3)?' pull-right':' float-right'), 
-                    'id'=>'add_row'
+                    'class'=>$this->classAdd.(($this->_bsVersion==3)?' pull-right add_row':' float-right add_row'), 
+                    // 'id'=>'add_row'
                 ]
             );
         }
@@ -725,13 +739,15 @@ JS;
             if ($modelIndex > 0) {
                 $htmlFields .= Html::tag('i', '', ['class'=>'remove-row formwizard-x-ico', 'data'=>['rowid'=>$modelIndex]]);
             }
+
             //iterate all fields associated to the relevant model
             foreach ($attributes as $attribute) {
 
                 //attribute name
                 $attributeName = ($isTabularStep) ? "[$modelIndex]" . $attribute : $attribute;
+                $customConfigDefinedForField = $fieldConfig && isset($fieldConfig[$attribute]);
 
-                if ($fieldConfig && isset($fieldConfig[$attribute])) {
+                if ($customConfigDefinedForField) {
                     //if filtered field
                     $isFilteredField = $fieldConfig[$attribute] === false;
 
@@ -748,6 +764,43 @@ JS;
                     //default field population
                     $htmlFields .= $this->createDefaultInput($model, $attributeName);
                 }
+
+
+                if ($customConfigDefinedForField) {
+                    //get the tabular events for the field
+                    $tabularEvents = ArrayHelper::getValue($fieldConfig[$attribute], 'tabularEvents', false);
+                    
+                    //check if tabular step and tabularEvents provided for field 
+                    if ($isTabularStep && is_array($tabularEvents) && $modelIndex == 0) {
+
+                        //id of the form
+                        $formId = $this->formOptions['id'];
+
+                        //id of the input
+                        $attributeId = Html::getInputId($model, $attributeName);
+
+                        //iterate all events attached and bind them
+                        foreach ($tabularEvents as $eventName=>$callback) {
+                            //get the call back
+                            $eventCallBack = new JsExpression($callback);
+
+                            if ($eventName!=='afterInsert') {
+                                //bind the call back to the field 
+                                $this->_tabularEventJs.=<<<JS
+                                $(document).on("formwizard.{$eventName}","#{$formId} #step-{$index} #{$attributeId}",{$eventCallBack});
+JS;
+                            } else {
+
+                                $this->_tabularEventJs.=<<<JS
+                                $(document).on("formwizard.{$eventName}","#{$formId} #step-{$index} .fields_container>div[id^='row_']",{$eventCallBack});
+JS;
+                            }
+                            
+                        }
+                    }
+                }
+                
+
             }
 
             //is tabular step
@@ -774,11 +827,6 @@ JS;
     public function addTabularHtmlClosingTags($modelIndex)
     {
         $htmlFields='';
-
-        //if more than one model of same type
-        // if ($modelIndex > 0) {
-        //     $htmlFields .= Html::tag('i', '', ['class'=>'remove-row formwizard-x-ico', 'data'=>['rowid'=>$modelIndex]]);
-        // }
 
         //close row div
         $htmlFields .= Html::endTag('div');

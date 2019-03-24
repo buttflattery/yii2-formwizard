@@ -6,6 +6,9 @@ if (typeof jQuery === "undefined") {
 }
 
 $.formwizard = {
+    triggerEvent: (event, eventSelector, eventParams) => {
+        $(eventSelector).trigger(event, eventParams);
+    },
     currentButtonTarget: null,
     observerObj: null,
     fields: [],
@@ -178,10 +181,12 @@ $.formwizard = {
     },
     formNavigation: {
         next: function (target) {
+
             let containerId = $(target)
                 .parent()
                 .closest(".sw-main")
                 .attr("id");
+            console.log("next", target, containerId);
             $("#" + containerId).smartWizard("next");
         },
         previous: function (target) {
@@ -197,12 +202,12 @@ $.formwizard = {
             // select the target node in select2
             var target = document.querySelector(selector);
 
-            $.formwizard.observerObj = $.formwizard.observer.observerInstance();
+            $.formwizard.observerObj = $.formwizard.observer.observerInstance(selector);
             // configuration of the observer:
             var config = {
                 childList: true,
                 attributes: true,
-                subtree: true
+                subtree: false
             };
             // pass in the target node, as well as the observer options
             $.formwizard.observerObj.observe(target, config);
@@ -212,7 +217,7 @@ $.formwizard = {
          *
          * @returns {MutationObserver}
          */
-        observerInstance: function () {
+        observerInstance: function (selector) {
             // create an observer instance
             return new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
@@ -224,7 +229,7 @@ $.formwizard = {
                         }
 
                         //init the button events for thetabular steps
-                        $.formwizard.init();
+                        $.formwizard.init(selector);
                         $.formwizard.observerObj.disconnect();
                     }
                 });
@@ -241,18 +246,34 @@ $.formwizard = {
                 .closest("form")
                 .attr("id");
             let currentStep = $.formwizard.helper.currentIndex("#" + formId);
+            let tabular = $.formwizard.tabular;
+            let oldFieldCollection = $(row).find('input,select,textarea');
+            let eventTrigger = $.formwizard.triggerEvent;
 
+            //trigger beforeClone event for all the inputs inside the tabular row to be cloned
+            oldFieldCollection.each(function (index, element) {
+                //trigger beforeclone event
+                eventTrigger("formwizard.beforeClone", "#" + formId + " #step-" + currentStep + " #" + element.id);
+            });
+
+            //clone node
             documentFragment.appendChild(row.cloneNode(true));
 
-            let cloneRow = documentFragment.querySelector("div.tabular-row");
+            //trigger afterClone event for all the inputs inside the tabular row
+            oldFieldCollection.each(function (index, element) {
+                //trigger beforeclone event
+                eventTrigger("formwizard.afterClone", "#" + formId + " #step-" + currentStep + " #" + element.id);
+            });
+
+            let rowClone = documentFragment.querySelector("div.tabular-row");
 
             //update row container id
-            cloneRow.id = cloneRow.id.replace(
+            rowClone.id = rowClone.id.replace(
                 /\_[^\_]+$/,
                 "_" + parseInt(currentIndex)
             );
-            let tabular = $.formwizard.tabular;
 
+            let newFields = [];
             //update input ids
             documentFragment
                 .querySelectorAll("input,select,textarea")
@@ -263,7 +284,7 @@ $.formwizard = {
                     //update input attributes
                     tabular.updateFieldAttributes(element, currentIndex);
 
-                    //get the default field options
+                    //get the default field options ActiveForm
                     let fieldOptions = tabular.setFieldDefaults(
                         element,
                         formId,
@@ -272,11 +293,13 @@ $.formwizard = {
 
                     //add field to the formwizard step fields list
                     $.formwizard.helper.addField(formId, element, currentStep);
+                    newFields.push(element.id);
 
                     if (typeof fieldOptions !== 'undefined') {
                         //add field to the activeform validation
                         $.formwizard.validation.addField(formId, fieldOptions);
                     }
+
 
                 });
 
@@ -284,9 +307,14 @@ $.formwizard = {
             let removeIcon = document.createElement("i");
             removeIcon.className = "remove-row formwizard-x-ico";
             removeIcon.dataset.rowid = currentIndex;
-            //documentFragment.querySelector(".tabular-row")
-            cloneRow.insertBefore(removeIcon, cloneRow.firstChild); //appendChild(removeIcon);
+
+            rowClone.insertBefore(removeIcon, rowClone.firstChild);
             $(currentContainer)[0].appendChild(documentFragment);
+
+            //trigger the afterInsert event 
+            eventTrigger("formwizard.afterInsert", "#" + formId + " #step-" + currentStep + " #row_" + currentIndex, {
+                rowIndex: currentIndex
+            });
         },
         removeRow: rowid => {
             let rowContainer = $("#row_" + rowid);
@@ -358,12 +386,13 @@ $.formwizard = {
             }
         }
     },
-    init: () => {
-        $(document).on("click", ".remove-row", function (e) {
+    init: (selector) => {
+
+        $(selector).on("click", ".remove-row", function (e) {
             $.formwizard.tabular.removeRow($(this).data("rowid"));
         });
 
-        $(document).on("click", "#add_row", function (e) {
+        $(selector + " .add_row").on("click", function (e) {
             $.formwizard.tabular.addRow($(this));
         });
     }
