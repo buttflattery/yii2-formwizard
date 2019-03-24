@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - Oct 7, 2018 [ENH:d8b14a6](https://github.com/buttflattery/yii2-formwizard/commit/d8b14a6de252bb0ff6e48963e2ecebdfbbeb9adf) updated the sections to customize all fields with `textarea`, `radio`, `checkbox`.
 
 <h3>Changed </h3>
+- March 25, 2019 [BUG:9e44bf7](https://github.com/buttflattery/yii2-formwizard/commit/9e44bf7805f7c78f7a33d746a1d42bf736bfbdd6) Fixed the bug with the add row when using widgets, closes #14.
 
 - Nov 28, 2018 [BUG:142f4de](https://github.com/buttflattery/yii2-formwizard/commit/142f4de15aa8cfcdd55997dca3cfead295bcbd0a) Disabled form navigation on keyboard LEFT & RIGHT buttons as it skips the validation for the form and navigates to the next step change the default to `keyNavigation:false`.
 
