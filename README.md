@@ -45,18 +45,19 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 #### Widget options
 
 - `wizardContainerId (string)`: Id of the main container for the wizard.
-- `formOptions (array)`: specify the [ActiveForm](https://www.yiiframework.com/doc/api/2.0/yii-widgets-activeform) properties.
+- `formOptions (array)`: Specify the [ActiveForm](https://www.yiiframework.com/doc/api/2.0/yii-widgets-activeform) properties.
 - `labelNext (string)` : Next button label, default value `Next`.
 - `labelPrev (string)` : Previous button label, default value `Previous`.
 - `labelFinish (string)` : Finish button label, default value `Finish`.
-- `classNext (string)` : css classes for the button Next, default `btn btn-info`.
-- `iconNext (string)` : the html string for the Next button, defaults to `<i class="formwizard-arrow-right-alt1-ico"></i>`.
-- `classPrev (string)` : css classes for the button Previous, default `btn btn-info`.
-- `iconPrev (string)` : the html string for the prev icon, defaults to `<i class="formwizard-arrow-left-alt1-ico"></i>`.
-- `classFinish (string)` : css classes for the button Finish, default `btn btn-success`.
-- `iconFinish (string)` : the Html string for the icon, defaults to `<i class="formwizard-check-alt-ico"></i>`.
-- `classAdd (string)` : css class for Add Row Button default to `btn btn-info`
-- `iconAdd (string)` : the html string for the button default to `<i class="formwizard-plus-ico"></i>`
+- `classNext (string)` : Css classes for the button Next, default `btn btn-info`.
+- `iconNext (string)` : The html string for the Next button, defaults to `<i class="formwizard-arrow-right-alt1-ico"></i>`.
+- `classPrev (string)` : Css classes for the button Previous, default `btn btn-info`.
+- `iconPrev (string)` : The html string for the prev icon, defaults to `<i class="formwizard-arrow-left-alt1-ico"></i>`.
+- `classFinish (string)` : Css classes for the button Finish, default `btn btn-success`.
+- `iconFinish (string)` : The Html string for the icon, defaults to `<i class="formwizard-check-alt-ico"></i>`.
+- `classAdd (string)` : Css class for Add Row Button default to `btn btn-info`
+- `iconAdd (string)` : The html string for the button default to `<i class="formwizard-plus-ico"></i>`
+- `enablePreview (boolean)` : Adds a Preview Step as the last step in the form wizard where you can preview all the entered inputs grouped by steps, clicking on any step will navigate to that step for quick edit, it defaults to `false`.
 - `steps (array)` : An array of the steps(`array`), the steps can have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
 
   - `type (string)` : The type of the step, defaults to `default`. This option is used if you need to have tabular inputs for the step by specifying the type as `tabular`, you can use the provided constants like `FormWizard::STEP_TYPE_TABULAR` or `FormWizard::STEP_TYPE_DEFAULT`.
