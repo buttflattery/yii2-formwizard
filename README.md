@@ -14,7 +14,7 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 - [jQuery v2.2.4](https://jquery.com/download/)
 - [Bootstrap v3.3.7](https://getbootstrap.com/docs/3.3/) && [Bootstrap v4](http://getbootstrap.com/)
 
-### UPDATE 2 : New Features Added
+### UPDATE 2 : New Features Added since 25th March, 2019
 
 #### Preview Step
 
