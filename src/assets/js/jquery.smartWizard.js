@@ -331,6 +331,7 @@
             return true;
         },
         _showStep: function (idx) {
+
             // If step not found, skip
             if (!this.steps.eq(idx)) {
                 return false;
@@ -565,6 +566,9 @@
             this.main.addClass('sw-theme-' + this.options.theme);
             // Trigger "themeChanged" event
             this._triggerEvent("themeChanged", [this.options.theme]);
+        },
+        goToStep: function (stepNum) {
+            this._showStep(stepNum);
         },
         next: function () {
             this._showNext();
