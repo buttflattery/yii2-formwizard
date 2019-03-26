@@ -104,15 +104,80 @@ $.formwizard = {
                     btnNext.addClass("hidden d-none");
                     btnFinish.removeClass("hidden d-none");
                     btnPrev.removeClass("disabled hidden d-none");
+                    //call preview step if enabled
+                    $.formwizard.helper.addPreviewStep(wizardContainerId);
                 } else {
                     btnPrev.removeClass("disabled");
                     btnNext.removeClass("disabled hidden d-none");
                     btnFinish.addClass("hidden d-none");
                 }
+
             });
         },
         currentIndex: function (form) {
             return $(form + " ul.step-anchor>li.active").index();
+        },
+        addPreviewStep: (wizardContainerId) => {
+            let formwizardOptions = $.formwizard.options;
+            let formId = $(wizardContainerId).closest('form').attr('id');
+            let fragment = document.createDocumentFragment();
+            let currentStep = $.formwizard.helper.currentIndex('#' + formId);
+            let stepContainer = document.querySelector('#step-' + currentStep);
+            let bsVersion = $.formwizard.options[formId].bsVersion;
+
+            stepContainer.querySelectorAll(".list-group").forEach(element => {
+                element.remove();
+            });
+
+            if (formwizardOptions.hasOwnProperty(formId) && formwizardOptions[formId].enablePreview) {
+                let fields = $.formwizard.fields[formId];
+                fields.forEach(function (stepFields, step) {
+                    let stepPreviewContainer = document.createElement("div");
+                    stepPreviewContainer.setAttribute('class', 'list-group col-sm-12 col-lg-12 preview-container');
+                    stepPreviewContainer.dataset.step = step;
+                    let rowHtml = '<h4 class="list-group-heading">Step ' + parseInt(step + 1) + '</h4>';
+                    stepFields.forEach(function (fieldName, index) {
+                        let inputLabel = $.formwizard.helper.getpreviewInputLabel(fieldName);
+                        let inputValue = $.formwizard.helper.getpreviewInputValue(fieldName);
+                        let stepData = {
+                            label: inputLabel == '' ? 'NA' : inputLabel,
+                            value: inputValue == '' ? 'NA' : inputValue
+                        };
+
+                        rowHtml += $.formwizard.helper.previewTemplate(stepData, bsVersion);
+                    });
+
+                    stepPreviewContainer.innerHTML = rowHtml;
+                    fragment.appendChild(stepPreviewContainer);
+                });
+
+                stepContainer.appendChild(fragment);
+                $(".preview-button").on('click', function (e) {
+                    let stepNo = $(this).closest('div.preview-container').data('step');
+                    $.formwizard.formNavigation.goToStep(wizardContainerId, stepNo);
+                });
+            }
+        },
+        getpreviewInputLabel: (fieldName) => {
+            let text = $('#' + fieldName).siblings('label').text();
+            if (text !== '') {
+                return text;
+            }
+            return $('#' + fieldName).attr("placeholder");
+        },
+        getpreviewInputValue: (fieldName) => {
+            let inputType = $('#' + fieldName);
+            if (inputType.is("select")) {
+                // <select> element.
+                return $('#' + fieldName + ' option:selected').text();
+            } else {
+                // <textarea> element.
+                return $('#' + fieldName).val();
+            }
+        },
+        previewTemplate: (params, bsVersion) => {
+            let bsClass = bsVersion == 4 ? ' list-group-item-action' : '';
+            return `<button type="button" class="list-group-item list-group-item-success${bsClass} preview-button"><span class="badge">${params.label}</span>${params.value}</button>`;
         }
     },
     validation: {
@@ -126,11 +191,19 @@ $.formwizard = {
                     event.preventDefault();
                     let formName = $(this).attr("id");
                     let currentIndex = $.formwizard.helper.currentIndex(form);
-                    let res = $.formwizard.fields[formName][currentIndex].diff(messages);
+                    let isLastStep = currentIndex == $(form + " .step-anchor").find("li").length - 1;
+                    let res;
+
+                    //check if the preview step then skip validation messages check
+                    if ($.formwizard.options[formName].enablePreview && isLastStep) {
+                        res = 0;
+                    } else {
+                        res = $.formwizard.fields[formName][currentIndex].diff(messages);
+                    }
+
                     if (!res.length) {
                         //check if last step then submit form
-                        let isLastStep =
-                            currentIndex == $(form + " .step-anchor").find("li").length - 1;
+
                         if (isLastStep) {
                             $.formwizard.submit = true;
                             return true;
@@ -180,16 +253,18 @@ $.formwizard = {
         }
     },
     formNavigation: {
-        next: function (target) {
+        next: (target) => {
 
             let containerId = $(target)
                 .parent()
                 .closest(".sw-main")
                 .attr("id");
-            console.log("next", target, containerId);
             $("#" + containerId).smartWizard("next");
         },
-        previous: function (target) {
+        goToStep: (wizardContainerId, stepno) => {
+            $(wizardContainerId).smartWizard("goToStep", stepno);
+        },
+        previous: (target) => {
             let containerId = $(target)
                 .parent()
                 .closest(".sw-main")
