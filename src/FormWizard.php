@@ -201,11 +201,11 @@ class FormWizard extends Widget
     public $enableAnchorOnDoneStep = true;
 
     /**
-     * Enable Preview Step option
+     * Enable Preview Step option, default value `false`
      * 
      * @var boolean
      */
-    public $enablePreview;
+    public $enablePreview = false;
 
     /**
      * The Text label for the Next button. Default is `Next`.
@@ -314,6 +314,7 @@ class FormWizard extends Widget
     /**STEP TYPES */
     const STEP_TYPE_DEFAULT='default';
     const STEP_TYPE_TABULAR='tabular';
+    const STEP_TYPE_PREVIEW='preview';
 
     /**THEMES */
     const THEME_DEFAULT = 'default';
@@ -515,7 +516,8 @@ JS;
         //fields list
         $.formwizard.fields.{$this->formOptions['id']}={$fieldsJSON};
 
-        $.formwizard.options.{$this->formOptions["id"]}={
+        $.formwizard.options.{$this->formOptions['id']}={
+            wizardContainerId:'{$wizardContainerId}',
             classAddRow:'{$this->classAdd}',
             labelNext:'{$this->labelNext}',
             labelPrev:'{$this->labelPrev}',
@@ -526,8 +528,11 @@ JS;
             iconAdd:'{$this->iconAdd}',
             classNext:'{$this->classNext}',
             classPrev:'{$this->classPrev}',
-            classFinish:'{$this->classFinish}'
+            classFinish:'{$this->classFinish}',
+            enablePreview:'{$this->enablePreview}',
+            bsVersion:'{$this->_bsVersion}'
         };
+        
         
 JS;
 
@@ -552,11 +557,27 @@ JS;
         $htmlSteps = Html::beginTag('div');
 
         $formId = $this->formOptions['id'];
-
+        
+        if ($this->enablePreview) {
+            $steps = array_merge(
+                $steps,
+                [
+                    [
+                        'type'=>self::STEP_TYPE_PREVIEW,
+                        'title' => 'Final Preview',
+                        'description' => 'Final Preview oof all Steps',
+                        'formInfoText' => 'Click any of the steps below to edit them',
+                    ]
+                ]
+            );
+        }
+      
         //loop thorugh all the steps
         foreach ($steps as $index => $step) {
+            
             //create wizard steps
             list($tabs, $steps) = $this->createStep($index, $step);
+
             $htmlTabs .= $tabs;
             $htmlSteps .= $steps;
         }
@@ -648,15 +669,14 @@ JS;
             $this->_checkTabularConstraints($step['model']);
         }
 
-        if (empty($step['model'])) {
-            throw new ArgException("The model property cannot be an empty array make sure you provide a new instance of the model in case you are editing/updating or using tabular step and there is not related model saved.");
-        }
+        
 
         //start step wrapper div
         $html .= Html::beginTag(
             'div', 
             ['id' => 'step-' . $index]
         );
+       
         $html .= Html::tag('div', $formInfoText, ['class' => 'border-bottom border-gray pb-2']);
         
         //Add Row Buton to add fields dynamically
@@ -670,11 +690,12 @@ JS;
             );
         }
 
-        //start field container tag <div class="fields_container">
-        $html .= Html::beginTag('div', ["class"=>"fields_container"]);
-
-        //create step fields
-        $html .= $this->createStepFields($index, $step, $isTabularStep);
+        if (!empty($step['model'])) {
+            //start field container tag <div class="fields_container">
+            $html .= Html::beginTag('div', ["class"=>"fields_container"]);
+            //create step fields
+            $html .= $this->createStepFields($index, $step, $isTabularStep);
+        }
 
         //close the field container tag </div>
         $html .= Html::endTag('div');
