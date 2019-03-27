@@ -14,7 +14,14 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 - [jQuery v2.2.4](https://jquery.com/download/)
 - [Bootstrap v3.3.7](https://getbootstrap.com/docs/3.3/) && [Bootstrap v4](http://getbootstrap.com/)
 
-### UPDATE 2 : Tabular Step Support
+### UPDATE 2 : New Features Added since 25th March, 2019
+
+#### Preview Step
+
+When enabled using the `"enablePreview"=>true` in the main options of the formwizard, after adding all the steps the last step which previews all the inputs entered for the steps. The user can navigate to the step by clicking on the list label inside the preview window. This option is turned off by default, and users will need to specify the `enablePreview` in the main options. it looks like below
+![preview](https://user-images.githubusercontent.com/1536454/55037359-545c2f00-503f-11e9-98a0-25382c49baa6.png)
+
+#### Tabular Step
 
 A new feature for tabular steps has been added which will help you to configure adressbook like features into the formwizard, there have been several quries related to such feature where we need to add multiple adresses against a single user, or add multiple tags against any album and we need to be able to have a <kbd>Add New</kbd> button which should dynamically add the set of inputs as needed.
 
@@ -45,18 +52,19 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 #### Widget options
 
 - `wizardContainerId (string)`: Id of the main container for the wizard.
-- `formOptions (array)`: specify the [ActiveForm](https://www.yiiframework.com/doc/api/2.0/yii-widgets-activeform) properties.
+- `formOptions (array)`: Specify the [ActiveForm](https://www.yiiframework.com/doc/api/2.0/yii-widgets-activeform) properties.
 - `labelNext (string)` : Next button label, default value `Next`.
 - `labelPrev (string)` : Previous button label, default value `Previous`.
 - `labelFinish (string)` : Finish button label, default value `Finish`.
-- `classNext (string)` : css classes for the button Next, default `btn btn-info`.
-- `iconNext (string)` : the html string for the Next button, defaults to `<i class="formwizard-arrow-right-alt1-ico"></i>`.
-- `classPrev (string)` : css classes for the button Previous, default `btn btn-info`.
-- `iconPrev (string)` : the html string for the prev icon, defaults to `<i class="formwizard-arrow-left-alt1-ico"></i>`.
-- `classFinish (string)` : css classes for the button Finish, default `btn btn-success`.
-- `iconFinish (string)` : the Html string for the icon, defaults to `<i class="formwizard-check-alt-ico"></i>`.
-- `classAdd (string)` : css class for Add Row Button default to `btn btn-info`
-- `iconAdd (string)` : the html string for the button default to `<i class="formwizard-plus-ico"></i>`
+- `classNext (string)` : Css classes for the button Next, default `btn btn-info`.
+- `iconNext (string)` : The html string for the Next button, defaults to `<i class="formwizard-arrow-right-alt1-ico"></i>`.
+- `classPrev (string)` : Css classes for the button Previous, default `btn btn-info`.
+- `iconPrev (string)` : The html string for the prev icon, defaults to `<i class="formwizard-arrow-left-alt1-ico"></i>`.
+- `classFinish (string)` : Css classes for the button Finish, default `btn btn-success`.
+- `iconFinish (string)` : The Html string for the icon, defaults to `<i class="formwizard-check-alt-ico"></i>`.
+- `classAdd (string)` : Css class for Add Row Button default to `btn btn-info`
+- `iconAdd (string)` : The html string for the button default to `<i class="formwizard-plus-ico"></i>`
+- `enablePreview (boolean)` : Adds a Preview Step as the last step in the form wizard where you can preview all the entered inputs grouped by steps, clicking on any step will navigate to that step for quick edit, it defaults to `false`.
 - `steps (array)` : An array of the steps(`array`), the steps can have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
 
   - `type (string)` : The type of the step, defaults to `default`. This option is used if you need to have tabular inputs for the step by specifying the type as `tabular`, you can use the provided constants like `FormWizard::STEP_TYPE_TABULAR` or `FormWizard::STEP_TYPE_DEFAULT`.
