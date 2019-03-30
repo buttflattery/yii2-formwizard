@@ -208,6 +208,13 @@ class FormWizard extends Widget
     public $enablePreview = false;
 
     /**
+     * Enables restoring of the data for the unsaved form
+     * 
+     * @var boolean
+     */
+    public $enablePersistence = false;
+
+    /**
      * The Text label for the Next button. Default is `Next`.
      *
      * @var string
@@ -227,6 +234,13 @@ class FormWizard extends Widget
      * @var string
      */
     public $labelFinish = 'Finish';
+
+    /**
+     * The label text for the restore button
+     * 
+     * @var string
+     */
+    public $labelRestore = 'Restore';
 
     /**
      * The icon for the Next button you want to be shown inside the button.
@@ -277,6 +291,18 @@ class FormWizard extends Widget
     public $iconAdd = self::ICON_ADD;
 
     /**
+     * The icon for the Restore button you want to be shown inside the button.
+     * Default is `<i class="formwizard-restore-ico"></i>`.
+     *
+     * This can be an html string '<i class="fa fa-restore"></i>'
+     * in case you are using FA, Material or Glyph icons, or an
+     * image tag like '<img src="/path/to/image" />'.
+     *
+     * @var mixed
+     */
+    public $iconRestore = self::ICON_RESTORE;
+
+    /**
      * The class for the Next button , default is `btn btn-info`
      *
      * @var string
@@ -304,12 +330,20 @@ class FormWizard extends Widget
      */
     public $classAdd = 'btn btn-info';
 
+    /**
+     * The class for the Add Row button, default is btn btn-info
+     * 
+     * @var string
+     */
+    public $classRestore = 'btn btn-success';
+
     /**ICONS */
 
     const ICON_NEXT = '<i class="formwizard-arrow-right-alt1-ico"></i>';
     const ICON_PREV = '<i class="formwizard-arrow-left-alt1-ico"></i>';
     const ICON_FINISH = '<i class="formwizard-check-alt-ico"></i>';
     const ICON_ADD = '<i class="formwizard-plus-ico"></i>';
+    const ICON_RESTORE = '<i class="formwizard-restore-ico"></i>';
 
     /**STEP TYPES */
     const STEP_TYPE_DEFAULT='default';
@@ -446,12 +480,15 @@ class FormWizard extends Widget
             labelNext:'{$this->labelNext}',
             labelPrev:'{$this->labelPrev}',
             labelFinish:'{$this->labelFinish}',
+            labelRestore:'{$this->labelRestore}',
             iconNext:'{$this->iconNext}',
             iconPrev:'{$this->iconPrev}',
             iconFinish:'{$this->iconFinish}',
+            iconRestore:'{$this->iconRestore}',
             classNext:'{$this->classNext}',
             classPrev:'{$this->classPrev}',
             classFinish:'{$this->classFinish}',
+            classRestore:'{$this->classRestore}'
         }).concat({$pluginOptions['toolbarSettings']['toolbarExtraButtons']})
 JS;
         $pluginOptions['toolbarSettings']['toolbarExtraButtons'] 
@@ -492,8 +529,10 @@ JS;
         $this->registerScripts();
         $js = $this->_tabularEventJs;
 
+        $jsOptionsPersistence = Json::encode($this->enablePersistence);
+        
         //init script for the wizard
-        $js .= <<< JS
+        $js .= <<<JS
 
         //start observer for the smart wizard to run the script
         //when the child HTMl elements are populated
@@ -532,7 +571,12 @@ JS;
             enablePreview:'{$this->enablePreview}',
             bsVersion:'{$this->_bsVersion}'
         };
+
+        //init the data persistence if enabled
         
+        if({$jsOptionsPersistence}){
+            $.formwizard.persistence.init('{$this->formOptions["id"]}');
+        }
         
 JS;
 
@@ -555,8 +599,6 @@ JS;
 
         //start Body steps html
         $htmlSteps = Html::beginTag('div');
-
-        $formId = $this->formOptions['id'];
         
         if ($this->enablePreview) {
             $steps = array_merge(
@@ -606,15 +648,31 @@ JS;
     {
         //step title
         $stepTitle = ArrayHelper::getValue($step, 'title', 'Step-' . ($index + 1)); 
+        
         //step description
         $stepDescription = ArrayHelper::getValue($step, 'description', 'Description');
+        
         //form body info text
         $formInfoText = ArrayHelper::getValue($step, 'formInfoText', 'Add details below'); 
+        
         //get html tabs
         $htmlTabs = $this->createTabs($index, $stepDescription, $stepTitle);
 
+        //html body 
+        $htmlBody = '';
+
+        // //add retore button
+        // if ($this->enablePersistence) {
+        //     $htmlBody = Html::button(
+        //         $this->iconRestore.'&nbsp;'.$this->labelRestore,
+        //         [
+        //         'class'=>$this->classRestore.' restore'
+        //         ]
+        //     );
+        // }
+
         //get html body
-        $htmlBody = $this->createBody($index, $formInfoText, $step);
+        $htmlBody .= $this->createBody($index, $formInfoText, $step);
 
         //return html
         return [$htmlTabs, $htmlBody];
@@ -669,8 +727,6 @@ JS;
             $this->_checkTabularConstraints($step['model']);
         }
 
-        
-
         //start step wrapper div
         $html .= Html::beginTag(
             'div', 
@@ -689,6 +745,8 @@ JS;
                 ]
             );
         }
+
+        
 
         if (!empty($step['model'])) {
             //start field container tag <div class="fields_container">
