@@ -60,6 +60,12 @@ $.formwizard = {
                 .html(options.iconFinish + "&nbsp;" + options.labelFinish)
                 .addClass(options.classFinish);
 
+            var formwizardBtnRestore = $(
+                    '<button class="formwizard-restore" type="button"/></button>'
+                )
+                .html(options.iconRestore + "&nbsp;" + options.labelRestore)
+                .addClass(options.classRestore);
+
             var combined = formwizardBtnNext.add(formwizardBtnFinish);
 
             $(combined).on("click", function (e) {
@@ -73,7 +79,7 @@ $.formwizard = {
                 return $.formwizard.formNavigation.next(e.target);
             });
 
-            return [formwizardBtnPrev, formwizardBtnNext, formwizardBtnFinish];
+            return [formwizardBtnRestore, formwizardBtnPrev, formwizardBtnNext, formwizardBtnFinish];
         },
         updateButtons: function (wizardContainerId) {
             $(wizardContainerId).on("showStep", function (
@@ -123,7 +129,7 @@ $.formwizard = {
             let fragment = document.createDocumentFragment();
             let currentStep = $.formwizard.helper.currentIndex('#' + formId);
             let stepContainer = document.querySelector('#step-' + currentStep);
-            let bsVersion = $.formwizard.options[formId].bsVersion;
+            let bsVersion = formwizardOptions[formId].bsVersion;
 
             stepContainer.querySelectorAll(".list-group").forEach(element => {
                 element.remove();
@@ -470,6 +476,37 @@ $.formwizard = {
         $(selector + " .add_row").on("click", function (e) {
             $.formwizard.tabular.addRow($(this));
         });
+    },
+    persistence: {
+        addButton: () => {
+
+        },
+        savefield: (fieldId) => {
+            $.stringify;
+        },
+        clearStorage: () => {
+
+        },
+        loadForm: () => {
+
+        },
+        init: (formId) => {
+
+            // if (localStorage.getItem('formwizard.persistence') == null) {
+            //     localStorage.setItem('formwizard.persistence', JSON.stringify(''));
+            // } else {
+            //     JSON.parse(localStorage.getItem('formwizard.persistence'));
+            // }
+            $("#" + formId + " :input").on("change", function (e) {
+                $.formwizard.persistence.savefield(e.currentTarget.id);
+            });
+
+            console.log($("#" + formId + " button.restore"));
+            $("#" + formId + " button.restore").on("click", function () {
+                console.log("here");
+            });
+
+        }
     }
 };
 

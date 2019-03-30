@@ -30,6 +30,10 @@
     content: "\e900";
 }
 
+.formwizard-restore-ico:before {
+    content: "\ea2e";
+}
+
 .formwizard-check-alt-ico:before {
     content: "\e901";
 }
