@@ -133,7 +133,7 @@ $.formwizard = {
                 let fields = $.formwizard.fields[formId];
                 fields.forEach(function (stepFields, step) {
                     let stepPreviewContainer = document.createElement("div");
-                    stepPreviewContainer.setAttribute('class', 'list-group col-sm-12 col-lg-12 preview-container');
+                    stepPreviewContainer.setAttribute('class', 'list-group preview-container');
                     stepPreviewContainer.dataset.step = step;
                     let rowHtml = '<h4 class="list-group-heading">Step ' + parseInt(step + 1) + '</h4>';
                     stepFields.forEach(function (fieldName, index) {
