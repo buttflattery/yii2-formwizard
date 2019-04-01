@@ -39,6 +39,12 @@
     margin: 0
 }
 
+.justify-content-end {
+    -ms-flex-pack: end !important;
+    justify-content: flex-end !important;
+    display: flex;
+}
+
 .sw-main .sw-toolbar {
     margin-left: 0
 }
