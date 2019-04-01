@@ -15,7 +15,8 @@
     display: block;
     margin: 0;
     padding: 0;
-    border-radius: .25rem !important
+    border-radius: .25rem !important;
+    background: #fff;
 }
 
 .sw-main .sw-container {
