@@ -25,7 +25,7 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\web\View;
-use yii\widgets\ActiveForm;
+
 
 /**
  * A Yii2 plugin used for creating stepped form or form wizard using
@@ -72,6 +72,13 @@ class FormWizard extends Widget
      * @var mixed
      */
     private $_tabularEventJs;
+
+    /**
+     * Used for collecting user provided callback for the event formwizard.afterRestore
+     * 
+     * @var mixed
+     */
+    private $_persistenceEvents;
 
     //options widget
 
@@ -292,7 +299,7 @@ class FormWizard extends Widget
 
     /**
      * The icon for the Restore button you want to be shown inside the button.
-     * Default is `<i class="formwizard-restore-ico"></i>`.
+     * Default is `<i class="formwizard_restore-ico"></i>`.
      *
      * This can be an html string '<i class="fa fa-restore"></i>'
      * in case you are using FA, Material or Glyph icons, or an
@@ -307,35 +314,35 @@ class FormWizard extends Widget
      *
      * @var string
      */
-    public $classNext = 'btn btn-info';
+    public $classNext = 'btn btn-info ';
 
     /**
      * The class for the Previous button , default is `btn btn-info`
      *
      * @var string
      */
-    public $classPrev = 'btn btn-info';
+    public $classPrev = 'btn btn-info ';
 
     /**
      * The class for the Finish button, default is `btn btn-success`
      *
      * @var string
      */
-    public $classFinish = 'btn btn-success';
+    public $classFinish = 'btn btn-success ';
 
     /**
      * The class for the Add Row button, default is btn btn-info
      * 
      * @var string
      */
-    public $classAdd = 'btn btn-info';
+    public $classAdd = 'btn btn-info ';
 
     /**
      * The class for the Add Row button, default is btn btn-info
      * 
      * @var string
      */
-    public $classRestore = 'btn btn-success';
+    public $classRestore = 'btn btn-success ';
 
     /**ICONS */
 
@@ -527,7 +534,9 @@ JS;
         $pluginOptionsJson = Json::encode($pluginOptions);
 
         $this->registerScripts();
+        //add tabular events call back js
         $js = $this->_tabularEventJs;
+        $js .= $this->_persistenceEvents;
 
         $jsOptionsPersistence = Json::encode($this->enablePersistence);
         
@@ -658,21 +667,8 @@ JS;
         //get html tabs
         $htmlTabs = $this->createTabs($index, $stepDescription, $stepTitle);
 
-        //html body 
-        $htmlBody = '';
-
-        // //add retore button
-        // if ($this->enablePersistence) {
-        //     $htmlBody = Html::button(
-        //         $this->iconRestore.'&nbsp;'.$this->labelRestore,
-        //         [
-        //         'class'=>$this->classRestore.' restore'
-        //         ]
-        //     );
-        // }
-
         //get html body
-        $htmlBody .= $this->createBody($index, $formInfoText, $step);
+        $htmlBody = $this->createBody($index, $formInfoText, $step);
 
         //return html
         return [$htmlTabs, $htmlBody];
@@ -727,10 +723,16 @@ JS;
             $this->_checkTabularConstraints($step['model']);
         }
 
+        //step data
+        $dataStep = [
+            'number'=>$index,
+            'type'=>$stepType
+        ];
+        
         //start step wrapper div
         $html .= Html::beginTag(
             'div', 
-            ['id' => 'step-' . $index]
+            ['id' => 'step-' . $index,'data'=>['step'=>Json::encode($dataStep)]]
         );
        
         $html .= Html::tag('div', $formInfoText, ['class' => 'border-bottom border-gray pb-2']);
@@ -846,47 +848,18 @@ JS;
                     $htmlFields .= $this->createCustomInput(
                         $model, $attributeName, $fieldConfig[$attribute]
                     );
+                     //id of the input
+                    $attributeId = Html::getInputId($model, $attributeName);
+
+                    //add tabular events
+                    $this->_addTabularEvents($fieldConfig[$attribute], $isTabularStep, $modelIndex, $attributeId, $index);
+
+                    //add the restore events
+                    $this->_addRestoreEvents($fieldConfig[$attribute], $attributeId);
                 } else {
                     //default field population
                     $htmlFields .= $this->createDefaultInput($model, $attributeName);
                 }
-
-
-                if ($customConfigDefinedForField) {
-                    //get the tabular events for the field
-                    $tabularEvents = ArrayHelper::getValue($fieldConfig[$attribute], 'tabularEvents', false);
-                    
-                    //check if tabular step and tabularEvents provided for field 
-                    if ($isTabularStep && is_array($tabularEvents) && $modelIndex == 0) {
-
-                        //id of the form
-                        $formId = $this->formOptions['id'];
-
-                        //id of the input
-                        $attributeId = Html::getInputId($model, $attributeName);
-
-                        //iterate all events attached and bind them
-                        foreach ($tabularEvents as $eventName=>$callback) {
-                            //get the call back
-                            $eventCallBack = new JsExpression($callback);
-
-                            if ($eventName!=='afterInsert') {
-                                //bind the call back to the field 
-                                $this->_tabularEventJs.=<<<JS
-                                $(document).on("formwizard.{$eventName}","#{$formId} #step-{$index} #{$attributeId}",{$eventCallBack});
-JS;
-                            } else {
-
-                                $this->_tabularEventJs.=<<<JS
-                                $(document).on("formwizard.{$eventName}","#{$formId} #step-{$index} .fields_container>div[id^='row_']",{$eventCallBack});
-JS;
-                            }
-                            
-                        }
-                    }
-                }
-                
-
             }
 
             //is tabular step
@@ -901,6 +874,69 @@ JS;
         $this->_allFields[$index] = $fields;
 
         return $htmlFields;
+    }
+
+    /**
+     * Adds the restore events for the fields 
+     * 
+     * @param array  $attributeConfig the configurations for the attribute
+     * @param string $attributeId     the field attribute id 
+     * 
+     * @return null
+     */
+    private function _addRestoreEvents($attributeConfig, $attributeId)
+    {
+        $persistenceEvents = ArrayHelper::getValue($attributeConfig, 'persistencEvents', []);
+        $formId = $this->formOptions['id'];
+        
+        foreach ($persistenceEvents as $eventName=>$callback) {
+            $eventCallBack = new JsExpression($callback);
+            $this->_persistenceEvents.=<<<JS
+            $(document).on("formwizard.{$formId}.{$eventName}","#{$formId} #{$attributeId}",{$eventCallBack});
+JS;
+        }
+    }
+
+    /**
+     * Adds tabular events for the attribute
+     * 
+     * @param array   $attributeConfig attribute configurations passed 
+     * @param boolean $isTabularStep   boolean if current step is tabular
+     * @param int     $modelIndex      the index of the current model
+     * @param string  $attributeId     the id of the current field 
+     * @param int     $index           the index of the current step 
+     * 
+     * @return null
+     */
+    private function _addTabularEvents($attributeConfig, $isTabularStep, $modelIndex, $attributeId, $index)
+    {
+        //get the tabular events for the field
+        $tabularEvents = ArrayHelper::getValue($attributeConfig, 'tabularEvents', false);
+                    
+        //check if tabular step and tabularEvents provided for field 
+        if ($isTabularStep && is_array($tabularEvents) && $modelIndex == 0) {
+
+            //id of the form
+            $formId = $this->formOptions['id'];
+
+            //iterate all events attached and bind them
+            foreach ($tabularEvents as $eventName=>$callback) {
+                //get the call back
+                $eventCallBack = new JsExpression($callback);
+
+                if ($eventName!=='afterInsert') {
+                    //bind the call back to the field 
+                    $this->_tabularEventJs.=<<<JS
+                    $(document).on("formwizard.{$eventName}","#{$formId} #step-{$index} #{$attributeId}",{$eventCallBack});
+JS;
+                } else {
+
+                    $this->_tabularEventJs.=<<<JS
+                    $(document).on("formwizard.{$eventName}","#{$formId} #step-{$index} .fields_container>div[id^='row_']",{$eventCallBack});
+JS;
+                }
+            }
+        }
     }
 
     /**
@@ -1031,8 +1067,10 @@ JS;
      */
     public function createCustomInput($model, $attribute, $fieldConfig)
     {
+        
         //options
         $options = ArrayHelper::getValue($fieldConfig, 'options', []);
+        
         //is multi field name
         $isMultiField = Arrayhelper::getValue($fieldConfig, 'multifield', false);
 
@@ -1078,7 +1116,7 @@ JS;
             $field= $field->widget($widget, $options)->label($label, $labelOptions);
             return (!$hintText) ? $field : $field->hint($hintText);
         }
-
+        
         //remove the type and itemList from options
         unset($options['type']);
         unset($options['itemsList']);
@@ -1108,7 +1146,7 @@ JS;
                 $label = $params['label'];
                 $labelOptions = $params['labelOptions'];
                 $itemsList = $params['itemsList'];
-
+                
                 if (is_array($itemsList)) {
                     return $field->radioList($itemsList, $options)
                         ->label($label, $labelOptions);
