@@ -14,7 +14,22 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 - [jQuery v2.2.4](https://jquery.com/download/)
 - [Bootstrap v3.3.7](https://getbootstrap.com/docs/3.3/) && [Bootstrap v4](http://getbootstrap.com/)
 
-### UPDATE 2 : New Features Added since 25th March, 2019
+### UPDATE 2 : New Features Added
+
+### April 02 2019
+
+#### Enable Persistence
+
+As there can be any number of steps with the form, and an accidental refresh , reload or navigate away from the page could make it hectic for the user to start entering the form values again, so we have an option to save/restore the form by
+enabling the option `enablePersistence` in the main options, it provides you wiht the <kbd>RESTORE</kbd> button, through which you can restore the previous data for the un-saved form. The form fields are saved to the local storage as soon as you update or type in the fields.
+
+The local storage would be cleared as soon as you submit the form or click the finish button. In this case, you would still see the Restore button but it will not restore any data.
+
+The restore functionality is able to restore the dynamically created rows for the Tabular steps and the values for their fields.
+
+---
+
+### 25th March, 2019
 
 #### Preview Step
 
@@ -65,6 +80,8 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 - `classAdd (string)` : Css class for Add Row Button default to `btn btn-info`
 - `iconAdd (string)` : The html string for the button default to `<i class="formwizard-plus-ico"></i>`
 - `enablePreview (boolean)` : Adds a Preview Step as the last step in the form wizard where you can preview all the entered inputs grouped by steps, clicking on any step will navigate to that step for quick edit, it defaults to `false`.
+- `enablePersistence (boolean)` : Enables to save and restore an un-saved form to the local storage for later use, defaults to `false`.
+
 - `steps (array)` : An array of the steps(`array`), the steps can have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
 
   - `type (string)` : The type of the step, defaults to `default`. This option is used if you need to have tabular inputs for the step by specifying the type as `tabular`, you can use the provided constants like `FormWizard::STEP_TYPE_TABULAR` or `FormWizard::STEP_TYPE_DEFAULT`.
@@ -156,6 +173,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
     - `multifield (boolean)`
     - `hint`
     - `tabularEvents` (used with the tabular steps)
+    - `persistenceEvents` (effective with `enablePersistence`)
 
     Details
 
@@ -189,6 +207,9 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
       - `beforeClone` : Takes a callback `function(event){}` used for the PRE processing of the source element before it is cloned, using `$(this)` inside the function callback referes to the element in the first rows always.
       - `afterClone` : Takes a callback `function(event){}` used for the POST processing of the source element before it is cloned, using`\$(this)` inside the function callback referes to the element in the first rows always.
       - `afterInsert`: Takes a callback `function(event, params){console.log(params)}` used for the POST processing of the newly added element after it is cloned, using `$(this)` inside the function callback referes to the newly added row.the `params` is json object which holds the `rowIndex`.
+    - `persistenceEvents (array)` : it accepts an array of events with the following name. (currently only `afterRestore` is supported).
+
+      - `afteRestore` : take a callback as string `"function(event,params){}"` to be called for post-restore operations, it provides 2 parameters `event` and `params` where params is a JSON `{fieldId: "field_name",fieldValue: "field_value"}`.
 
 #### Widget Plugin (SmartWizard) Options
 
