@@ -42,6 +42,12 @@
     margin-left: 0;
 }
 
+.sw-main .tabular-row i.remove-row {
+    float: right;
+    clear: both;
+    color: #d9534f;
+}
+
 .sw-main .fields_container {
     width: 80%;
 }
