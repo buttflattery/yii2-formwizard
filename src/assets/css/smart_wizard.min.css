@@ -15,7 +15,8 @@
     display: block;
     margin: 0;
     padding: 0;
-    border-radius: 0.25rem !important;
+    border-radius: .25rem !important;
+    background: #fff;
 }
 
 .sw-main .sw-container {
@@ -35,6 +36,12 @@
     display: none;
     position: relative;
     margin: 0;
+}
+
+.justify-content-end {
+    -ms-flex-pack: end !important;
+    justify-content: flex-end !important;
+    display: flex;
 }
 
 .sw-main .sw-toolbar {

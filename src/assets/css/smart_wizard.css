@@ -15,7 +15,7 @@
     display: block;
     margin: 0;
     padding: 0;
-    border-radius: 0.25rem !important;
+    border-radius: .25rem !important;
     background: #fff;
 }
 
@@ -52,10 +52,14 @@
     padding: 5px;
 }
 
-.sw-main .tabular-row i.remove-row {
-    float: right;
-    clear: both;
-    color: #d9534f;
+.justify-content-end {
+    -ms-flex-pack: end !important;
+    justify-content: flex-end !important;
+    display: flex;
+}
+
+.sw-main .sw-toolbar {
+    margin-left: 0
 }
 
 .sw-theme-default {
@@ -91,30 +95,20 @@
     border-top-color: #ddd !important;
 }
 
-.sw-theme-default>ul.step-anchor {
-    background: transparent !important;
-}
-
 .sw-theme-default>ul.step-anchor>li {
     position: relative;
     margin-right: 2px;
 }
 
-.justify-content-end {
-    -ms-flex-pack: end !important;
-    justify-content: flex-end !important;
-    display: flex;
-}
-
 .sw-theme-default>ul.step-anchor>li>a,
 .sw-theme-default>ul.step-anchor>li>a:hover {
     border: none !important;
-    color: #bbb !important;
-    text-decoration: none !important;
-    outline-style: none !important;
+    color: #bbb;
+    text-decoration: none;
+    outline-style: none;
     background: 0 0 !important;
     border: none !important;
-    cursor: not-allowed !important;
+    cursor: not-allowed
 }
 
 .sw-theme-default>ul.step-anchor>li.clickable>a:hover {
