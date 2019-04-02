@@ -56,6 +56,12 @@
     float: right !important;
 }
 
+.sw-main .tabular-row i.remove-row {
+    float: right;
+    clear: both;
+    color: #d9534f;
+}
+
 .sw-theme-material-v .step-content {
     margin: 0;
     padding: 0;

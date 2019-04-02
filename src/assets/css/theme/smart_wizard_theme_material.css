@@ -12,7 +12,7 @@
 
 /* SmartWizard Theme: Dots */
 .sw-theme-material {
-    font-family: 'Montserrat', sans-serif !important;
+    font-family: "Montserrat", sans-serif !important;
     background: #fff;
     min-height: 50px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -98,6 +98,12 @@
 .sw-theme-material ul.step-anchor li.done a {
     background-color: rgba(92, 184, 92, 0.6);
     color: #fff;
+}
+
+.sw-main .tabular-row i.remove-row {
+    float: right;
+    clear: both;
+    color: #d9534f;
 }
 
 .sw-theme-material .sw-container .step-content {
