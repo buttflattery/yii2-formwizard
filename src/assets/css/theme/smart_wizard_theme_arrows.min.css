@@ -26,6 +26,12 @@
     min-height: 200px;
 }
 
+.sw-main .tabular-row i.remove-row {
+    float: right;
+    clear: both;
+    color: #d9534f;
+}
+
 .justify-content-end {
     -ms-flex-pack: end !important;
     justify-content: flex-end !important;
