@@ -12,7 +12,7 @@
 
 /* SmartWizard Theme: Dots */
 .sw-theme-material-v {
-    font-family: 'Montserrat', sans-serif !important;
+    font-family: "Montserrat", sans-serif !important;
     background: #fff;
     min-height: 50px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -27,9 +27,9 @@
     min-width: 96%;
 }
 
-.sw-theme-material-v .formwizard-next,
-.sw-theme-material-v .formwizard-prev,
-.sw-theme-material-v .formwizard-finish {
+.sw-theme-material-v .formwizard_next,
+.sw-theme-material-v .formwizard_prev,
+.sw-theme-material-v .formwizard_finish {
     font-family: inherit !important;
     background-color: teal;
 }
@@ -51,7 +51,6 @@
 }
 
 .sw-theme-material-v .step-content {
-
     margin: 0;
     padding: 0;
     clear: both;
@@ -96,11 +95,10 @@
 }
 
 .sw-theme-material-v ul.step-anchor>li.active a {
-    background-color: #4CAF50 !important;
+    background-color: #4caf50 !important;
     color: #fff !important;
     cursor: default;
     padding: 15px 130px 10px 10px;
-
 }
 
 .sw-theme-material-v ul.step-anchor li.done a {
@@ -130,7 +128,6 @@
     color: #555;
     padding: 10px 20px;
     position: relative;
-
 }
 
 .sw-theme-material-v .sw-toolbar button,
@@ -150,7 +147,6 @@
     font-size: 12px;
     font-weight: normal;
 }
-
 
 /* Responsive CSS */
 @media screen and (max-width: 800px) {
