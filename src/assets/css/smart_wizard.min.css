@@ -38,6 +38,26 @@
     margin: 0;
 }
 
+.sw-main .sw-toolbar {
+    margin-left: 0;
+}
+
+.sw-main .tabular-row i.remove-row {
+    float: right;
+    clear: both;
+    color: #d9534f;
+}
+
+.sw-main .fields_container {
+    width: 80%;
+}
+
+.sw-main .fields_container .tabular-row {
+    margin-top: 10px;
+    border-top: 1px solid #c8c8c8;
+    padding: 5px;
+}
+
 .justify-content-end {
     -ms-flex-pack: end !important;
     justify-content: flex-end !important;
@@ -45,7 +65,7 @@
 }
 
 .sw-main .sw-toolbar {
-    margin-left: 0;
+    margin-left: 0
 }
 
 .sw-theme-default {
@@ -94,7 +114,7 @@
     outline-style: none;
     background: 0 0 !important;
     border: none !important;
-    cursor: not-allowed;
+    cursor: not-allowed
 }
 
 .sw-theme-default>ul.step-anchor>li.clickable>a:hover {

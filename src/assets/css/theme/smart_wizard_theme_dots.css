@@ -25,6 +25,12 @@
     display: flex;
 }
 
+.sw-main .tabular-row i.remove-row {
+    float: right;
+    clear: both;
+    color: #d9534f;
+}
+
 .sw-theme-dots .step-content {
     padding: 10px 0;
     border: none;
