@@ -53,16 +53,6 @@ $.formwizard = {
                 );
             }
 
-            // Toolbar next, previous and finish custom buttons
-            let formwizardBtnNext = $('<button class="formwizard_next"></button>')
-                .html(options.iconNext + "&nbsp" + options.labelNext)
-                .addClass(options.classNext);
-
-            //add to return array
-            buttons.push(
-                formwizardBtnNext
-            );
-
             //add to buttons array
             buttons.push(
                 $('<button class="formwizard_prev"></button>')
@@ -74,6 +64,16 @@ $.formwizard = {
                 })
             );
 
+            // Toolbar next, previous and finish custom buttons
+            let formwizardBtnNext = $('<button class="formwizard_next"></button>')
+                .html(options.iconNext + "&nbsp" + options.labelNext)
+                .addClass(options.classNext);
+
+            //add to return array
+            buttons.push(
+                formwizardBtnNext
+            );
+
             let formwizardBtnFinish = $(
                     '<button class="formwizard_finish" type="submit"/></button>'
                 )
@@ -83,8 +83,6 @@ $.formwizard = {
             buttons.push(
                 formwizardBtnFinish
             );
-
-
 
             var combined = formwizardBtnNext.add(formwizardBtnFinish);
 
