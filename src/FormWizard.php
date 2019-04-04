@@ -343,7 +343,9 @@ class FormWizard extends Widget
      */
     public $classRestore = 'btn btn-success ';
 
-    /**ICONS */
+    /**
+     * ICONS 
+     * */
 
     const ICON_NEXT = '<i class="formwizard-arrow-right-alt1-ico"></i>';
     const ICON_PREV = '<i class="formwizard-arrow-left-alt1-ico"></i>';
@@ -351,12 +353,16 @@ class FormWizard extends Widget
     const ICON_ADD = '<i class="formwizard-plus-ico"></i>';
     const ICON_RESTORE = '<i class="formwizard-restore-ico"></i>';
 
-    /**STEP TYPES */
+    /**
+     * STEP TYPES 
+     * */
     const STEP_TYPE_DEFAULT = 'default';
     const STEP_TYPE_TABULAR = 'tabular';
     const STEP_TYPE_PREVIEW = 'preview';
 
-    /**THEMES */
+    /**
+     * THEMES 
+     * */
     const THEME_DEFAULT = 'default';
     const THEME_DOTS = 'dots';
     const THEME_ARROWS = 'arrows';
