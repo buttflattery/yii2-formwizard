@@ -41,30 +41,48 @@ $.formwizard = {
             }, 1000);
         },
         appendButtons: function (options) {
-            // Toolbar next, previous and finish custom buttons
-            var formwizardBtnNext = $('<button class="formwizard_next"></button>')
-                .html(options.iconNext + "&nbsp" + options.labelNext)
-                .addClass(options.classNext);
+            let buttons = [];
 
-            var formwizardBtnPrev = $('<button class="formwizard_prev"></button>')
+            if (options.enablePersistence) {
+                buttons.push(
+                    $(
+                        '<button class="formwizard_restore" type="button"/></button>'
+                    )
+                    .html(options.iconRestore + "&nbsp;" + options.labelRestore)
+                    .addClass(options.classRestore)
+                );
+            }
+
+            //add to buttons array
+            buttons.push(
+                $('<button class="formwizard_prev"></button>')
                 .html(options.iconPrev + "&nbsp;" + options.labelPrev)
                 .addClass(options.classPrev)
                 .on("click", function (e) {
                     e.preventDefault();
                     $.formwizard.formNavigation.previous(e.target);
-                });
+                })
+            );
 
-            var formwizardBtnFinish = $(
+            // Toolbar next, previous and finish custom buttons
+            let formwizardBtnNext = $('<button class="formwizard_next"></button>')
+                .html(options.iconNext + "&nbsp" + options.labelNext)
+                .addClass(options.classNext);
+
+            //add to return array
+            buttons.push(
+                formwizardBtnNext
+            );
+
+            let formwizardBtnFinish = $(
                     '<button class="formwizard_finish" type="submit"/></button>'
                 )
                 .html(options.iconFinish + "&nbsp;" + options.labelFinish)
                 .addClass(options.classFinish);
-
-            var formwizardBtnRestore = $(
-                    '<button class="formwizard_restore" type="button"/></button>'
-                )
-                .html(options.iconRestore + "&nbsp;" + options.labelRestore)
-                .addClass(options.classRestore);
+            //add to buttons array
+            buttons.push(
+                formwizardBtnFinish
+            );
 
             var combined = formwizardBtnNext.add(formwizardBtnFinish);
 
@@ -79,7 +97,7 @@ $.formwizard = {
                 return $.formwizard.formNavigation.next(e.target);
             });
 
-            return [formwizardBtnRestore, formwizardBtnPrev, formwizardBtnNext, formwizardBtnFinish];
+            return buttons;
         },
         updateButtons: function (wizardContainerId) {
             $(wizardContainerId).on("showStep", function (
