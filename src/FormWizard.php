@@ -819,14 +819,15 @@ JS;
                 )
             );
 
-            //start row div 
+            //check if tabular step
             if ($isTabularStep) {
+                //begin the row container 
                 $htmlFields.= Html::beginTag('div', ['id'=>'row_'.$modelIndex, 'class'=>'tabular-row']);
+
+                //add remove icon if edit mode and rows are more than 1
+                ($modelIndex > 0) && $htmlFields .= Html::tag('i', '', ['class'=>'remove-row formwizard-x-ico', 'data'=>['rowid'=>$modelIndex]]);
             }
-            
-            if ($modelIndex > 0) {
-                $htmlFields .= Html::tag('i', '', ['class'=>'remove-row formwizard-x-ico', 'data'=>['rowid'=>$modelIndex]]);
-            }
+
 
             //iterate all fields associated to the relevant model
             foreach ($attributes as $attribute) {
