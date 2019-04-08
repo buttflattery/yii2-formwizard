@@ -344,7 +344,27 @@ class FormWizard extends Widget
     public $classRestore = 'btn btn-success ';
 
     /**
-     * ICONS 
+     * @var string
+     */
+    public $classListGroup = 'list-group';
+
+    /**
+     * @var string
+     */
+    public $classListGroupHeading = 'list-group-heading';
+
+    /**
+     * @var string
+     */
+    public $classListGroupItem = 'list-group-item-success';
+
+    /**
+     * @var string
+     */
+    public $classListGroupBadge = 'success';
+
+    /**
+     * ICONS
      * */
 
     const ICON_NEXT = '<i class="formwizard-arrow-right-alt1-ico"></i>';
@@ -354,14 +374,14 @@ class FormWizard extends Widget
     const ICON_RESTORE = '<i class="formwizard-restore-ico"></i>';
 
     /**
-     * STEP TYPES 
+     * STEP TYPES
      * */
     const STEP_TYPE_DEFAULT = 'default';
     const STEP_TYPE_TABULAR = 'tabular';
     const STEP_TYPE_PREVIEW = 'preview';
 
     /**
-     * THEMES 
+     * THEMES
      * */
     const THEME_DEFAULT = 'default';
     const THEME_DOTS = 'dots';
@@ -501,7 +521,8 @@ class FormWizard extends Widget
             classPrev:'{$this->classPrev}',
             classFinish:'{$this->classFinish}',
             classRestore:'{$this->classRestore}',
-            enablePersistence:'{$this->enablePersistence}'
+            enablePersistence:'{$this->enablePersistence}',
+
         }).concat({$pluginOptions['toolbarSettings']['toolbarExtraButtons']})
 JS;
         $pluginOptions['toolbarSettings']['toolbarExtraButtons']
@@ -584,7 +605,11 @@ JS;
             classPrev:'{$this->classPrev}',
             classFinish:'{$this->classFinish}',
             enablePreview:'{$this->enablePreview}',
-            bsVersion:'{$this->_bsVersion}'
+            bsVersion:'{$this->_bsVersion}',
+            classListgroup:'{$this->classListGroup}',
+            classListGroupHeading:'{$this->classListGroupHeading}',
+            classListGroupItem:'{$this->classListGroupItem}',
+            classListGroupBadge:'{$this->classListGroupBadge}'
         };
 
         //init the data persistence if enabled
@@ -622,7 +647,7 @@ JS;
                     [
                         'type' => self::STEP_TYPE_PREVIEW,
                         'title' => 'Final Preview',
-                        'description' => 'Final Preview oof all Steps',
+                        'description' => 'Final Preview of all Steps',
                         'formInfoText' => 'Click any of the steps below to edit them',
                     ],
                 ]
