@@ -19,10 +19,23 @@
 .sw-theme-arrows {
     border-radius: 5px;
     border: 1px solid #ddd;
+    font-family: 'Montserrat', sans-serif !important;
 }
 
 .sw-theme-arrows>.sw-container {
     min-height: 200px;
+}
+
+.sw-main .tabular-row i.remove-row {
+    float: right;
+    clear: both;
+    color: #d9534f;
+}
+
+.justify-content-end {
+    -ms-flex-pack: end !important;
+    justify-content: flex-end !important;
+    display: flex;
 }
 
 .sw-theme-arrows .step-content {

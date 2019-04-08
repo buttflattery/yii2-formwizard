@@ -1,12 +1,12 @@
 <?php
 /**
  * PHP VERSION >=5.6
- * 
+ *
  * @category  Yii2-Plugin
  * @package   Yii2-formwizard
  * @author    Muhammad Omer Aslam <buttflattery@gmail.com>
  * @copyright 2018 IdowsTECH
- * @license   https://github.com/buttflattery/yii2-formwizard/blob/master/LICENSE  
+ * @license   https://github.com/buttflattery/yii2-formwizard/blob/master/LICENSE
  *            BSD License 3.01
  * @link      https://github.com/buttflattery/yii2-formwizard
  */
@@ -25,7 +25,6 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\web\View;
-use yii\widgets\ActiveForm;
 
 /**
  * A Yii2 plugin used for creating stepped form or form wizard using
@@ -37,7 +36,7 @@ use yii\widgets\ActiveForm;
  * @package   Yii2-formwizard
  * @author    Muhammad Omer Aslam <buttflattery@gmail.com>
  * @copyright 2018 IdowsTECH
- * @license   https://github.com/buttflattery/yii2-formwizard/blob/master/LICENSE  
+ * @license   https://github.com/buttflattery/yii2-formwizard/blob/master/LICENSE
  *            BSD License 3.01
  * @version   Release: 1.0
  * @link      https://github.com/buttflattery/yii2-formwizard
@@ -68,10 +67,17 @@ class FormWizard extends Widget
 
     /**
      * Used for collecting user provided custom Js for the formwizard.beforeClone event
-     * 
+     *
      * @var mixed
      */
     private $_tabularEventJs;
+
+    /**
+     * Used for collecting user provided callback for the event formwizard.afterRestore
+     *
+     * @var mixed
+     */
+    private $_persistenceEvents;
 
     //options widget
 
@@ -131,17 +137,17 @@ class FormWizard extends Widget
 
     /**
      * Automatically adjust content height, default value is `true`.`
-     * 
+     *
      * @var boolean
      */
-    public $autoAdjustHeight=true;
+    public $autoAdjustHeight = true;
     /**
-     * An array of step numbers to show as disabled, 
+     * An array of step numbers to show as disabled,
      * zero based array of step index ex: [2,4]
-     * 
+     *
      * @var array
      */
-    public $disabledSteps=[];
+    public $disabledSteps = [];
 
     /**
      * Wether to show the step URL Hash in the url hash based on step,
@@ -202,10 +208,17 @@ class FormWizard extends Widget
 
     /**
      * Enable Preview Step option, default value `false`
-     * 
+     *
      * @var boolean
      */
     public $enablePreview = false;
+
+    /**
+     * Enables restoring of the data for the unsaved form
+     *
+     * @var boolean
+     */
+    public $enablePersistence = false;
 
     /**
      * The Text label for the Next button. Default is `Next`.
@@ -227,6 +240,13 @@ class FormWizard extends Widget
      * @var string
      */
     public $labelFinish = 'Finish';
+
+    /**
+     * The label text for the restore button
+     *
+     * @var string
+     */
+    public $labelRestore = 'Restore';
 
     /**
      * The icon for the Next button you want to be shown inside the button.
@@ -277,46 +297,92 @@ class FormWizard extends Widget
     public $iconAdd = self::ICON_ADD;
 
     /**
+     * The icon for the Restore button you want to be shown inside the button.
+     * Default is `<i class="formwizard_restore-ico"></i>`.
+     *
+     * This can be an html string '<i class="fa fa-restore"></i>'
+     * in case you are using FA, Material or Glyph icons, or an
+     * image tag like '<img src="/path/to/image" />'.
+     *
+     * @var mixed
+     */
+    public $iconRestore = self::ICON_RESTORE;
+
+    /**
      * The class for the Next button , default is `btn btn-info`
      *
      * @var string
      */
-    public $classNext = 'btn btn-info';
+    public $classNext = 'btn btn-info ';
 
     /**
      * The class for the Previous button , default is `btn btn-info`
      *
      * @var string
      */
-    public $classPrev = 'btn btn-info';
+    public $classPrev = 'btn btn-info ';
 
     /**
      * The class for the Finish button, default is `btn btn-success`
      *
      * @var string
      */
-    public $classFinish = 'btn btn-success';
+    public $classFinish = 'btn btn-success ';
 
     /**
      * The class for the Add Row button, default is btn btn-info
-     * 
+     *
      * @var string
      */
-    public $classAdd = 'btn btn-info';
+    public $classAdd = 'btn btn-info ';
 
-    /**ICONS */
+    /**
+     * The class for the Add Row button, default is btn btn-info
+     *
+     * @var string
+     */
+    public $classRestore = 'btn btn-success ';
+
+    /**
+     * @var string
+     */
+    public $classListGroup = 'list-group';
+
+    /**
+     * @var string
+     */
+    public $classListGroupHeading = 'list-group-heading';
+
+    /**
+     * @var string
+     */
+    public $classListGroupItem = 'list-group-item-success';
+
+    /**
+     * @var string
+     */
+    public $classListGroupBadge = 'success';
+
+    /**
+     * ICONS
+     * */
 
     const ICON_NEXT = '<i class="formwizard-arrow-right-alt1-ico"></i>';
     const ICON_PREV = '<i class="formwizard-arrow-left-alt1-ico"></i>';
     const ICON_FINISH = '<i class="formwizard-check-alt-ico"></i>';
     const ICON_ADD = '<i class="formwizard-plus-ico"></i>';
+    const ICON_RESTORE = '<i class="formwizard-restore-ico"></i>';
 
-    /**STEP TYPES */
-    const STEP_TYPE_DEFAULT='default';
-    const STEP_TYPE_TABULAR='tabular';
-    const STEP_TYPE_PREVIEW='preview';
+    /**
+     * STEP TYPES
+     * */
+    const STEP_TYPE_DEFAULT = 'default';
+    const STEP_TYPE_TABULAR = 'tabular';
+    const STEP_TYPE_PREVIEW = 'preview';
 
-    /**THEMES */
+    /**
+     * THEMES
+     * */
     const THEME_DEFAULT = 'default';
     const THEME_DOTS = 'dots';
     const THEME_ARROWS = 'arrows';
@@ -334,7 +400,7 @@ class FormWizard extends Widget
         self::THEME_CIRCLES => 'Circles',
         self::THEME_ARROWS => 'Arrows',
         self::THEME_MATERIAL => 'Material',
-        self::THEME_MATERIAL_V => 'MaterialVerticle'
+        self::THEME_MATERIAL_V => 'MaterialVerticle',
     ];
 
     /**
@@ -349,7 +415,7 @@ class FormWizard extends Widget
     }
 
     /**
-     * Sets the defaults for the widget and detects to 
+     * Sets the defaults for the widget and detects to
      * use which version of Bootstrap.
      *
      * @return null
@@ -369,7 +435,7 @@ class FormWizard extends Widget
 
             if ($matches[0] !== $this->formOptions['id']) {
                 throw new ArgException(
-                    'You must provide the id for the form that matches 
+                    'You must provide the id for the form that matches
                     any word character (equal to [a-zA-Z0-9_])'
                 );
             }
@@ -381,7 +447,7 @@ class FormWizard extends Widget
         }
 
         //theme buttons material
-        if ($this->theme == self::THEME_MATERIAL 
+        if ($this->theme == self::THEME_MATERIAL
             || $this->theme == self::THEME_MATERIAL_V
         ) {
             $this->classNext .= 'waves-effect';
@@ -404,8 +470,8 @@ class FormWizard extends Widget
         return [
             'selected' => 0,
             'keyNavigation' => false,
-            'autoAdjustHeight'=>$this->autoAdjustHeight,
-            'disabledSteps'=>$this->disabledSteps,
+            'autoAdjustHeight' => $this->autoAdjustHeight,
+            'disabledSteps' => $this->disabledSteps,
             'backButtonSupport' => false,
             'theme' => $this->theme,
             'transitionEffect' => $this->transitionEffect,
@@ -446,17 +512,22 @@ class FormWizard extends Widget
             labelNext:'{$this->labelNext}',
             labelPrev:'{$this->labelPrev}',
             labelFinish:'{$this->labelFinish}',
+            labelRestore:'{$this->labelRestore}',
             iconNext:'{$this->iconNext}',
             iconPrev:'{$this->iconPrev}',
             iconFinish:'{$this->iconFinish}',
+            iconRestore:'{$this->iconRestore}',
             classNext:'{$this->classNext}',
             classPrev:'{$this->classPrev}',
             classFinish:'{$this->classFinish}',
+            classRestore:'{$this->classRestore}',
+            enablePersistence:'{$this->enablePersistence}',
+
         }).concat({$pluginOptions['toolbarSettings']['toolbarExtraButtons']})
 JS;
-        $pluginOptions['toolbarSettings']['toolbarExtraButtons'] 
-            = new JsExpression($jsButton);
-        //if bootstrap3 loaded    
+        $pluginOptions['toolbarSettings']['toolbarExtraButtons']
+        = new JsExpression($jsButton);
+        //if bootstrap3 loaded
         $isBs3 = $this->_bsVersion == 3;
 
         if ($isBs3) {
@@ -470,7 +541,7 @@ JS;
 
         //start container tag
         echo Html::beginTag('div', ['id' => $wizardContainerId]);
-        
+
         //draw form steps
         echo $this->createFormWizard();
 
@@ -490,17 +561,21 @@ JS;
         $pluginOptionsJson = Json::encode($pluginOptions);
 
         $this->registerScripts();
+        //add tabular events call back js
         $js = $this->_tabularEventJs;
+        $js .= $this->_persistenceEvents;
+
+        $jsOptionsPersistence = Json::encode($this->enablePersistence);
 
         //init script for the wizard
-        $js .= <<< JS
+        $js .= <<<JS
 
         //start observer for the smart wizard to run the script
         //when the child HTMl elements are populated
-        //necessary for material themes and the button 
+        //necessary for material themes and the button
         //events for tabular row
         $.formwizard.observer.start('#{$wizardContainerId}');
-        
+
         // Step show event
         $.formwizard.helper.updateButtons('#{$wizardContainerId}');
 
@@ -530,10 +605,19 @@ JS;
             classPrev:'{$this->classPrev}',
             classFinish:'{$this->classFinish}',
             enablePreview:'{$this->enablePreview}',
-            bsVersion:'{$this->_bsVersion}'
+            bsVersion:'{$this->_bsVersion}',
+            classListgroup:'{$this->classListGroup}',
+            classListGroupHeading:'{$this->classListGroupHeading}',
+            classListGroupItem:'{$this->classListGroupItem}',
+            classListGroupBadge:'{$this->classListGroupBadge}'
         };
-        
-        
+
+        //init the data persistence if enabled
+
+        if({$jsOptionsPersistence}){
+            $.formwizard.persistence.init('{$this->formOptions["id"]}');
+        }
+
 JS;
 
         //register script
@@ -556,25 +640,23 @@ JS;
         //start Body steps html
         $htmlSteps = Html::beginTag('div');
 
-        $formId = $this->formOptions['id'];
-        
         if ($this->enablePreview) {
             $steps = array_merge(
                 $steps,
                 [
                     [
-                        'type'=>self::STEP_TYPE_PREVIEW,
+                        'type' => self::STEP_TYPE_PREVIEW,
                         'title' => 'Final Preview',
-                        'description' => 'Final Preview oof all Steps',
+                        'description' => 'Final Preview of all Steps',
                         'formInfoText' => 'Click any of the steps below to edit them',
-                    ]
+                    ],
                 ]
             );
         }
-      
+
         //loop thorugh all the steps
         foreach ($steps as $index => $step) {
-            
+
             //create wizard steps
             list($tabs, $steps) = $this->createStep($index, $step);
 
@@ -605,11 +687,14 @@ JS;
     public function createStep($index, $step)
     {
         //step title
-        $stepTitle = ArrayHelper::getValue($step, 'title', 'Step-' . ($index + 1)); 
+        $stepTitle = ArrayHelper::getValue($step, 'title', 'Step-' . ($index + 1));
+
         //step description
         $stepDescription = ArrayHelper::getValue($step, 'description', 'Description');
+
         //form body info text
-        $formInfoText = ArrayHelper::getValue($step, 'formInfoText', 'Add details below'); 
+        $formInfoText = ArrayHelper::getValue($step, 'formInfoText', 'Add details below');
+
         //get html tabs
         $htmlTabs = $this->createTabs($index, $stepDescription, $stepTitle);
 
@@ -648,7 +733,7 @@ JS;
      * Create the body for the Step
      *
      * @param int    $index        index of the current step
-     * @param string $formInfoText description text for the form displayed 
+     * @param string $formInfoText description text for the form displayed
      *                             on top of the fields
      * @param array  $step         the config for the current step
      *
@@ -664,27 +749,31 @@ JS;
         //check if tabular step
         $isTabularStep = $stepType == self::STEP_TYPE_TABULAR;
 
-         //check if tabular step
+        //check if tabular step
         if ($isTabularStep) {
             $this->_checkTabularConstraints($step['model']);
         }
 
-        
+        //step data
+        $dataStep = [
+            'number' => $index,
+            'type' => $stepType,
+        ];
 
         //start step wrapper div
         $html .= Html::beginTag(
-            'div', 
-            ['id' => 'step-' . $index]
+            'div',
+            ['id' => 'step-' . $index, 'data' => ['step' => Json::encode($dataStep)]]
         );
-       
+
         $html .= Html::tag('div', $formInfoText, ['class' => 'border-bottom border-gray pb-2']);
-        
+
         //Add Row Buton to add fields dynamically
         if ($isTabularStep) {
             $html .= Html::button(
-                $this->iconAdd.'&nbsp;Add', 
+                $this->iconAdd . '&nbsp;Add',
                 [
-                    'class'=>$this->classAdd.(($this->_bsVersion==3)?' pull-right add_row':' float-right add_row'), 
+                    'class' => $this->classAdd . (($this->_bsVersion == 3) ? ' pull-right add_row' : ' float-right add_row'),
                     // 'id'=>'add_row'
                 ]
             );
@@ -692,14 +781,14 @@ JS;
 
         if (!empty($step['model'])) {
             //start field container tag <div class="fields_container">
-            $html .= Html::beginTag('div', ["class"=>"fields_container"]);
+            $html .= Html::beginTag('div', ["class" => "fields_container"]);
             //create step fields
             $html .= $this->createStepFields($index, $step, $isTabularStep);
         }
 
         //close the field container tag </div>
         $html .= Html::endTag('div');
-        
+
         //close the step div </div>
         $html .= Html::endTag('div');
         return $html;
@@ -711,7 +800,7 @@ JS;
      * @param int     $index         index of the current step
      * @param array   $step          config for the current step
      * @param boolean $isTabularStep if the current step is tabular or not
-     * 
+     *
      * @return HTML
      */
     public function createStepFields($index, $step, $isTabularStep)
@@ -720,13 +809,13 @@ JS;
         $htmlFields = '';
 
         //field configurations
-        $fieldConfig = ArrayHelper::getValue($step, 'fieldConfig', false); 
-        
+        $fieldConfig = ArrayHelper::getValue($step, 'fieldConfig', false);
+
         //disabled fields
-        $disabledFields = ArrayHelper::getValue($fieldConfig, 'except', []); 
+        $disabledFields = ArrayHelper::getValue($fieldConfig, 'except', []);
 
         //only fields
-        $onlyFields = ArrayHelper::getValue($fieldConfig, 'only', []); 
+        $onlyFields = ArrayHelper::getValue($fieldConfig, 'only', []);
 
         //is array of models
         $isArrayOfModels = is_array($step['model']);
@@ -735,37 +824,37 @@ JS;
 
         if (!$isArrayOfModels) {
             $models = [$step['model']];
-        } 
+        }
 
         //current step fields
-        $fields=[];
+        $fields = [];
 
         //iterate models
-        foreach ($models as $modelIndex=>$model) {
-            
+        foreach ($models as $modelIndex => $model) {
+
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
-        
+
             //field order
             $this->_sortFields($fieldConfig, $attributes, $step);
 
             //add all the field ids to array
             $fields = array_merge(
-                $fields, 
+                $fields,
                 array_map(
                     function ($element) use ($model, $isTabularStep, $modelIndex) {
-                        return Html::getInputId($model, ($isTabularStep)?"[$modelIndex]".$element:$element);
+                        return Html::getInputId($model, ($isTabularStep) ? "[$modelIndex]" . $element : $element);
                     }, $attributes
                 )
             );
 
-            //start row div 
+            //start row div
             if ($isTabularStep) {
-                $htmlFields.= Html::beginTag('div', ['id'=>'row_'.$modelIndex, 'class'=>'tabular-row']);
+                $htmlFields .= Html::beginTag('div', ['id' => 'row_' . $modelIndex, 'class' => 'tabular-row']);
             }
-            
+
             if ($modelIndex > 0) {
-                $htmlFields .= Html::tag('i', '', ['class'=>'remove-row formwizard-x-ico', 'data'=>['rowid'=>$modelIndex]]);
+                $htmlFields .= Html::tag('i', '', ['class' => 'remove-row formwizard-x-ico', 'data' => ['rowid' => $modelIndex]]);
             }
 
             //iterate all fields associated to the relevant model
@@ -788,47 +877,18 @@ JS;
                     $htmlFields .= $this->createCustomInput(
                         $model, $attributeName, $fieldConfig[$attribute]
                     );
+                    //id of the input
+                    $attributeId = Html::getInputId($model, $attributeName);
+
+                    //add tabular events
+                    $this->_addTabularEvents($fieldConfig[$attribute], $isTabularStep, $modelIndex, $attributeId, $index);
+
+                    //add the restore events
+                    $this->_addRestoreEvents($fieldConfig[$attribute], $attributeId);
                 } else {
                     //default field population
                     $htmlFields .= $this->createDefaultInput($model, $attributeName);
                 }
-
-
-                if ($customConfigDefinedForField) {
-                    //get the tabular events for the field
-                    $tabularEvents = ArrayHelper::getValue($fieldConfig[$attribute], 'tabularEvents', false);
-                    
-                    //check if tabular step and tabularEvents provided for field 
-                    if ($isTabularStep && is_array($tabularEvents) && $modelIndex == 0) {
-
-                        //id of the form
-                        $formId = $this->formOptions['id'];
-
-                        //id of the input
-                        $attributeId = Html::getInputId($model, $attributeName);
-
-                        //iterate all events attached and bind them
-                        foreach ($tabularEvents as $eventName=>$callback) {
-                            //get the call back
-                            $eventCallBack = new JsExpression($callback);
-
-                            if ($eventName!=='afterInsert') {
-                                //bind the call back to the field 
-                                $this->_tabularEventJs.=<<<JS
-                                $(document).on("formwizard.{$eventName}","#{$formId} #step-{$index} #{$attributeId}",{$eventCallBack});
-JS;
-                            } else {
-
-                                $this->_tabularEventJs.=<<<JS
-                                $(document).on("formwizard.{$eventName}","#{$formId} #step-{$index} .fields_container>div[id^='row_']",{$eventCallBack});
-JS;
-                            }
-                            
-                        }
-                    }
-                }
-                
-
             }
 
             //is tabular step
@@ -846,15 +906,78 @@ JS;
     }
 
     /**
+     * Adds the restore events for the fields
+     *
+     * @param array  $attributeConfig the configurations for the attribute
+     * @param string $attributeId     the field attribute id
+     *
+     * @return null
+     */
+    private function _addRestoreEvents($attributeConfig, $attributeId)
+    {
+        $persistenceEvents = ArrayHelper::getValue($attributeConfig, 'persistencEvents', []);
+        $formId = $this->formOptions['id'];
+
+        foreach ($persistenceEvents as $eventName => $callback) {
+            $eventCallBack = new JsExpression($callback);
+            $this->_persistenceEvents .= <<<JS
+            $(document).on("formwizard.{$formId}.{$eventName}","#{$formId} #{$attributeId}",{$eventCallBack});
+JS;
+        }
+    }
+
+    /**
+     * Adds tabular events for the attribute
+     *
+     * @param array   $attributeConfig attribute configurations passed
+     * @param boolean $isTabularStep   boolean if current step is tabular
+     * @param int     $modelIndex      the index of the current model
+     * @param string  $attributeId     the id of the current field
+     * @param int     $index           the index of the current step
+     *
+     * @return null
+     */
+    private function _addTabularEvents($attributeConfig, $isTabularStep, $modelIndex, $attributeId, $index)
+    {
+        //get the tabular events for the field
+        $tabularEvents = ArrayHelper::getValue($attributeConfig, 'tabularEvents', false);
+
+        //check if tabular step and tabularEvents provided for field
+        if ($isTabularStep && is_array($tabularEvents) && $modelIndex == 0) {
+
+            //id of the form
+            $formId = $this->formOptions['id'];
+
+            //iterate all events attached and bind them
+            foreach ($tabularEvents as $eventName => $callback) {
+                //get the call back
+                $eventCallBack = new JsExpression($callback);
+
+                if ($eventName !== 'afterInsert') {
+                    //bind the call back to the field
+                    $this->_tabularEventJs .= <<<JS
+                    $(document).on("formwizard.{$eventName}","#{$formId} #step-{$index} #{$attributeId}",{$eventCallBack});
+JS;
+                } else {
+
+                    $this->_tabularEventJs .= <<<JS
+                    $(document).on("formwizard.{$eventName}","#{$formId} #step-{$index} .fields_container>div[id^='row_']",{$eventCallBack});
+JS;
+                }
+            }
+        }
+    }
+
+    /**
      * Adds closing tags for the tabular fields row and the remove icon if necessary
-     * 
+     *
      * @param integer $modelIndex the index of the model
-     * 
+     *
      * @return string $htmlFields
      */
     public function addTabularHtmlClosingTags($modelIndex)
     {
-        $htmlFields='';
+        $htmlFields = '';
 
         //close row div
         $htmlFields .= Html::endTag('div');
@@ -863,13 +986,13 @@ JS;
     }
 
     /**
-    * Check if tabular step has the multiple models if the same type or throw an exception
-    *
-    * @param array $models the model(s) of the step 
-    *
-    * @return null
-    * @throws ArgException
-    */
+     * Check if tabular step has the multiple models if the same type or throw an exception
+     *
+     * @param array $models the model(s) of the step
+     *
+     * @return null
+     * @throws ArgException
+     */
     private function _checkTabularConstraints($models)
     {
         $classes = [];
@@ -877,28 +1000,28 @@ JS;
             $classes[] = get_class($model);
         }
         $classes = array_unique($classes);
-        
+
         //check if not a multiple model step with the type set to tabular
-        if (sizeof($classes)>1) {
+        if (sizeof($classes) > 1) {
             throw new ArgException('You cannot have multiple models in a step when the "type" property is set to "tabular", you must provide only a single model or remove the step "type" property.');
         }
         return true;
     }
 
     /**
-    * Sorts the fields. If the `fieldOrder` option is specified then the
-    * order will be dependend on the order specified in the `fieldOrder`
-    * array. If not provided the order will be according to the order of
-    * the fields specified under the `fieldConfig` option, and if none of
-    * the above is given then it will fallback to the order in which they
-    * are retrieved from the model.
-    *
-    * @param array $fieldConfig the active field configurations array
-    * @param array $attributes  the attributes reference for the model
-    * @param array $step        the config for the current step
-    *
-    * @return null
-    */
+     * Sorts the fields. If the `fieldOrder` option is specified then the
+     * order will be dependend on the order specified in the `fieldOrder`
+     * array. If not provided the order will be according to the order of
+     * the fields specified under the `fieldConfig` option, and if none of
+     * the above is given then it will fallback to the order in which they
+     * are retrieved from the model.
+     *
+     * @param array $fieldConfig the active field configurations array
+     * @param array $attributes  the attributes reference for the model
+     * @param array $step        the config for the current step
+     *
+     * @return null
+     */
     private function _sortFields($fieldConfig, &$attributes, $step)
     {
         $defaultOrder = $fieldConfig !== false ? array_keys($fieldConfig) : false;
@@ -946,7 +1069,7 @@ JS;
         if (!empty($onlyFields)) {
             return array_values(
                 array_filter(
-                    array_keys($model->getAttributes($model->safeAttributes())), 
+                    array_keys($model->getAttributes($model->safeAttributes())),
                     function ($item) use ($onlyFields) {
                         return in_array($item, $onlyFields);
                     }
@@ -954,7 +1077,7 @@ JS;
             );
         }
         return array_filter(
-            array_keys($model->getAttributes($model->safeAttributes())), 
+            array_keys($model->getAttributes($model->safeAttributes())),
             function ($item) use ($disabledFields) {
                 return !in_array($item, $disabledFields);
             }
@@ -973,8 +1096,10 @@ JS;
      */
     public function createCustomInput($model, $attribute, $fieldConfig)
     {
+
         //options
         $options = ArrayHelper::getValue($fieldConfig, 'options', []);
+
         //is multi field name
         $isMultiField = Arrayhelper::getValue($fieldConfig, 'multifield', false);
 
@@ -1002,7 +1127,6 @@ JS;
         $labelOptions = ArrayHelper::getValue($labelConfig, 'options', []);
         //get the hint text for the field
         $hintText = ArrayHelper::getValue($fieldConfig, 'hint', false);
-        
 
         //create field
         $field = $this->createField(
@@ -1017,21 +1141,21 @@ JS;
 
         //widget
         if ($widget) {
-            $field= $field->widget($widget, $options)->label($label, $labelOptions);
+            $field = $field->widget($widget, $options)->label($label, $labelOptions);
             return (!$hintText) ? $field : $field->hint($hintText);
         }
 
         //remove the type and itemList from options
         unset($options['type']);
         unset($options['itemsList']);
-        
+
         $defaultFieldTypes = [
             'text' => function ($params) {
                 $field = $params['field'];
                 $options = $params['options'];
                 $label = $params['label'];
                 $labelOptions = $params['labelOptions'];
-                
+
                 return $field->textInput($options)->label($label, $labelOptions);
             },
             'dropdown' => function ($params) {
@@ -1054,7 +1178,7 @@ JS;
                 if (is_array($itemsList)) {
                     return $field->radioList($itemsList, $options)
                         ->label($label, $labelOptions);
-                } 
+                }
                 return $field->radio($options);
             },
             'checkbox' => function ($params) {
@@ -1068,7 +1192,7 @@ JS;
                 if (is_array($itemsList)) {
                     return $field->checkboxList($itemsList, $options)
                         ->label($label, $labelOptions);
-                } 
+                }
 
                 //if a single checkbox needs to be created
                 $labelNull = $label === null;
@@ -1077,7 +1201,7 @@ JS;
                 $label = $nothingSetByUser ? false : $label;
 
                 return $field->checkbox($options)->label($label, $labelOptions);
-                
+
             },
             'textarea' => function ($params) {
                 $field = $params['field'];
@@ -1115,24 +1239,24 @@ JS;
         if (isset($defaultFieldTypes[$fieldType])) {
             // initialize options
             $fieldTypeOptions = [
-                'field'=>$field, 
-                'options'=>$options, 
-                'labelOptions'=>$labelOptions, 
-                'label'=>$label, 
-                'itemsList'=>$itemsList
+                'field' => $field,
+                'options' => $options,
+                'labelOptions' => $labelOptions,
+                'label' => $label,
+                'itemsList' => $itemsList,
             ];
             $field = $defaultFieldTypes[$fieldType]($fieldTypeOptions);
-            return (!$hintText)? $field : $field->hint($hintText);
+            return (!$hintText) ? $field : $field->hint($hintText);
         }
     }
 
     /**
-     * Creates a default field for the steps if no fields under 
+     * Creates a default field for the steps if no fields under
      * the activefield config is provided
      *
      * @param object $model     instance of the current model
      * @param string $attribute name of the attribute / field
-     * 
+     *
      * @return \yii\widgets\ActiveField
      */
     public function createDefaultInput($model, $attribute)
@@ -1146,13 +1270,13 @@ JS;
      * Creates a default ActiveFieldObject
      *
      * @param object  $model        instance of the current model
-     * @param string  $attribute    name of the current field / attribute 
-     * @param array   $fieldOptions options for the field as in 
+     * @param string  $attribute    name of the current field / attribute
+     * @param array   $fieldOptions options for the field as in
      *                              \yii\widgets\ActiveField `fieldOptions`
-     * @param boolean $isMulti      determines if the field will be using array name 
-     *                              or not for example : first_name[] will be used 
+     * @param boolean $isMulti      determines if the field will be using array name
+     *                              or not for example : first_name[] will be used
      *                              if true and first_name if false
-     * 
+     *
      * @return \yii\widgets\ActiveField
      */
     public function createField(
@@ -1164,10 +1288,10 @@ JS;
     }
 
     /**
-    * Registers the necessary AssetBundles for the widget 
-    * 
-    * @return null
-    */
+     * Registers the necessary AssetBundles for the widget
+     *
+     * @return null
+     */
     public function registerScripts()
     {
         $view = $this->getView();
@@ -1176,18 +1300,18 @@ JS;
         $themeSelected = $this->theme;
 
         //register plugin assets
-        $this->_bsVersion == 3 
-        ? 
-        Bs3Assets::register($view) 
-        : 
+        $this->_bsVersion == 3
+            ?
+        Bs3Assets::register($view)
+            :
         Bs4Assets::register($view);
 
         //is supported theme
         if (in_array($themeSelected, array_keys($this->themesSupported))) {
-            $themeAsset = __NAMESPACE__ . '\assetbundles\bs' . 
-                         $this->_bsVersion . '\Theme' . 
-                         $this->themesSupported[$themeSelected] . 'Asset';
-                         
+            $themeAsset = __NAMESPACE__ . '\assetbundles\bs' .
+            $this->_bsVersion . '\Theme' .
+            $this->themesSupported[$themeSelected] . 'Asset';
+
             $themeAsset::register($view);
         }
     }
