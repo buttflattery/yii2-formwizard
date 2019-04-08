@@ -148,8 +148,12 @@ $.formwizard = {
             let currentStep = $.formwizard.helper.currentIndex('#' + formId);
             let stepContainer = document.querySelector('#step-' + currentStep);
             let bsVersion = formwizardOptions[formId].bsVersion;
+            let classListGroup = formwizardOptions[formId].classListGroup;
+            let classListGroupHeading = formwizardOptions[formId].classListGroupHeading;
+            let classListGroupItem = formwizardOptions[formId].classListGroupItem;
+            let classListGroupBadge = formwizardOptions[formId].classListGroupBadge;
 
-            stepContainer.querySelectorAll(".list-group").forEach(element => {
+            stepContainer.querySelectorAll("." + classListGroup).forEach(element => {
                 element.remove();
             });
 
@@ -157,9 +161,9 @@ $.formwizard = {
                 let fields = $.formwizard.fields[formId];
                 fields.forEach(function (stepFields, step) {
                     let stepPreviewContainer = document.createElement("div");
-                    stepPreviewContainer.setAttribute('class', 'list-group preview-container');
+                    stepPreviewContainer.setAttribute('class', classListGroup + ' preview-container');
                     stepPreviewContainer.dataset.step = step;
-                    let rowHtml = '<h4 class="list-group-heading">Step ' + parseInt(step + 1) + '</h4>';
+                    let rowHtml = '<h4 class="' + classListGroupHeading + '">Step ' + parseInt(step + 1) + '</h4>';
                     stepFields.forEach(function (fieldName, index) {
                         let inputLabel = $.formwizard.helper.getpreviewInputLabel(fieldName);
                         let inputValue = $.formwizard.helper.getpreviewInputValue(fieldName);
@@ -168,7 +172,7 @@ $.formwizard = {
                             value: inputValue == '' ? 'NA' : inputValue
                         };
 
-                        rowHtml += $.formwizard.helper.previewTemplate(stepData, bsVersion);
+                        rowHtml += $.formwizard.helper.previewTemplate(stepData, bsVersion, formwizardOptions[formId]);
                     });
 
                     stepPreviewContainer.innerHTML = rowHtml;
@@ -199,9 +203,14 @@ $.formwizard = {
                 return $('#' + fieldName).val();
             }
         },
-        previewTemplate: (params, bsVersion) => {
-            let bsClass = bsVersion == 4 ? ' list-group-item-action' : '';
-            return `<button type="button" class="list-group-item list-group-item-success${bsClass} preview-button"><span class="badge">${params.label}</span>${params.value}</button>`;
+        previewTemplate: (params, bsVersion, formwizardOptions) => {
+            let bsClass = bsVersion == 4 ? 'list-group-item-action' : '';
+            return `<button type="button" class="list-group-item ${formwizardOptions.classListGroupItem} ${bsClass} preview-button">
+                    <span class="badge ${formwizardOptions.classListGroupBadge}">
+                        ${params.label}
+                    </span>
+                    ${params.value}
+                    </button>`;
         }
     },
     validation: {
