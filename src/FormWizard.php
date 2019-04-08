@@ -525,8 +525,8 @@ class FormWizard extends Widget
 
         }).concat({$pluginOptions['toolbarSettings']['toolbarExtraButtons']})
 JS;
-        $pluginOptions['toolbarSettings']['toolbarExtraButtons']
-        = new JsExpression($jsButton);
+
+        $pluginOptions['toolbarSettings']['toolbarExtraButtons'] = new JsExpression($jsButton);
         //if bootstrap3 loaded
         $isBs3 = $this->_bsVersion == 3;
 
@@ -848,13 +848,13 @@ JS;
                 )
             );
 
-            //start row div
+            //is tabular step
             if ($isTabularStep) {
+                //start the row constainer
                 $htmlFields .= Html::beginTag('div', ['id' => 'row_' . $modelIndex, 'class' => 'tabular-row']);
-            }
 
-            if ($modelIndex > 0) {
-                $htmlFields .= Html::tag('i', '', ['class' => 'remove-row formwizard-x-ico', 'data' => ['rowid' => $modelIndex]]);
+                //add the remove icon if edit mode and more than one rows
+                ($modelIndex > 0) && $htmlFields .= Html::tag('i', '', ['class' => 'remove-row formwizard-x-ico', 'data' => ['rowid' => $modelIndex]]);
             }
 
             //iterate all fields associated to the relevant model
