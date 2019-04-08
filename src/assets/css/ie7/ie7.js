@@ -13,6 +13,7 @@
 		el.innerHTML = '<span style="font-family: \'formwizard\'">' + entity + '</span>' + html;
 	}
 	var icons = {
+		'formwizard_restore-ico': '&#xea2e;',
 		'formwizard-checkmark-ico': '&#xe900;',
 		'formwizard-check-alt-ico': '&#xe901;',
 		'formwizard-x-ico': '&#xe902;',
