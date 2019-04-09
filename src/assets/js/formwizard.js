@@ -762,6 +762,7 @@ $.formwizard = {
 
         },
         init: (formId) => {
+
             //bind the onchange for the form inputs to update the form data as soon it is updated
             $(document).on("change", "#" + formId + " :input", function (e) {
                 let stepData = $(this).closest("div.step-content").data('step');
