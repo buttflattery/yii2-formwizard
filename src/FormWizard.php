@@ -506,6 +506,8 @@ class FormWizard extends Widget
         $wizardContainerId = $this->wizardContainerId;
 
         $pluginOptions = $this->getPluginOptions();
+        $jsOptionsPersistence = Json::encode($this->enablePersistence);
+
         $jsButton = <<< JS
         $.formwizard.helper.appendButtons({
             form:'#{$this->formOptions["id"]}',
@@ -521,7 +523,7 @@ class FormWizard extends Widget
             classPrev:'{$this->classPrev}',
             classFinish:'{$this->classFinish}',
             classRestore:'{$this->classRestore}',
-            enablePersistence:'{$this->enablePersistence}',
+            enablePersistence:{$jsOptionsPersistence},
 
         }).concat({$pluginOptions['toolbarSettings']['toolbarExtraButtons']})
 JS;
@@ -565,7 +567,7 @@ JS;
         $js = $this->_tabularEventJs;
         $js .= $this->_persistenceEvents;
 
-        $jsOptionsPersistence = Json::encode($this->enablePersistence);
+        
 
         //init script for the wizard
         $js .= <<<JS
@@ -614,7 +616,7 @@ JS;
 
         //init the data persistence if enabled
 
-        if({$jsOptionsPersistence}){
+        if(true =={$jsOptionsPersistence}){
             $.formwizard.persistence.init('{$this->formOptions["id"]}');
         }
 
