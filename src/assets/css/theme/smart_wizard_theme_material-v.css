@@ -31,7 +31,7 @@
 .sw-theme-material-v .formwizard_prev,
 .sw-theme-material-v .formwizard_finish {
     font-family: inherit !important;
-    background-color: teal;
+    background-color: rgb(76, 117, 175) !important;
 }
 
 .justify-content-end {

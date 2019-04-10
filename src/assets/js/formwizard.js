@@ -66,7 +66,7 @@ $.formwizard = {
 
             // Toolbar next, previous and finish custom buttons
             let formwizardBtnNext = $('<button class="formwizard_next"></button>')
-                .html(options.iconNext + "&nbsp" + options.labelNext)
+                .html(options.labelNext + "&nbsp" + options.iconNext)
                 .addClass(options.classNext);
 
             //add to return array
@@ -150,8 +150,6 @@ $.formwizard = {
             let bsVersion = formwizardOptions[formId].bsVersion;
             let classListGroup = formwizardOptions[formId].classListGroup;
             let classListGroupHeading = formwizardOptions[formId].classListGroupHeading;
-            let classListGroupItem = formwizardOptions[formId].classListGroupItem;
-            let classListGroupBadge = formwizardOptions[formId].classListGroupBadge;
 
             stepContainer.querySelectorAll("." + classListGroup).forEach(element => {
                 element.remove();
@@ -166,7 +164,7 @@ $.formwizard = {
                     let rowHtml = '<h4 class="' + classListGroupHeading + '">Step ' + parseInt(step + 1) + '</h4>';
                     stepFields.forEach(function (fieldName, index) {
                         let inputLabel = $.formwizard.helper.getpreviewInputLabel(fieldName);
-                        let inputValue = $.formwizard.helper.getpreviewInputValue(fieldName);
+                        let inputValue = $.formwizard.helper.getpreviewInputValue(formId, fieldName);
                         let stepData = {
                             label: inputLabel == '' ? 'NA' : inputLabel,
                             value: inputValue == '' ? 'NA' : inputValue
@@ -193,14 +191,15 @@ $.formwizard = {
             }
             return $('#' + fieldName).attr("placeholder");
         },
-        getpreviewInputValue: (fieldName) => {
-            let inputType = $('#' + fieldName);
+        getpreviewInputValue: (formId, fieldName) => {
+            let inputType = $('#' + formId + ' #' + fieldName);
+
             if (inputType.is("select")) {
                 // <select> element.
-                return $('#' + fieldName + ' option:selected').text();
+                return $('#' + formId + '#' + fieldName + ' option:selected').text();
             } else {
                 // <textarea> element.
-                return $('#' + fieldName).val();
+                return inputType.val();
             }
         },
         previewTemplate: (params, bsVersion, formwizardOptions) => {
