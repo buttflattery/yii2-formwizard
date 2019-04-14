@@ -389,6 +389,7 @@ class FormWizard extends Widget
     const THEME_CIRCLES = 'circles';
     const THEME_MATERIAL = 'material';
     const THEME_MATERIAL_V = 'material-v';
+    const THEME_NOTEBOOK = 'notebook';
 
     /**
      * Supported themes for the Widget, default value used is `default`.
@@ -401,6 +402,7 @@ class FormWizard extends Widget
         self::THEME_ARROWS => 'Arrows',
         self::THEME_MATERIAL => 'Material',
         self::THEME_MATERIAL_V => 'MaterialVerticle',
+        self::THEME_NOTEBOOK=>'NoteBook',
     ];
 
     /**
