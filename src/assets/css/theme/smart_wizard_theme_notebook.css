@@ -1,0 +1,170 @@
+/*!
+ * SmartWizard v4.3.x
+ * jQuery Wizard Plugin
+ * http://www.techlaboratory.net/smartwizard
+ *
+ * Created by Dipu Raj
+ * http://dipuraj.me
+ *
+ * Licensed under the terms of MIT License
+ * https://github.com/techlab/SmartWizard/blob/master/LICENSE
+ */
+
+/* SmartWizard Theme: Dots */
+.sw-theme-notebook {
+    font-family: "Montserrat", sans-serif !important;
+    background: #fff;
+    min-height: 50px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    margin-bottom: 30px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    -ms-border-radius: 2px;
+    border-radius: 2px;
+    float: left;
+    clear: both;
+    min-width: 96%;
+}
+
+.sw-theme-notebook .formwizard_next,
+.sw-theme-notebook .formwizard_prev,
+.sw-theme-notebook .formwizard_finish {
+    font-family: inherit !important;
+    background-color: rgb(76, 117, 175) !important;
+}
+
+.justify-content-end {
+    -ms-flex-pack: end !important;
+    justify-content: flex-end !important;
+    display: flex;
+}
+
+.sw-theme-notebook .step-anchor {
+    border: 0px;
+    background-color: #ffffff;
+}
+
+.sw-theme-notebook .sw-container {
+    min-height: 300px;
+    width: 73%;
+    float: left;
+    margin-left: 15px;
+}
+
+.sw-theme-notebook .sw-btn-group-extra {
+    float: right !important;
+}
+
+.sw-main .tabular-row i.remove-row {
+    float: right;
+    clear: both;
+    color: #d9534f;
+}
+
+.sw-theme-notebook .step-content {
+    margin: 0;
+    padding: 0;
+    clear: both;
+    width: 74%;
+    font-size: 14px;
+    color: #555;
+    padding: 20px;
+}
+
+.sw-theme-notebook ul.step-anchor {
+    list-style: none !important;
+    padding: 0;
+    margin: 0;
+    float: left;
+    width: 25%;
+    clear: both;
+    display: block;
+}
+
+.sw-theme-notebook ul.step-anchor li {
+    float: none;
+    display: block;
+    padding: 0;
+    box-shadow: 0 0px 1px rgba(0, 0, 0, 0.2);
+}
+
+.sw-theme-notebook .step-anchor a {
+    -moz-transition: 0.5s;
+    -o-transition: 0.5s;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    display: block;
+    width: auto;
+    padding: 1em 1em;
+    text-decoration: none;
+    border: 0px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    background: #eee;
+    color: #aaa !important;
+    cursor: default;
+    border-radius: 0px;
+}
+
+.sw-theme-notebook ul.step-anchor>li.active a {
+    background-color: rgb(76, 117, 175) !important;
+    color: #fff !important;
+    cursor: default;
+    padding: 20px 30px 20px 10px;
+}
+
+.sw-theme-notebook ul.step-anchor li.done a {
+    background-color: #00ac4899;
+    color: #fff !important;
+}
+
+.sw-theme-notebook .sw-container .step-content {
+    min-height: 245px;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -ms-border-radius: 0;
+    border-radius: 0;
+    overflow-y: auto;
+    min-height: 35em;
+    overflow: hidden;
+    position: relative;
+    width: auto;
+    padding: 5px;
+    border-top: 0px;
+}
+
+.sw-theme-notebook .sw-toolbar {
+    padding: 5px;
+    float: left;
+    width: 73%;
+    color: #555;
+    padding: 10px 20px;
+    position: relative;
+}
+
+.sw-theme-notebook .sw-toolbar button,
+.sw-theme-notebook .sw-toolbar input {
+    border-radius: 0px;
+}
+
+.sw-theme-notebook .step-content h3 {
+    font-size: 1.3em;
+}
+
+.sw-theme-notebook .step-content input {
+    border-radius: 0px;
+}
+
+.sw-theme-notebook .step-content label {
+    font-size: 12px;
+    font-weight: normal;
+}
+
+/* Responsive CSS */
+@media screen and (max-width: 800px) {
+
+    .sw-theme-notebook .step-anchor li a,
+    .sw-theme-notebook .step-anchor li.active a {
+        padding-right: 0px !important;
+    }
+}
