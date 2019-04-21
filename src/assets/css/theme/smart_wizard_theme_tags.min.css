@@ -178,7 +178,7 @@
     width: 100%;
     color: #555;
     position: absolute;
-    top: -60px;
+    z-index: 99;
 }
 
 .sw-theme-tags .sw-toolbar button,
