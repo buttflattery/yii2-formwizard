@@ -197,7 +197,7 @@ class FormWizard extends Widget
      *
      * @var mixed
      */
-    public $removeDoneStepOnNavigateBack = false;
+    public $removeDoneStepOnNavigateBack = true;
 
     /**
      * Enable/Disable the done steps navigation default is `true`.
@@ -389,7 +389,7 @@ class FormWizard extends Widget
     const THEME_CIRCLES = 'circles';
     const THEME_MATERIAL = 'material';
     const THEME_MATERIAL_V = 'material-v';
-    const THEME_NOTEBOOK = 'notebook';
+    const THEME_TAGS = 'tags';
 
     /**
      * Supported themes for the Widget, default value used is `default`.
@@ -402,7 +402,7 @@ class FormWizard extends Widget
         self::THEME_ARROWS => 'Arrows',
         self::THEME_MATERIAL => 'Material',
         self::THEME_MATERIAL_V => 'MaterialVerticle',
-        self::THEME_NOTEBOOK=>'NoteBook',
+        self::THEME_TAGS => 'Tags'
     ];
 
     /**
@@ -482,7 +482,7 @@ class FormWizard extends Widget
                 'toolbarPosition' => $this->toolbarPosition,
                 'showNextButton' => false,
                 'showPreviousButton' => false,
-                'toolbarExtraButtons' => $this->toolbarExtraButtons,
+                'toolbarExtraButtons' => $this->toolbarExtraButtons
             ],
             'anchorSettings' => [
                 'anchorClickable' => false,
@@ -490,8 +490,8 @@ class FormWizard extends Widget
                 'markDoneStep' => $this->markDoneStep,
                 'markAllPreviousStepsAsDone' => $this->markAllPreviousStepsAsDone,
                 'removeDoneStepOnNavigateBack' => $this->removeDoneStepOnNavigateBack,
-                'enableAnchorOnDoneStep' => $this->enableAnchorOnDoneStep,
-            ],
+                'enableAnchorOnDoneStep' => $this->enableAnchorOnDoneStep
+            ]
         ];
     }
 
@@ -568,8 +568,6 @@ JS;
         //add tabular events call back js
         $js = $this->_tabularEventJs;
         $js .= $this->_persistenceEvents;
-
-        
 
         //init script for the wizard
         $js .= <<<JS
@@ -652,8 +650,8 @@ JS;
                         'type' => self::STEP_TYPE_PREVIEW,
                         'title' => 'Final Preview',
                         'description' => 'Final Preview of all Steps',
-                        'formInfoText' => 'Click any of the steps below to edit them',
-                    ],
+                        'formInfoText' => 'Click any of the steps below to edit them'
+                    ]
                 ]
             );
         }
@@ -761,7 +759,7 @@ JS;
         //step data
         $dataStep = [
             'number' => $index,
-            'type' => $stepType,
+            'type' => $stepType
         ];
 
         //start step wrapper div
@@ -777,7 +775,7 @@ JS;
             $html .= Html::button(
                 $this->iconAdd . '&nbsp;Add',
                 [
-                    'class' => $this->classAdd . (($this->_bsVersion == 3) ? ' pull-right add_row' : ' float-right add_row'),
+                    'class' => $this->classAdd . (($this->_bsVersion == 3) ? ' pull-right add_row' : ' float-right add_row')
                     // 'id'=>'add_row'
                 ]
             );
@@ -1138,7 +1136,7 @@ JS;
             [
                 'template' => $template,
                 'options' => $containerOptions,
-                'inputOptions' => $inputOptions,
+                'inputOptions' => $inputOptions
             ],
             $isMultiField
         );
@@ -1236,7 +1234,7 @@ JS;
                 $labelOptions = $params['labelOptions'];
 
                 return $field->passwordInput($options)->label($label, $labelOptions);
-            },
+            }
         ];
 
         //create field depending on the type of the value provided
@@ -1247,7 +1245,7 @@ JS;
                 'options' => $options,
                 'labelOptions' => $labelOptions,
                 'label' => $label,
-                'itemsList' => $itemsList,
+                'itemsList' => $itemsList
             ];
             $field = $defaultFieldTypes[$fieldType]($fieldTypeOptions);
             return (!$hintText) ? $field : $field->hint($hintText);

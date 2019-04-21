@@ -18,7 +18,7 @@ class ThemeNoteBookAsset extends ThemeBase
      * @var array
      */
     public $css = [
-        'css/theme/smart_wizard_theme_notebook.min.css',
+        'css/theme/smart_wizard_theme_tags.min.css',
         'css/theme/waves.css'
     ];
 
