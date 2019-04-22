@@ -2,7 +2,7 @@
 
 ### What is this repository for?
 
-A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\ActiveForm` and `\yii\db\ActiveRecord`, it uses [smart wizard library](https://github.com/mstratman/jQuery-Smart-Wizard) for creating the form interface that uses 3 builtin and 2 extra themes, moreover you can also create your own customized theme too.
+A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\ActiveForm` and `\yii\db\ActiveRecord`, it uses [smart wizard library](https://github.com/mstratman/jQuery-Smart-Wizard) for creating the form interface that uses 3 builtin and 3 extra themes, moreover you can also create your own customized theme too.
 
 **_Note : It uses limited features of the jquery plugin SmartWizard that suite the needs of the ActiveForm validation so not all options in the javascript plugin library are allowed to be changed or customized from within this plugin._**
 
@@ -239,16 +239,16 @@ Only the following options of the plugin SmartWizard are allowed to be customize
 ### Widget Constants
 
 - Icons
-
   - `FormWizard::ICON_NEXT` defaults to `'<i class="formwizard-arrow-right-alt1-ico"></i>'`.
   - `FormWizard::ICON_PREV` defaults to `'<i class="formwizard-arrow-left-alt1-ico"></i>'`.
   - `FormWizard::ICON_FINISH` defaults to `'<i class="formwizard-check-alt-ico"></i>'`.
   - `FormWizard::ICON_ADD` defaults to `'<i class="formwizard-plus-ico"></i>'`.
+  - `FormWizard::ICON_RESTORE` defaults to `'<i class="formwizard-restore-ico"></i>'`.
 
 - Step Types
-
   - `FormWizard::STEP_TYPE_DEFAULT` defaults to `'default'`.
   - `FormWizard::STEP_TYPE_TABULAR` default to `'tabular'`.
+  - `FormWizard::STEP_TYPE_PREVIEW` default to `'preview'`.
 
 - Themes
   - `FormWizard::THEME_DEFAULT` defaults to `'default'`.
@@ -257,6 +257,7 @@ Only the following options of the plugin SmartWizard are allowed to be customize
   - `FormWizard::THEME_CIRCLES` defaults to `'circles'`.
   - `FormWizard::THEME_MATERIAL` defaults to `'material'`.
   - `FormWizard::THEME_MATERIAL_V` defaults to `'material-v'`.
+  - `FormWizard::THEME_TAGS` defaults to `'tags'`.
 
 ### Who do I talk to?
 
