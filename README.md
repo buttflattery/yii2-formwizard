@@ -2,7 +2,7 @@
 
 ### What is this repository for?
 
-A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\ActiveForm` and `\yii\db\ActiveRecord`, it uses [smart wizard library](https://github.com/mstratman/jQuery-Smart-Wizard) for creating the form interface that uses 3 builtin and 3 extra themes, moreover you can also create your own customized theme too.
+A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\ActiveForm` and `\yii\db\ActiveRecord`, it uses [smart wizard library](https://github.com/mstratman/jQuery-Smart-Wizard) for creating the form interface that uses 3 builtin and 2 extra themes, moreover you can also create your own customized theme too.
 
 **_Note : It uses limited features of the jquery plugin SmartWizard that suite the needs of the ActiveForm validation so not all options in the javascript plugin library are allowed to be changed or customized from within this plugin._**
 
@@ -80,6 +80,13 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 - `classAdd (string)` : Css class for Add Row Button default to `btn btn-info`
 - `iconAdd (string)` : The html string for the button default to `<i class="formwizard-plus-ico"></i>`
 - `enablePreview (boolean)` : Adds a Preview Step as the last step in the form wizard where you can preview all the entered inputs grouped by steps, clicking on any step will navigate to that step for quick edit, it defaults to `false`.
+
+  When using `'enablePreview'=>true` you can customize the classes using the below options.
+  - `classListGroup (string)` : Css class for the list group defaults to `'list-group'`.
+  - `classListGroupHeading (string)` : Css class for the list group heading element, defautls to `'list-group-heading'`.
+  - `classListGroupItem  (string)` : Css class for the list group item, defaults to `'list-group-item-success'`.
+  - `classListGroupBadge (string)` : Css class for the list group badge that displayes the input label, defaults to `'success'`.
+  
 - `enablePersistence (boolean)` : Enables to save and restore an un-saved form to the local storage for later use, defaults to `false`.
 
 - `steps (array)` : An array of the steps(`array`), the steps can have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
