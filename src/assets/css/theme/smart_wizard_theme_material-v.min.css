@@ -27,6 +27,13 @@
     min-width: 96%;
 }
 
+.sw-theme-tags .fields_container .tabular-row {
+    margin-top: 10px;
+    border-top: 1px solid #c8c8c8;
+    padding: 5px;
+    width: 80%;
+}
+
 .sw-theme-material-v .formwizard_next,
 .sw-theme-material-v .formwizard_prev,
 .sw-theme-material-v .formwizard_finish {
