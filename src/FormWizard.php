@@ -197,7 +197,7 @@ class FormWizard extends Widget
      *
      * @var mixed
      */
-    public $removeDoneStepOnNavigateBack = false;
+    public $removeDoneStepOnNavigateBack = true;
 
     /**
      * Enable/Disable the done steps navigation default is `true`.
@@ -372,6 +372,7 @@ class FormWizard extends Widget
     const ICON_FINISH = '<i class="formwizard-check-alt-ico"></i>';
     const ICON_ADD = '<i class="formwizard-plus-ico"></i>';
     const ICON_RESTORE = '<i class="formwizard-restore-ico"></i>';
+    const ICON_HEADING = '<i class="formwizard-quill-ico"></i>';
 
     /**
      * STEP TYPES
@@ -389,6 +390,7 @@ class FormWizard extends Widget
     const THEME_CIRCLES = 'circles';
     const THEME_MATERIAL = 'material';
     const THEME_MATERIAL_V = 'material-v';
+    const THEME_TAGS = 'tags';
 
     /**
      * Supported themes for the Widget, default value used is `default`.
@@ -401,6 +403,7 @@ class FormWizard extends Widget
         self::THEME_ARROWS => 'Arrows',
         self::THEME_MATERIAL => 'Material',
         self::THEME_MATERIAL_V => 'MaterialVerticle',
+        self::THEME_TAGS => 'Tags'
     ];
 
     /**
@@ -480,7 +483,7 @@ class FormWizard extends Widget
                 'toolbarPosition' => $this->toolbarPosition,
                 'showNextButton' => false,
                 'showPreviousButton' => false,
-                'toolbarExtraButtons' => $this->toolbarExtraButtons,
+                'toolbarExtraButtons' => $this->toolbarExtraButtons
             ],
             'anchorSettings' => [
                 'anchorClickable' => false,
@@ -488,8 +491,8 @@ class FormWizard extends Widget
                 'markDoneStep' => $this->markDoneStep,
                 'markAllPreviousStepsAsDone' => $this->markAllPreviousStepsAsDone,
                 'removeDoneStepOnNavigateBack' => $this->removeDoneStepOnNavigateBack,
-                'enableAnchorOnDoneStep' => $this->enableAnchorOnDoneStep,
-            ],
+                'enableAnchorOnDoneStep' => $this->enableAnchorOnDoneStep
+            ]
         ];
     }
 
@@ -566,8 +569,6 @@ JS;
         //add tabular events call back js
         $js = $this->_tabularEventJs;
         $js .= $this->_persistenceEvents;
-
-        
 
         //init script for the wizard
         $js .= <<<JS
@@ -650,8 +651,8 @@ JS;
                         'type' => self::STEP_TYPE_PREVIEW,
                         'title' => 'Final Preview',
                         'description' => 'Final Preview of all Steps',
-                        'formInfoText' => 'Click any of the steps below to edit them',
-                    ],
+                        'formInfoText' => 'Click any of the steps below to edit them'
+                    ]
                 ]
             );
         }
@@ -759,7 +760,7 @@ JS;
         //step data
         $dataStep = [
             'number' => $index,
-            'type' => $stepType,
+            'type' => $stepType
         ];
 
         //start step wrapper div
@@ -775,7 +776,7 @@ JS;
             $html .= Html::button(
                 $this->iconAdd . '&nbsp;Add',
                 [
-                    'class' => $this->classAdd . (($this->_bsVersion == 3) ? ' pull-right add_row' : ' float-right add_row'),
+                    'class' => $this->classAdd . (($this->_bsVersion == 3) ? ' pull-right add_row' : ' float-right add_row')
                     // 'id'=>'add_row'
                 ]
             );
@@ -837,6 +838,9 @@ JS;
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
 
+            //get the step headings
+            $stepHeadings = ArrayHelper::getValue($step, 'stepHeadings', false);
+
             //field order
             $this->_sortFields($fieldConfig, $attributes, $step);
 
@@ -865,6 +869,21 @@ JS;
                 //attribute name
                 $attributeName = ($isTabularStep) ? "[$modelIndex]" . $attribute : $attribute;
                 $customConfigDefinedForField = $fieldConfig && isset($fieldConfig[$attribute]);
+
+                //has heading for the field
+                $hasHeading = false !== $stepHeadings;
+
+                if ($hasHeading) {
+                    $headingFields = ArrayHelper::getColumn($stepHeadings, 'before', true);
+                    if (in_array($attribute, $headingFields)) {
+                        $currentIndex = array_search($attribute, array_values($headingFields));
+                        $headingConfig = $stepHeadings[$currentIndex];
+
+                        //add heading
+                        $htmlFields .= $this->addHeading($headingConfig);
+                    }
+
+                }
 
                 if ($customConfigDefinedForField) {
                     //if filtered field
@@ -905,6 +924,22 @@ JS;
         $this->_allFields[$index] = $fields;
 
         return $htmlFields;
+    }
+
+    /**
+     * Adds heading before the desired field
+     *
+     * @param array $headingConfig the configuration array
+     *
+     * @return HTML
+     */
+    public function addHeading($headingConfig)
+    {
+        $headingText = $headingConfig['text'];
+        $headingClass = ArrayHelper::getValue($headingConfig, 'className', 'field-heading');
+        $headingIcon = ArrayHelper::getValue($headingConfig, 'icon', self::ICON_HEADING);
+
+        return Html::tag('h3', $headingIcon . Html::encode($headingText), ['class' => $headingClass]);
     }
 
     /**
@@ -1136,7 +1171,7 @@ JS;
             [
                 'template' => $template,
                 'options' => $containerOptions,
-                'inputOptions' => $inputOptions,
+                'inputOptions' => $inputOptions
             ],
             $isMultiField
         );
@@ -1234,7 +1269,7 @@ JS;
                 $labelOptions = $params['labelOptions'];
 
                 return $field->passwordInput($options)->label($label, $labelOptions);
-            },
+            }
         ];
 
         //create field depending on the type of the value provided
@@ -1245,7 +1280,7 @@ JS;
                 'options' => $options,
                 'labelOptions' => $labelOptions,
                 'label' => $label,
-                'itemsList' => $itemsList,
+                'itemsList' => $itemsList
             ];
             $field = $defaultFieldTypes[$fieldType]($fieldTypeOptions);
             return (!$hintText) ? $field : $field->hint($hintText);

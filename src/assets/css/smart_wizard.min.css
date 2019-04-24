@@ -32,6 +32,12 @@
     font-family: inherit !important;
 }
 
+.sw-theme-default .field-heading {
+    border-bottom: 1px solid rgb(161, 161, 161);
+    margin-bottom: 31px;
+    font-size: 1.3em;
+}
+
 .sw-main .step-content {
     display: none;
     position: relative;
@@ -48,14 +54,12 @@
     color: #d9534f;
 }
 
-.sw-main .fields_container {
-    width: 80%;
-}
 
 .sw-main .fields_container .tabular-row {
     margin-top: 10px;
     border-top: 1px solid #c8c8c8;
     padding: 5px;
+    width: 80%;
 }
 
 .justify-content-end {
@@ -85,7 +89,7 @@
 }
 
 .sw-theme-default .sw-toolbar {
-    background: #f9f9f9;
+
     border-radius: 0 !important;
     padding-left: 10px;
     padding-right: 10px;
@@ -101,6 +105,11 @@
     border-top-color: #ddd !important;
 }
 
+.sw-theme-default>ul.step-anchor {
+    background: #f9f9f9;
+    padding: 0 !important;
+}
+
 .sw-theme-default>ul.step-anchor>li {
     position: relative;
     margin-right: 2px;
@@ -109,12 +118,13 @@
 .sw-theme-default>ul.step-anchor>li>a,
 .sw-theme-default>ul.step-anchor>li>a:hover {
     border: none !important;
-    color: #bbb;
+    color: #bbb !important;
     text-decoration: none;
     outline-style: none;
     background: 0 0 !important;
     border: none !important;
-    cursor: not-allowed
+    cursor: not-allowed;
+
 }
 
 .sw-theme-default>ul.step-anchor>li.clickable>a:hover {
@@ -143,6 +153,7 @@
     color: teal !important;
     background: 0 0 !important;
     cursor: pointer;
+
 }
 
 .sw-theme-default>ul.step-anchor>li.active>a::after {
