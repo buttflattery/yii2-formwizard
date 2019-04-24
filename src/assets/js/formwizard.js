@@ -66,7 +66,7 @@ $.formwizard = {
 
             // Toolbar next, previous and finish custom buttons
             let formwizardBtnNext = $('<button class="formwizard_next"></button>')
-                .html(options.iconNext + "&nbsp" + options.labelNext)
+                .html(options.labelNext + "&nbsp" + options.iconNext)
                 .addClass(options.classNext);
 
             //add to return array
@@ -150,8 +150,6 @@ $.formwizard = {
             let bsVersion = formwizardOptions[formId].bsVersion;
             let classListGroup = formwizardOptions[formId].classListGroup;
             let classListGroupHeading = formwizardOptions[formId].classListGroupHeading;
-            let classListGroupItem = formwizardOptions[formId].classListGroupItem;
-            let classListGroupBadge = formwizardOptions[formId].classListGroupBadge;
 
             stepContainer.querySelectorAll("." + classListGroup).forEach(element => {
                 element.remove();
@@ -166,7 +164,7 @@ $.formwizard = {
                     let rowHtml = '<h4 class="' + classListGroupHeading + '">Step ' + parseInt(step + 1) + '</h4>';
                     stepFields.forEach(function (fieldName, index) {
                         let inputLabel = $.formwizard.helper.getpreviewInputLabel(fieldName);
-                        let inputValue = $.formwizard.helper.getpreviewInputValue(fieldName);
+                        let inputValue = $.formwizard.helper.getpreviewInputValue(formId, fieldName);
                         let stepData = {
                             label: inputLabel == '' ? 'NA' : inputLabel,
                             value: inputValue == '' ? 'NA' : inputValue
@@ -193,14 +191,15 @@ $.formwizard = {
             }
             return $('#' + fieldName).attr("placeholder");
         },
-        getpreviewInputValue: (fieldName) => {
-            let inputType = $('#' + fieldName);
+        getpreviewInputValue: (formId, fieldName) => {
+            let inputType = $('#' + formId + ' #' + fieldName);
+
             if (inputType.is("select")) {
                 // <select> element.
-                return $('#' + fieldName + ' option:selected').text();
+                return $('#' + formId + '#' + fieldName + ' option:selected').text();
             } else {
                 // <textarea> element.
-                return $('#' + fieldName).val();
+                return inputType.val();
             }
         },
         previewTemplate: (params, bsVersion, formwizardOptions) => {
@@ -356,13 +355,16 @@ $.formwizard = {
                 .attr("id");
             let currentStep = $.formwizard.helper.currentIndex("#" + formId);
             let tabular = $.formwizard.tabular;
+            //get all inputs 
             let oldFieldCollection = $(row).find('input,select,textarea');
             let eventTrigger = $.formwizard.triggerEvent;
 
             //trigger beforeClone event for all the inputs inside the tabular row to be cloned
             oldFieldCollection.each(function (index, element) {
-                //trigger beforeclone event
-                eventTrigger("formwizard.beforeClone", "#" + formId + " #step-" + currentStep + " #" + element.id);
+                if (typeof $(element).attr('id') !== 'undefined') {
+                    //trigger beforeclone event
+                    eventTrigger("formwizard.beforeClone", "#" + formId + " #step-" + currentStep + " #" + element.id);
+                }
             });
 
             //clone node
@@ -370,8 +372,10 @@ $.formwizard = {
 
             //trigger afterClone event for all the inputs inside the tabular row
             oldFieldCollection.each(function (index, element) {
-                //trigger beforeclone event
-                eventTrigger("formwizard.afterClone", "#" + formId + " #step-" + currentStep + " #" + element.id);
+                if (typeof $(element).attr('id') !== 'undefined') {
+                    //trigger beforeclone event
+                    eventTrigger("formwizard.afterClone", "#" + formId + " #step-" + currentStep + " #" + element.id);
+                }
             });
 
             let rowClone = documentFragment.querySelector("div.tabular-row");
@@ -387,29 +391,28 @@ $.formwizard = {
             documentFragment
                 .querySelectorAll("input,select,textarea")
                 .forEach(function (element, index) {
+
                     //save old id
                     let oldFieldId = element.id;
 
                     //update input attributes
                     tabular.updateFieldAttributes(element, currentIndex);
+                    if (typeof $(element).attr('id') !== 'undefined') {
+                        //get the default field options ActiveForm
+                        let fieldOptions = tabular.setFieldDefaults(
+                            element,
+                            formId,
+                            oldFieldId
+                        );
 
-                    //get the default field options ActiveForm
-                    let fieldOptions = tabular.setFieldDefaults(
-                        element,
-                        formId,
-                        oldFieldId
-                    );
-
-                    //add field to the formwizard step fields list
-                    $.formwizard.helper.addField(formId, element, currentStep);
-                    newFields.push(element.id);
-
-                    if (typeof fieldOptions !== 'undefined') {
-                        //add field to the activeform validation
-                        $.formwizard.validation.addField(formId, fieldOptions);
+                        //add field to the formwizard step fields list
+                        $.formwizard.helper.addField(formId, element, currentStep);
+                        newFields.push(element.id);
+                        if (typeof fieldOptions !== 'undefined') {
+                            //add field to the activeform validation
+                            $.formwizard.validation.addField(formId, fieldOptions);
+                        }
                     }
-
-
                 });
 
             //add the remove button
@@ -466,11 +469,14 @@ $.formwizard = {
                 .parent()
                 .hasClass("field-" + element.id);
 
-            //update counter of the id
-            element.id = element.id.replace(
-                /\-([\d]+)\-/,
-                "-" + parseInt(currentIndex) + "-"
-            );
+            if (typeof $(element).attr('id') !== 'undefined') {
+                //update counter of the id
+                element.id = element.id.replace(
+                    /\-([\d]+)\-/,
+                    "-" + parseInt(currentIndex) + "-"
+                );
+            }
+
 
             //update the counter of the name
             element.name = element.name.replace(
@@ -537,34 +543,34 @@ $.formwizard = {
             let fieldTypes = {
                 'select-one': (fieldId) => {
                     if ($.formwizard.persistence.storageFields['step-' + stepNumber].stepType == 'tabular') {
-                        let rowId = $("#" + fieldId).closest('div.tabular-row').attr('id');
+                        let rowId = $("#" + formId + " #" + fieldId).closest('div.tabular-row').attr('id');
                         if (!$.formwizard.persistence.storageFields['step-' + stepNumber].fields.hasOwnProperty(rowId)) {
                             $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId] = {};
                         }
-                        $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId][fieldId] = document.querySelector("#" + fieldId).value;
+                        $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId][fieldId] = document.querySelector("#" + formId + " #" + fieldId).value;
                     } else {
                         //add fields to the local fieldstorage property
-                        $.formwizard.persistence.storageFields['step-' + stepNumber].fields[fieldId] = document.querySelector("#" + fieldId).value;
+                        $.formwizard.persistence.storageFields['step-' + stepNumber].fields[fieldId] = document.querySelector("#" + formId + " #" + fieldId).value;
                     }
 
                 },
                 text: function (fieldId) {
                     if ($.formwizard.persistence.storageFields['step-' + stepNumber].stepType == 'tabular') {
-                        let rowId = $("#" + fieldId).closest('div.tabular-row').attr('id');
+                        let rowId = $("#" + formId + " #" + fieldId).closest('div.tabular-row').attr('id');
 
                         if (!$.formwizard.persistence.storageFields['step-' + stepNumber].fields.hasOwnProperty(rowId)) {
                             $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId] = {};
                         }
-                        $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId][fieldId] = document.querySelector("#" + fieldId).value;
+                        $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId][fieldId] = document.querySelector("#" + formId + " #" + fieldId).value;
                     } else {
                         //add fields to the local fieldstorage property
-                        $.formwizard.persistence.storageFields['step-' + stepNumber].fields[fieldId] = document.querySelector("#" + fieldId).value;
+                        $.formwizard.persistence.storageFields['step-' + stepNumber].fields[fieldId] = document.querySelector("#" + formId + " #" + fieldId).value;
                     }
                 },
                 radio: (fieldId) => {
-                    let radioList = $("#" + fieldId).closest('div[role="radiogroup"]').find('input:radio');
+                    let radioList = $("#" + formId + " #" + fieldId).closest('div[role="radiogroup"]').find('input:radio');
                     if ($.formwizard.persistence.storageFields['step-' + stepNumber].stepType == 'tabular') {
-                        let rowId = $("#" + fieldId).closest('div.tabular-row').attr('id');
+                        let rowId = $("#" + formId + " #" + fieldId).closest('div.tabular-row').attr('id');
                         if (!$.formwizard.persistence.storageFields['step-' + stepNumber].fields.hasOwnProperty(rowId)) {
                             $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId] = {};
                         }
@@ -575,7 +581,7 @@ $.formwizard = {
                             });
                         } else {
                             //add fields to the local fieldstorage property
-                            $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId][fieldId] = $("#" + fieldId).is(":checked");
+                            $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId][fieldId] = $("#" + formId + " #" + fieldId).is(":checked");
                         }
                     } else {
                         if (radioList.length) {
@@ -585,7 +591,7 @@ $.formwizard = {
                             });
                         } else {
                             //add fields to the local fieldstorage property
-                            $.formwizard.persistence.storageFields['step-' + stepNumber].fields[fieldId] = $("#" + fieldId).is(":checked");
+                            $.formwizard.persistence.storageFields['step-' + stepNumber].fields[fieldId] = $("#" + formId + " #" + fieldId).is(":checked");
                         }
                     }
 
@@ -593,33 +599,33 @@ $.formwizard = {
 
                 },
                 checkbox: (fieldId) => {
-                    let isCheckBoxList = $('#' + fieldId).attr('name').match(/\[\]$/g);
+                    let isCheckBoxList = $('#' + formId + " #" + fieldId).attr('name').match(/\[\]$/g);
 
                     if ($.formwizard.persistence.storageFields['step-' + stepNumber].stepType == 'tabular') {
-                        let rowId = $("#" + fieldId).closest('div.tabular-row').attr('id');
+                        let rowId = $("#" + formId + " #" + fieldId).closest('div.tabular-row').attr('id');
                         if (!$.formwizard.persistence.storageFields['step-' + stepNumber].fields.hasOwnProperty(rowId)) {
                             $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId] = {};
                         }
                         if (isCheckBoxList.length) {
-                            let checkboxList = $("input[name='" + $("#" + fieldId).attr('name') + "']");
+                            let checkboxList = $("input[name='" + $("#" + formId + " #" + fieldId).attr('name') + "']");
                             checkboxList.each(function (index, element) {
                                 //add fields to the local fieldstorage property
                                 $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId][element.id] = element.checked;
                             });
                         } else {
                             //add fields to the local fieldstorage property
-                            $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId][fieldId] = $("#" + fieldId).is(":checked");
+                            $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId][fieldId] = $("#" + formId + " #" + fieldId).is(":checked");
                         }
                     } else {
                         if (isCheckBoxList.length) {
-                            let checkboxList = $("input[name='" + $("#" + fieldId).attr('name') + "']");
+                            let checkboxList = $("input[name='" + $("#" + formId + " #" + fieldId).attr('name') + "']");
                             checkboxList.each(function (index, element) {
                                 //add fields to the local fieldstorage property
                                 $.formwizard.persistence.storageFields['step-' + stepNumber].fields[element.id] = element.checked;
                             });
                         } else {
                             //add fields to the local fieldstorage property
-                            $.formwizard.persistence.storageFields['step-' + stepNumber].fields[fieldId] = $("#" + fieldId).is(":checked");
+                            $.formwizard.persistence.storageFields['step-' + stepNumber].fields[fieldId] = $("#" + formId + " #" + fieldId).is(":checked");
                         }
                     }
 
@@ -654,7 +660,7 @@ $.formwizard = {
             let storageFields = $.formwizard.persistence.storageFields;
             let fieldTypes = {
                 'select-one': (fieldId, value) => {
-                    let field = document.querySelector("#" + fieldId);
+                    let field = document.querySelector("#" + formId + " #" + fieldId);
 
                     // restore value
                     field.value = value;
@@ -669,7 +675,7 @@ $.formwizard = {
                     });
                 },
                 text: function (fieldId, value) {
-                    let field = document.querySelector("#" + fieldId);
+                    let field = document.querySelector("#" + formId + " #" + fieldId);
 
                     // restore value
                     field.value = value;
@@ -681,7 +687,7 @@ $.formwizard = {
                     });
                 },
                 radio: (fieldId, value) => {
-                    let field = document.querySelector("#" + fieldId);
+                    let field = document.querySelector("#" + formId + " #" + fieldId);
 
                     // restore value
                     field.checked = value;
@@ -693,7 +699,7 @@ $.formwizard = {
                     });
                 },
                 checkbox: (fieldId, value) => {
-                    let field = document.querySelector("#" + fieldId);
+                    let field = document.querySelector("#" + formId + " #" + fieldId);
 
                     // restore value
                     field.checked = value;
