@@ -11,36 +11,22 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 ### External Libraries Used
 
 - [Smart Wizard](https://github.com/mstratman/jQuery-Smart-Wizard).
-- [jQuery v2.2.4](https://jquery.com/download/)
+- [jQuery>= v2.2.4](https://jquery.com/download/)
 - [Bootstrap v3.3.7](https://getbootstrap.com/docs/3.3/) && [Bootstrap v4](http://getbootstrap.com/)
-
-### UPDATE 2 : New Features Added
-
-### April 02 2019
-
-#### Enable Persistence
-
-As there can be any number of steps with the form, and an accidental refresh , reload or navigate away from the page could make it hectic for the user to start entering the form values again, so we have an option to save/restore the form by
-enabling the option `enablePersistence` in the main options, it provides you wiht the <kbd>RESTORE</kbd> button, through which you can restore the previous data for the un-saved form. The form fields are saved to the local storage as soon as you update or type in the fields.
-
-The local storage would be cleared as soon as you submit the form or click the finish button. In this case, you would still see the Restore button but it will not restore any data.
-
-The restore functionality is able to restore the dynamically created rows for the Tabular steps and the values for their fields.
 
 ---
 
-### 25th March, 2019
+### New Features Added
 
-#### Preview Step
+#### 24th April, 2019 : [Group Step Fields](https://github.com/buttflattery/yii2-formwizard/wiki/Group-Step-Fields-using-Heading)
 
-When enabled using the `"enablePreview"=>true` in the main options of the formwizard, after adding all the steps the last step which previews all the inputs entered for the steps. The user can navigate to the step by clicking on the list label inside the preview window. This option is turned off by default, and users will need to specify the `enablePreview` in the main options. it looks like below
-![preview](https://user-images.githubusercontent.com/1536454/55037359-545c2f00-503f-11e9-98a0-25382c49baa6.png)
+#### 2nd April, 2019 : [Enable Persistence](https://github.com/buttflattery/yii2-formwizard/wiki/Form-Persistence)
 
-#### Tabular Step
+#### 25th March, 2019 : [Preview Step](https://github.com/buttflattery/yii2-formwizard/wiki/Enable-Preview-Step), [Tabular Step](<https://github.com/buttflattery/yii2-formwizard/wiki/Tabular-Steps-(New-Feature)>)
 
-A new feature for tabular steps has been added which will help you to configure adressbook like features into the formwizard, there have been several quries related to such feature where we need to add multiple adresses against a single user, or add multiple tags against any album and we need to be able to have a <kbd>Add New</kbd> button which should dynamically add the set of inputs as needed.
+---
 
-### UPDATE : About Bootstrap Version Usage
+### About Bootstrap Version Usage
 
 The extension detects if you are using the `yiisoft/yii2-bootstrap` or `yiisoft/yii2-bootstrap4` and loads the appropriate assets for the extension. It will check first the `"yiisoft/yii2-bootstrap4"` if it exists then it will load bootstrap4 resources otherwise it will fall back to use bootstrap3. So make sure you are following the correct guide to use the [`yiisoft/yii2-bootstrap4"`](https://github.com/yiisoft/yii2-bootstrap4) and remove the `"yiisoft/yii2-bootstrap": "~2.0.0",` from you `composer.json` and change the `minimum-stability:"dev"` here is the complete [guide](https://github.com/yiisoft/yii2-bootstrap4/blob/master/docs/guide/README.md).
 
@@ -82,11 +68,12 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 - `enablePreview (boolean)` : Adds a Preview Step as the last step in the form wizard where you can preview all the entered inputs grouped by steps, clicking on any step will navigate to that step for quick edit, it defaults to `false`.
 
   When using `'enablePreview'=>true` you can customize the classes using the below options.
+
   - `classListGroup (string)` : Css class for the list group defaults to `'list-group'`.
-  - `classListGroupHeading (string)` : Css class for the list group heading element, defautls to `'list-group-heading'`.
-  - `classListGroupItem  (string)` : Css class for the list group item, defaults to `'list-group-item-success'`.
-  - `classListGroupBadge (string)` : Css class for the list group badge that displayes the input label, defaults to `'success'`.
-  
+  - `classListGroupHeading (string)` : Css class for the list group heading element, defaults to `'list-group-heading'`.
+  - `classListGroupItem (string)` : Css class for the list group item, defaults to `'list-group-item-success'`.
+  - `classListGroupBadge (string)` : Css class for the list group badge that displays the input label, defaults to `'success'`.
+
 - `enablePersistence (boolean)` : Enables to save and restore an un-saved form to the local storage for later use, defaults to `false`.
 
 - `steps (array)` : An array of the steps(`array`), the steps can have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
@@ -137,6 +124,13 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
   * `description (string)` : The short description for the step.
   * `formInfoText (text)` : The text to be displayed on the top of the form fields inside the step.
   * `fieldOrder (array)` : The default order of the fields in the steps, if specified then the fields will be populated according to the order of the fields in the array, if not then the fields will be ordered according to the order in the `fieldConfig` option, and if `fieldConfig` option is not specified then the default order in which the attributes are returned from the model will be used.
+  * `stepHeadings (array)` : takes a collection of arrays to group step fields under the headings, it accepts arrays with the following keys
+
+        - `text (string)` the text to be displayed as the heading.
+        - `before (string)` the field before which you want the heading to appear.
+        - `icon (string)` the markup for the icon like `<i class="fa-user"></i>`or the image tag with url you want to display, it defaults to
+        `<i class="formwizard-quill-ico"></i>`. If you dont wish to use an icon you can pass `false`.
+
   * `fieldConfig (array)` : This option is used mainly to customize the form fields for the step. 3 options are recognized inside the `fieldConfig`, 2 of them are `except` and `only`. See below for the details
 
   - `except (array)` : List of fields that should not be populated in the step or should be ignored, for example
@@ -246,6 +240,7 @@ Only the following options of the plugin SmartWizard are allowed to be customize
 ### Widget Constants
 
 - Icons
+
   - `FormWizard::ICON_NEXT` defaults to `'<i class="formwizard-arrow-right-alt1-ico"></i>'`.
   - `FormWizard::ICON_PREV` defaults to `'<i class="formwizard-arrow-left-alt1-ico"></i>'`.
   - `FormWizard::ICON_FINISH` defaults to `'<i class="formwizard-check-alt-ico"></i>'`.
@@ -253,6 +248,7 @@ Only the following options of the plugin SmartWizard are allowed to be customize
   - `FormWizard::ICON_RESTORE` defaults to `'<i class="formwizard-restore-ico"></i>'`.
 
 - Step Types
+
   - `FormWizard::STEP_TYPE_DEFAULT` defaults to `'default'`.
   - `FormWizard::STEP_TYPE_TABULAR` default to `'tabular'`.
   - `FormWizard::STEP_TYPE_PREVIEW` default to `'preview'`.
