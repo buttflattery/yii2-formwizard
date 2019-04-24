@@ -372,6 +372,7 @@ class FormWizard extends Widget
     const ICON_FINISH = '<i class="formwizard-check-alt-ico"></i>';
     const ICON_ADD = '<i class="formwizard-plus-ico"></i>';
     const ICON_RESTORE = '<i class="formwizard-restore-ico"></i>';
+    const ICON_HEADING = '<i class="formwizard-quill-ico"></i>';
 
     /**
      * STEP TYPES
@@ -837,6 +838,9 @@ JS;
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
 
+            //get the step headings
+            $stepHeadings = ArrayHelper::getValue($step, 'stepHeadings', false);
+
             //field order
             $this->_sortFields($fieldConfig, $attributes, $step);
 
@@ -865,6 +869,21 @@ JS;
                 //attribute name
                 $attributeName = ($isTabularStep) ? "[$modelIndex]" . $attribute : $attribute;
                 $customConfigDefinedForField = $fieldConfig && isset($fieldConfig[$attribute]);
+
+                //has heading for the field
+                $hasHeading = false !== $stepHeadings;
+
+                if ($hasHeading) {
+                    $headingFields = ArrayHelper::getColumn($stepHeadings, 'before', true);
+                    if (in_array($attribute, $headingFields)) {
+                        $currentIndex = array_search($attribute, array_values($headingFields));
+                        $headingConfig = $stepHeadings[$currentIndex];
+
+                        //add heading
+                        $htmlFields .= $this->addHeading($headingConfig);
+                    }
+
+                }
 
                 if ($customConfigDefinedForField) {
                     //if filtered field
@@ -905,6 +924,22 @@ JS;
         $this->_allFields[$index] = $fields;
 
         return $htmlFields;
+    }
+
+    /**
+     * Adds heading before the desired field
+     *
+     * @param array $headingConfig the configuration array
+     *
+     * @return HTML
+     */
+    public function addHeading($headingConfig)
+    {
+        $headingText = $headingConfig['text'];
+        $headingClass = ArrayHelper::getValue($headingConfig, 'className', 'field-heading');
+        $headingIcon = ArrayHelper::getValue($headingConfig, 'icon', self::ICON_HEADING);
+
+        return Html::tag('h3', $headingIcon . Html::encode($headingText), ['class' => $headingClass]);
     }
 
     /**

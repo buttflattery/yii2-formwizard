@@ -32,6 +32,12 @@
     width: 80%;
 }
 
+.sw-theme-tags .field-heading {
+    border-bottom: 1px solid rgb(161, 161, 161);
+    margin-bottom: 31px;
+    font-size: 24px;
+}
+
 .sw-theme-tags .formwizard_next,
 .sw-theme-tags .formwizard_prev,
 .sw-theme-tags .formwizard_finish {
@@ -79,6 +85,7 @@
     float: right;
     clear: both;
     color: #d9534f;
+    cursor: pointer;
 }
 
 .sw-theme-tags .step-content {
