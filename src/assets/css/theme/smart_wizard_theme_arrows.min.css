@@ -23,11 +23,17 @@
 }
 
 
-.sw-theme-tags .fields_container .tabular-row {
+.sw-theme-arrows .fields_container .tabular-row {
     margin-top: 10px;
     border-top: 1px solid #c8c8c8;
     padding: 5px;
     width: 80%;
+}
+
+.sw-theme-arrows .field-heading {
+    border-bottom: 1px solid rgb(161, 161, 161);
+    margin-bottom: 31px;
+    font-size: 24px;
 }
 
 .sw-theme-arrows>.sw-container {
@@ -38,6 +44,7 @@
     float: right;
     clear: both;
     color: #d9534f;
+    cursor: pointer;
 }
 
 .justify-content-end {

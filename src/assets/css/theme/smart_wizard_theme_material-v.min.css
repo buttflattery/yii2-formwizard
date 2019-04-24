@@ -27,11 +27,17 @@
     min-width: 96%;
 }
 
-.sw-theme-tags .fields_container .tabular-row {
+.sw-theme-material-v .fields_container .tabular-row {
     margin-top: 10px;
     border-top: 1px solid #c8c8c8;
     padding: 5px;
     width: 80%;
+}
+
+.sw-theme-material-v .field-heading {
+    border-bottom: 1px solid rgb(161, 161, 161);
+    margin-bottom: 31px;
+    font-size: 24px;
 }
 
 .sw-theme-material-v .formwizard_next,
@@ -67,6 +73,7 @@
     float: right;
     clear: both;
     color: #d9534f;
+    cursor: pointer;
 }
 
 .sw-theme-material-v .step-content {

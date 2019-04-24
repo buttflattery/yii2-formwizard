@@ -355,13 +355,16 @@ $.formwizard = {
                 .attr("id");
             let currentStep = $.formwizard.helper.currentIndex("#" + formId);
             let tabular = $.formwizard.tabular;
+            //get all inputs 
             let oldFieldCollection = $(row).find('input,select,textarea');
             let eventTrigger = $.formwizard.triggerEvent;
 
             //trigger beforeClone event for all the inputs inside the tabular row to be cloned
             oldFieldCollection.each(function (index, element) {
-                //trigger beforeclone event
-                eventTrigger("formwizard.beforeClone", "#" + formId + " #step-" + currentStep + " #" + element.id);
+                if (typeof $(element).attr('id') !== 'undefined') {
+                    //trigger beforeclone event
+                    eventTrigger("formwizard.beforeClone", "#" + formId + " #step-" + currentStep + " #" + element.id);
+                }
             });
 
             //clone node
@@ -369,8 +372,10 @@ $.formwizard = {
 
             //trigger afterClone event for all the inputs inside the tabular row
             oldFieldCollection.each(function (index, element) {
-                //trigger beforeclone event
-                eventTrigger("formwizard.afterClone", "#" + formId + " #step-" + currentStep + " #" + element.id);
+                if (typeof $(element).attr('id') !== 'undefined') {
+                    //trigger beforeclone event
+                    eventTrigger("formwizard.afterClone", "#" + formId + " #step-" + currentStep + " #" + element.id);
+                }
             });
 
             let rowClone = documentFragment.querySelector("div.tabular-row");
@@ -386,29 +391,28 @@ $.formwizard = {
             documentFragment
                 .querySelectorAll("input,select,textarea")
                 .forEach(function (element, index) {
+
                     //save old id
                     let oldFieldId = element.id;
 
                     //update input attributes
                     tabular.updateFieldAttributes(element, currentIndex);
+                    if (typeof $(element).attr('id') !== 'undefined') {
+                        //get the default field options ActiveForm
+                        let fieldOptions = tabular.setFieldDefaults(
+                            element,
+                            formId,
+                            oldFieldId
+                        );
 
-                    //get the default field options ActiveForm
-                    let fieldOptions = tabular.setFieldDefaults(
-                        element,
-                        formId,
-                        oldFieldId
-                    );
-
-                    //add field to the formwizard step fields list
-                    $.formwizard.helper.addField(formId, element, currentStep);
-                    newFields.push(element.id);
-
-                    if (typeof fieldOptions !== 'undefined') {
-                        //add field to the activeform validation
-                        $.formwizard.validation.addField(formId, fieldOptions);
+                        //add field to the formwizard step fields list
+                        $.formwizard.helper.addField(formId, element, currentStep);
+                        newFields.push(element.id);
+                        if (typeof fieldOptions !== 'undefined') {
+                            //add field to the activeform validation
+                            $.formwizard.validation.addField(formId, fieldOptions);
+                        }
                     }
-
-
                 });
 
             //add the remove button
@@ -465,11 +469,14 @@ $.formwizard = {
                 .parent()
                 .hasClass("field-" + element.id);
 
-            //update counter of the id
-            element.id = element.id.replace(
-                /\-([\d]+)\-/,
-                "-" + parseInt(currentIndex) + "-"
-            );
+            if (typeof $(element).attr('id') !== 'undefined') {
+                //update counter of the id
+                element.id = element.id.replace(
+                    /\-([\d]+)\-/,
+                    "-" + parseInt(currentIndex) + "-"
+                );
+            }
+
 
             //update the counter of the name
             element.name = element.name.replace(
