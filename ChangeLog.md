@@ -1,10 +1,28 @@
 <h1>Change Log</h1>
 All notable changes to this project will be documented in this file.
 
+<h1>1.4.0 - 22/10/2018</h1>
+
+<h3>Added</h3>
+- April 24, 2019 [FEATURE:f387e81]() added ability to group fields under heading.
+
+<h3>Changed </h3>
+- April 25, 2019[BUG:30936c3]() added fix for the form-persistence bug when using multiple instances.
+
+- April 23, 2019 [BUG:22b06d2 ]() fix for tabular row width for all themes and zindex for the tags theme tool bar.
+
+- April 22, 2019 [BUG:3ab6f4f]() fixed toolbar position.
+
+- April 16,2019 [BUG:e4bcf15]() fixed the navigation padding and the background for the toolbar buttons.
+
+- April 15, 2019 [BUG:30936c3]() added fix for the form-persistence bug when using multiple instances.
+
+---
+
 <h1>1.0.0 - 22/10/2018</h1>
 
 <h3>Added</h3>
-
+- April 21, 2019 [FEATURE:97e5464]() added new theme tags.
 - April 02, 2019 [FEATURE:6fca8ea](https://github.com/buttflattery/yii2-formwizard/commit/6fca8ea9a29de0da9c4c3c14a8e291a47566615b) Added new feaature to save/restore un-saved form fields by enabling `enablePersistence` option.
 
 - March 27, 2019 [FEATURE:1beb505](https://github.com/buttflattery/yii2-formwizard/commit/1beb5050f8fbaa8d8b8cb6af89cc8cb8de20fe7d) (feature/final-preview) Added new feature Preview Step.
@@ -26,7 +44,7 @@ All notable changes to this project will be documented in this file.
 
 - Oct 7, 2018 [ENH:d8b14a6](https://github.com/buttflattery/yii2-formwizard/commit/d8b14a6de252bb0ff6e48963e2ecebdfbbeb9adf) updated the sections to customize all fields with `textarea`, `radio`, `checkbox`.
 
-<h3>Changed </h3>
+<h3>Changed</h3>
 - March 30,2019 [BUG:52d9582](https://github.com/buttflattery/yii2-formwizard/commit/52d9582014c5b8e3b80633b8fbaa161f60800cc5) fixed unsynced preview containers for theme arrows.
 
 - March 25, 2019 [BUG:9e44bf7](https://github.com/buttflattery/yii2-formwizard/commit/9e44bf7805f7c78f7a33d746a1d42bf736bfbdd6) Fixed the bug with the add row when using widgets, closes #14.
