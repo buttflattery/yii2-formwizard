@@ -1195,6 +1195,15 @@ JS;
 
                 return $field->textInput($options)->label($label, $labelOptions);
             },
+            'number' => function ($params) {
+                $params['options']['type'] = 'number';
+                $field = $params['field'];
+                $options = $params['options'];
+                $label = $params['label'];
+                $labelOptions = $params['labelOptions'];
+
+                return $field->textInput($options)->label($label, $labelOptions);
+            },            
             'dropdown' => function ($params) {
                 $field = $params['field'];
                 $options = $params['options'];
