@@ -1192,7 +1192,7 @@ JS;
         }
 
         //remove the type and itemList from options
-        if ($options['type'] !== 'number') {
+        if (isset($options['type']) && $options['type'] !== 'number') {
             unset($options['type']);
         }
         unset($options['itemsList']);
