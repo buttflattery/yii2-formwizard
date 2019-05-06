@@ -1183,7 +1183,9 @@ JS;
         }
 
         //remove the type and itemList from options
-        unset($options['type']);
+        if($options['type'] !== 'number'){
+            unset($options['type'])
+        }        
         unset($options['itemsList']);
 
         $defaultFieldTypes = [
@@ -1195,6 +1197,14 @@ JS;
 
                 return $field->textInput($options)->label($label, $labelOptions);
             },
+            'number' => function ($params) {
+                $field = $params['field'];
+                $options = $params['options'];
+                $label = $params['label'];
+                $labelOptions = $params['labelOptions'];
+
+                return $field->textInput($options)->label($label, $labelOptions);
+            },            
             'dropdown' => function ($params) {
                 $field = $params['field'];
                 $options = $params['options'];
