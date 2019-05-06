@@ -450,7 +450,8 @@ class FormWizard extends Widget
         }
 
         //theme buttons material
-        if ($this->theme == self::THEME_MATERIAL
+        if (
+            $this->theme == self::THEME_MATERIAL
             || $this->theme == self::THEME_MATERIAL_V
         ) {
             $this->classNext .= 'waves-effect';
@@ -850,7 +851,8 @@ JS;
                 array_map(
                     function ($element) use ($model, $isTabularStep, $modelIndex) {
                         return Html::getInputId($model, ($isTabularStep) ? "[$modelIndex]" . $element : $element);
-                    }, $attributes
+                    },
+                    $attributes
                 )
             );
 
@@ -882,7 +884,6 @@ JS;
                         //add heading
                         $htmlFields .= $this->addHeading($headingConfig);
                     }
-
                 }
 
                 if ($customConfigDefinedForField) {
@@ -896,7 +897,9 @@ JS;
 
                     //custom field population
                     $htmlFields .= $this->createCustomInput(
-                        $model, $attributeName, $fieldConfig[$attribute]
+                        $model,
+                        $attributeName,
+                        $fieldConfig[$attribute]
                     );
                     //id of the input
                     $attributeId = Html::getInputId($model, $attributeName);
@@ -1069,8 +1072,10 @@ JS;
             $unorderedAttributes = [];
 
             array_walk(
-                $attributes, function (&$item, $index, $fieldOrder) use (
-                    &$orderedAttributes, &$unorderedAttributes
+                $attributes,
+                function (&$item, $index, $fieldOrder) use (
+                    &$orderedAttributes,
+                    &$unorderedAttributes
                 ) {
                     $moveToIndex = array_search($item, $fieldOrder);
 
@@ -1079,8 +1084,8 @@ JS;
                     } else {
                         $unorderedAttributes[] = $item;
                     }
-
-                }, $fieldOrder
+                },
+                $fieldOrder
             );
 
             //sort new order according to keys
@@ -1089,7 +1094,6 @@ JS;
             //merge array with unordered attributes
             $attributes = array_merge($orderedAttributes, $unorderedAttributes);
         }
-
     }
 
     /**
@@ -1148,11 +1152,15 @@ JS;
         $labelConfig = ArrayHelper::getValue($fieldConfig, 'labelOptions', null);
         //template
         $template = ArrayHelper::getValue(
-            $fieldConfig, 'template', "{label}\n{input}\n{hint}\n{error}"
+            $fieldConfig,
+            'template',
+            "{label}\n{input}\n{hint}\n{error}"
         );
         //container
         $containerOptions = ArrayHelper::getValue(
-            $fieldConfig, 'containerOptions', []
+            $fieldConfig,
+            'containerOptions',
+            []
         );
         //inputOptions
         $inputOptions = ArrayHelper::getValue($fieldConfig, 'inputOptions', []);
@@ -1167,7 +1175,8 @@ JS;
 
         //create field
         $field = $this->createField(
-            $model, $attribute,
+            $model,
+            $attribute,
             [
                 'template' => $template,
                 'options' => $containerOptions,
@@ -1183,9 +1192,9 @@ JS;
         }
 
         //remove the type and itemList from options
-        if($options['type'] !== 'number'){
-            unset($options['type'])
-        }        
+        if ($options['type'] !== 'number') {
+            unset($options['type']);
+        }
         unset($options['itemsList']);
 
         $defaultFieldTypes = [
@@ -1204,7 +1213,7 @@ JS;
                 $labelOptions = $params['labelOptions'];
 
                 return $field->textInput($options)->label($label, $labelOptions);
-            },            
+            },
             'dropdown' => function ($params) {
                 $field = $params['field'];
                 $options = $params['options'];
@@ -1248,7 +1257,6 @@ JS;
                 $label = $nothingSetByUser ? false : $label;
 
                 return $field->checkbox($options)->label($label, $labelOptions);
-
             },
             'textarea' => function ($params) {
                 $field = $params['field'];
@@ -1327,10 +1335,15 @@ JS;
      * @return \yii\widgets\ActiveField
      */
     public function createField(
-        $model, $attribute, $fieldOptions = [], $isMulti = false
+        $model,
+        $attribute,
+        $fieldOptions = [],
+        $isMulti = false
     ) {
         return $this->_form->field(
-            $model, $attribute . ($isMulti ? '[]' : ''), $fieldOptions
+            $model,
+            $attribute . ($isMulti ? '[]' : ''),
+            $fieldOptions
         );
     }
 
@@ -1349,18 +1362,16 @@ JS;
         //register plugin assets
         $this->_bsVersion == 3
             ?
-        Bs3Assets::register($view)
-            :
-        Bs4Assets::register($view);
+            Bs3Assets::register($view)
+            : Bs4Assets::register($view);
 
         //is supported theme
         if (in_array($themeSelected, array_keys($this->themesSupported))) {
             $themeAsset = __NAMESPACE__ . '\assetbundles\bs' .
-            $this->_bsVersion . '\Theme' .
-            $this->themesSupported[$themeSelected] . 'Asset';
+                $this->_bsVersion . '\Theme' .
+                $this->themesSupported[$themeSelected] . 'Asset';
 
             $themeAsset::register($view);
         }
     }
-
 }
