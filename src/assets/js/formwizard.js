@@ -196,7 +196,7 @@ $.formwizard = {
 
             if (inputType.is("select")) {
                 // <select> element.
-                return $('#' + formId + '#' + fieldName + ' option:selected').text();
+                return $('#' + formId + ' #' + fieldName + ' option:selected').text();
             } else {
                 // <textarea> element.
                 return inputType.val();
