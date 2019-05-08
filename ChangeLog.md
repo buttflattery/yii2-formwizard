@@ -4,29 +4,40 @@ All notable changes to this project will be documented in this file.
 <h1>1.4.0 - 22/10/2018</h1>
 
 <h3>Added</h3>
-- April 24, 2019 [FEATURE:f387e81]() added ability to group fields under heading.
+- April 24, 2019 [FEATURE:f387e81](https://github.com/buttflattery/yii2-formwizard/commit/f387e81a9f48241904fed9f1e4b4e17ef213ad9c) added ability to group fields under heading.
+- April 21, 2019 [FEATURE:97e5464](https://github.com/buttflattery/yii2-formwizard/commit/97e5464d6c3b84ad5cb4472320cdf56b4fa5bd9d) added new theme tags.
 
 <h3>Changed </h3>
-- April 25, 2019[BUG:30936c3]() added fix for the form-persistence bug when using multiple instances.
+- April 25, 2019[BUG:30936c3](https://github.com/buttflattery/yii2-formwizard/commit/30936c352a93b365e681bbb76cc5b8dfdb74e9aa) added fix for the form-persistence bug when using multiple instances.
 
-- April 23, 2019 [BUG:22b06d2 ]() fix for tabular row width for all themes and zindex for the tags theme tool bar.
+- April 23, 2019 [BUG:22b06d2 ](https://github.com/buttflattery/yii2-formwizard/commit/22b06d2cb6eb0c233ca82f4864f21de0e19d86f7) fix for tabular row width for all themes and zindex for the tags theme tool bar.
 
-- April 22, 2019 [BUG:3ab6f4f]() fixed toolbar position.
+- April 22, 2019 [BUG:3ab6f4f](https://github.com/buttflattery/yii2-formwizard/commit/3ab6f4f7d6ebd721c6834f6d5a26e802fa919e19) fixed toolbar position.
 
-- April 16,2019 [BUG:e4bcf15]() fixed the navigation padding and the background for the toolbar buttons.
+- April 16,2019 [BUG:e4bcf15](https://github.com/buttflattery/yii2-formwizard/commit/e4bcf154b51c8e3cbac9c8f962b23c767e7f9111) fixed the navigation padding and the background for the toolbar buttons.
 
-- April 15, 2019 [BUG:30936c3]() added fix for the form-persistence bug when using multiple instances.
+- April 15, 2019 [BUG:30936c3](https://github.com/buttflattery/yii2-formwizard/commit/30936c352a93b365e681bbb76cc5b8dfdb74e9aa) added fix for the form-persistence bug when using multiple instances.
+
+---
+
+<h1>1.3.0 - 22/10/2018</h1>
+
+<h3>Added</h3>
+
+- April 02, 2019 [FEATURE:6fca8ea](https://github.com/buttflattery/yii2-formwizard/commit/6fca8ea9a29de0da9c4c3c14a8e291a47566615b) Added new feaature to save/restore un-saved form fields by enabling `enablePersistence` option.
+
+- March 27, 2019 [FEATURE:1beb505](https://github.com/buttflattery/yii2-formwizard/commit/1beb5050f8fbaa8d8b8cb6af89cc8cb8de20fe7d) (feature/final-preview) Added new feature Preview Step.
+- March 18, 2019 [FEATURE:5769d27](https://github.com/buttflattery/yii2-formwizard/commit/5769d27fc9059cf4d7d5f7348d0a67213678c8c9) Added new feature for the Tabular step
+
+  <h3>Removed</h3>
+
+- March 25, 2019 [2d7d08f](https://github.com/buttflattery/yii2-formwizard/commit/2d7d08f5aa6a6489a57e30a87baaa67e3225b29f) removed the `form-inline` class for the tabular form.
 
 ---
 
 <h1>1.0.0 - 22/10/2018</h1>
 
 <h3>Added</h3>
-- April 21, 2019 [FEATURE:97e5464]() added new theme tags.
-- April 02, 2019 [FEATURE:6fca8ea](https://github.com/buttflattery/yii2-formwizard/commit/6fca8ea9a29de0da9c4c3c14a8e291a47566615b) Added new feaature to save/restore un-saved form fields by enabling `enablePersistence` option.
-
-- March 27, 2019 [FEATURE:1beb505](https://github.com/buttflattery/yii2-formwizard/commit/1beb5050f8fbaa8d8b8cb6af89cc8cb8de20fe7d) (feature/final-preview) Added new feature Preview Step.
-- March 18, 2019 [FEATURE:5769d27](https://github.com/buttflattery/yii2-formwizard/commit/5769d27fc9059cf4d7d5f7348d0a67213678c8c9) Added new feature for the Tabular step
 
 - March 13, 2019 [ENH:4e52390](https://github.com/buttflattery/yii2-formwizard/commit/4e523900e3f5312a1bc72e7561b5b43a731f1fb3) Added hint option for the inputs to provide customized text.
 
@@ -72,7 +83,5 @@ All notable changes to this project will be documented in this file.
 - Oct 10, 2018 [BUG:3a7bc4a](https://github.com/buttflattery/yii2-formwizard/commit/3a7bc4aefc50e0be2b597b5ffa233c55c5aa4b97) updated the sections with ajax validation fix.
 
 <h3>Removed</h3>
-
-- March 25, 2019 [2d7d08f](https://github.com/buttflattery/yii2-formwizard/commit/2d7d08f5aa6a6489a57e30a87baaa67e3225b29f) removed the `form-inline` class for the tabular form.
 
 - Nov 21, 2018 [BUG:30cd5d8](https://github.com/buttflattery/yii2-formwizard/commit/30cd5d85dc135084011b3e61407c940962a6ce95) remove manual setting of `formOptions['action']` in the `setDefaults()` method.
