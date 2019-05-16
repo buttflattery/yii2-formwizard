@@ -621,7 +621,7 @@ JS;
             classFinish:'{$this->classFinish}',
             enablePreview:'{$this->enablePreview}',
             bsVersion:'{$this->_bsVersion}',
-            classListgroup:'{$this->classListGroup}',
+            classListGroup:'{$this->classListGroup}',
             classListGroupHeading:'{$this->classListGroupHeading}',
             classListGroupItem:'{$this->classListGroupItem}',
             classListGroupBadge:'{$this->classListGroupBadge}'
