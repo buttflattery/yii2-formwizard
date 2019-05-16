@@ -1,4 +1,4 @@
-# Yii2-FormWizard (v1.0)
+# Yii2-FormWizard (v1.4.6)
 
 ### What is this repository for?
 
@@ -79,6 +79,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 - `steps (array)` : An array of the steps(`array`), the steps can have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
 
   - `type (string)` : The type of the step, defaults to `default`. This option is used if you need to have tabular inputs for the step by specifying the type as `tabular`, you can use the provided constants like `FormWizard::STEP_TYPE_TABULAR` or `FormWizard::STEP_TYPE_DEFAULT`.
+  - `limitRows (int)` : The number of rows to limit the tabular step Add Rows functionality in combination with the `FormWizard::STEP_TYPE_TABULAR`, default is unlimited `-1`. [See Wiki](https://github.com/buttflattery/yii2-formwizard/wiki/Tabular-Steps:-Limiting-Rows).
   - `model (object | array of models)` : The `\yii\model\ActiveRecord` model object or array of models to create step fields.
 
     **Note: After the addition of the feature Tabular Steps when using `'type'=>'tabular'` you must remember that you cannot provide different models, although you can provide multiple instances when in edit mode but for the same model only.**
