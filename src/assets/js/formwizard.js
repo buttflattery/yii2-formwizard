@@ -15,6 +15,9 @@ $.formwizard = {
     options: [],
     submit: false,
     helper: {
+        showMessage: message => {
+            alert(message);
+        },
         removeField: element => {
             let formId = $(element)
                 .closest("form")
@@ -40,24 +43,39 @@ $.formwizard = {
                 $(form + " .sw-main").removeClass("shake animated");
             }, 1000);
         },
-        appendButtons: function (options) {
+        appendButtons: function ({
+            form,
+            labelNext,
+            labelPrev,
+            labelFinish,
+            labelRestore,
+            iconNext,
+            iconPrev,
+            iconFinish,
+            iconRestore,
+            classNext,
+            classPrev,
+            classFinish,
+            classRestore,
+            enablePersistence = false
+        }) {
             let buttons = [];
 
-            if (options.enablePersistence) {
+            if (enablePersistence) {
                 buttons.push(
                     $(
                         '<button class="formwizard_restore" type="button"/></button>'
                     )
-                    .html(options.iconRestore + "&nbsp;" + options.labelRestore)
-                    .addClass(options.classRestore)
+                    .html(iconRestore + "&nbsp;" + labelRestore)
+                    .addClass(classRestore)
                 );
             }
 
             //add to buttons array
             buttons.push(
                 $('<button class="formwizard_prev"></button>')
-                .html(options.iconPrev + "&nbsp;" + options.labelPrev)
-                .addClass(options.classPrev)
+                .html(iconPrev + "&nbsp;" + labelPrev)
+                .addClass(classPrev)
                 .on("click", function (e) {
                     e.preventDefault();
                     $.formwizard.formNavigation.previous(e.target);
@@ -66,8 +84,8 @@ $.formwizard = {
 
             // Toolbar next, previous and finish custom buttons
             let formwizardBtnNext = $('<button class="formwizard_next"></button>')
-                .html(options.labelNext + "&nbsp" + options.iconNext)
-                .addClass(options.classNext);
+                .html(labelNext + "&nbsp" + iconNext)
+                .addClass(classNext);
 
             //add to return array
             buttons.push(
@@ -77,8 +95,8 @@ $.formwizard = {
             let formwizardBtnFinish = $(
                     '<button class="formwizard_finish" type="submit"/></button>'
                 )
-                .html(options.iconFinish + "&nbsp;" + options.labelFinish)
-                .addClass(options.classFinish);
+                .html(iconFinish + "&nbsp;" + labelFinish)
+                .addClass(classFinish);
             //add to buttons array
             buttons.push(
                 formwizardBtnFinish
@@ -88,11 +106,11 @@ $.formwizard = {
 
             $(combined).on("click", function (e) {
                 e.preventDefault();
-                if ($(options.form).yiiActiveForm("data").attributes.length) {
-                    return $.formwizard.validation.run(options.form, e);
+                if ($(form).yiiActiveForm("data").attributes.length) {
+                    return $.formwizard.validation.run(form, e);
                 }
                 if ($(e.target).hasClass("formwizard_finish")) {
-                    $(options.form).yiiActiveForm("submitForm");
+                    $(form).yiiActiveForm("submitForm");
                 }
                 return $.formwizard.formNavigation.next(e.target);
             });
@@ -223,7 +241,7 @@ $.formwizard = {
                     event.preventDefault();
                     let formName = $(this).attr("id");
                     let currentIndex = $.formwizard.helper.currentIndex(form);
-                    let isLastStep = currentIndex == $(form + " .step-anchor").find("li").length - 1;
+                    const isLastStep = currentIndex == $(form + " .step-anchor").find("li").length - 1;
                     let res;
 
                     //check if the preview step then skip validation messages check
@@ -311,12 +329,14 @@ $.formwizard = {
             var target = document.querySelector(selector);
 
             $.formwizard.observerObj = $.formwizard.observer.observerInstance(selector);
+
             // configuration of the observer:
             var config = {
                 childList: true,
                 attributes: true,
                 subtree: false
             };
+
             // pass in the target node, as well as the observer options
             $.formwizard.observerObj.observe(target, config);
         },
@@ -348,6 +368,14 @@ $.formwizard = {
         addRow: element => {
             let currentContainer = $(element).siblings(".fields_container");
             let currentIndex = currentContainer.find(".tabular-row").length;
+            let limitOver = currentIndex === currentContainer.data('rows-limit');
+
+            //if row limit exceeded
+            if (limitOver) {
+                $.formwizard.helper.showMessage("Cannot add any more.");
+                return;
+            }
+
             let documentFragment = document.createDocumentFragment();
             let row = $(currentContainer)[0].firstChild;
             let formId = $(element)
@@ -355,9 +383,11 @@ $.formwizard = {
                 .attr("id");
             let currentStep = $.formwizard.helper.currentIndex("#" + formId);
             let tabular = $.formwizard.tabular;
+
             //get all inputs 
             let oldFieldCollection = $(row).find('input,select,textarea');
             let eventTrigger = $.formwizard.triggerEvent;
+
 
             //trigger beforeClone event for all the inputs inside the tabular row to be cloned
             oldFieldCollection.each(function (index, element) {
