@@ -1,7 +1,21 @@
 <h1>Change Log</h1>
 All notable changes to this project will be documented in this file.
 
-<h1>1.4.0 - 22/10/2018</h1>
+<h1>1.4.6 - 17/05/2019</h1>
+
+<h3>Added</h3>
+
+- [ENH:6cbe50a](https://github.com/buttflattery/yii2-formwizard/commit/6cbe50ae60137cb31c4e6d4c541d1b24850a2b5d) Added support for the missing input type number by [@sircovsw](https://github.com/sircovsw).
+- [ENH:25dd39b]() Limit rows for tabular form and code enhancement
+
+  <h3>Changed</h3>
+
+- [BUG:84899ca](https://github.com/buttflattery/yii2-formwizard/commit/84899ca84f9efabae9df6482ada79ca0e34f92fb) Fixed the bug in formwizard preview steps while retrieving the text from drop-down by [@sircovsw](https://github.com/sircovsw).
+- [HOTFIX:36594062f97fcd31cf142484fc3c86cd511fd0c5](https://github.com/buttflattery/yii2-formwizard/commit/36594062f97fcd31cf142484fc3c86cd511fd0c5) added missing semi-colon.
+- [HOTFIX:9f9c8892fc8e155695f15b83662cae610294f438](https://github.com/buttflattery/yii2-formwizard/commit/9f9c8892fc8e155695f15b83662cae610294f438) added check for the options type.
+- [BUG:71efb65]() Fixed name for the classListGroup option
+
+<h1>1.4.0 - 25/04/2019</h1>
 
 <h3>Added</h3>
 - April 24, 2019 [FEATURE:f387e81](https://github.com/buttflattery/yii2-formwizard/commit/f387e81a9f48241904fed9f1e4b4e17ef213ad9c) added ability to group fields under heading.
