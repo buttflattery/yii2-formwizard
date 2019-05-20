@@ -65,7 +65,7 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
 - `iconFinish (string)` : The Html string for the icon, defaults to `<i class="formwizard-check-alt-ico"></i>`.
 - `classAdd (string)` : Css class for Add Row Button default to `btn btn-info`
 - `iconAdd (string)` : The html string for the button default to `<i class="formwizard-plus-ico"></i>`
-- `enablePreview (boolean)` : Adds a Preview Step as the last step in the form wizard where you can preview all the entered inputs grouped by steps, clicking on any step will navigate to that step for quick edit, it defaults to `false`.
+- `enablePreview (boolean)` : Adds a Preview Step as the last step in the form wizard where you can preview all the entered inputs grouped by steps, clicking on any step will navigate to that step for quick edit, it defaults to `false`. [See Wiki For Code Samples](https://github.com/buttflattery/yii2-formwizard/wiki/Enable-Preview-Step)
 
   When using `'enablePreview'=>true` you can customize the classes using the below options.
 
@@ -120,13 +120,14 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
     ]
 
     ```
+    [See wiki For Tabular Step Code Sample](https://github.com/buttflattery/yii2-formwizard/wiki/Tabular-Steps-(New-Feature))
 
   * `title (string)` : The title of the step to be displayed inside the step Tab.
   * `description (string)` : The short description for the step.
   * `formInfoText (text)` : The text to be displayed on the top of the form fields inside the step.
   * `fieldOrder (array)` : The default order of the fields in the steps, if specified then the fields will be populated according to the order of the fields in the array, if not then the fields will be ordered according to the order in the `fieldConfig` option, and if `fieldConfig` option is not specified then the default order in which the attributes are returned from the model will be used.
-  * `stepHeadings (array)` : takes a collection of arrays to group step fields under the headings, it accepts arrays with the following keys
-
+  * `stepHeadings (array)` : takes a collection of arrays to group step fields under the headings, it accepts arrays with the following keys. [Wiki Code Sample](https://github.com/buttflattery/yii2-formwizard/wiki/Group-Step-Fields-using-Heading)
+  
         - `text (string)` the text to be displayed as the heading.
         - `before (string)` the field before which you want the heading to appear.
         - `icon (string)` the markup for the icon like `<i class="fa-user"></i>`or the image tag with url you want to display, it defaults to
@@ -172,11 +173,11 @@ See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all opti
     - `template`
     - `labelOptions`
     - `widget`
-    - `multifield (boolean)`
+    - `multifield (boolean)` 
     - `hint`
     - `tabularEvents` (used with the tabular steps)
-    - `persistenceEvents` (effective with `enablePersistence`)
-
+    - `persistenceEvents` (effective with `enablePersistence`) [See Wiki](https://github.com/buttflattery/yii2-formwizard/wiki/Form-Persistence)
+     [See Wiki For Customizing Fields using options above](https://github.com/buttflattery/yii2-formwizard/wiki/Customizing-form-fields)
     Details
 
     - `options (array)` : You can specify the HTML attributes (name-value pairs) for the field
