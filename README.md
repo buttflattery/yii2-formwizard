@@ -44,6 +44,8 @@ or add into the `composer.json` file under `require` section
 "buttflattery/yii2-formwizard":"@dev"
 ```
 
+**Note : The demo site is not working i forgot to renew the domain. will be up soon, you can see the wiki for detailed docs**
+
 ### Demos
 
 - [Minimal Options](https://yii2plugins.idowstech.com/formwizard/index#minimal-options)
