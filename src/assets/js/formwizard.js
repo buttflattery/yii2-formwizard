@@ -10,6 +10,7 @@ $.formwizard = {
         $(eventSelector).trigger(event, eventParams);
     },
     currentButtonTarget: null,
+    resetCurrentTarget: true,
     observerObj: null,
     fields: [],
     options: [],
@@ -104,15 +105,22 @@ $.formwizard = {
 
             var combined = formwizardBtnNext.add(formwizardBtnFinish);
 
+            //bind validation for the button next and finish on click
             $(combined).on("click", function (e) {
                 e.preventDefault();
-                if ($(form).yiiActiveForm("data").attributes.length) {
-                    return $.formwizard.validation.run(form, e);
-                }
-                if ($(e.target).hasClass("formwizard_finish")) {
-                    $(form).yiiActiveForm("submitForm");
-                }
-                return $.formwizard.formNavigation.next(e.target);
+                setTimeout(
+                    function () {
+                        if ($(form).yiiActiveForm("data").attributes.length) {
+                            return $.formwizard.validation.run(form, e);
+                        }
+                        if ($(e.target).hasClass("formwizard_finish")) {
+                            $(form).yiiActiveForm("submitForm");
+                        }
+                        $.formwizard.formNavigation.next(e.target);
+                    },
+                    200
+                );
+
             });
 
             return buttons;
@@ -232,12 +240,19 @@ $.formwizard = {
     },
     validation: {
         run: function (form, event) {
+
+            $.formwizard.resetCurrentTarget = false;
             $.formwizard.currentButtonTarget = event.target;
             $(form).yiiActiveForm("validate", true);
         },
         bindAfterValidate: function (form) {
             $(form)
                 .on("afterValidate", function (event, messages, errorAttributes) {
+                    //reset the current target button if not clicked on the next button
+
+                    if ($.formwizard.resetCurrentTarget) {
+                        $.formwizard.currentButtonTarget = null;
+                    }
                     event.preventDefault();
                     let formName = $(this).attr("id");
                     let currentIndex = $.formwizard.helper.currentIndex(form);
@@ -259,11 +274,16 @@ $.formwizard = {
                             return true;
                         } else {
                             $(form).yiiActiveForm("resetForm");
-                            $.formwizard.formNavigation.next(
-                                $.formwizard.currentButtonTarget
-                            );
+
+                            //check if target null dont call the next navigation
+                            if ($.formwizard.currentButtonTarget !== null) {
+
+                                $.formwizard.formNavigation.next(
+                                    $.formwizard.currentButtonTarget
+                                );
+                            }
                         }
-                    } else {
+                    } else if ($.formwizard.resetCurrentTarget === false) {
                         $.formwizard.helper.shake(form);
                     }
                     return false;
@@ -305,7 +325,6 @@ $.formwizard = {
     },
     formNavigation: {
         next: (target) => {
-
             let containerId = $(target)
                 .parent()
                 .closest(".sw-main")
@@ -349,6 +368,7 @@ $.formwizard = {
             // create an observer instance
             return new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
+
                     if (mutation.type == "childList") {
 
                         //check if material theme used 
@@ -533,12 +553,20 @@ $.formwizard = {
     },
     init: (selector) => {
 
+        //bind remove row for tabular steps
         $(selector).on("click", ".remove-row", function (e) {
             $.formwizard.tabular.removeRow($(this).data("rowid"));
         });
 
+        //bind addRow for tabular step
         $(selector + " .add_row").on("click", function (e) {
             $.formwizard.tabular.addRow($(this));
+        });
+
+        //bind blur & change to reset the target input
+        $(selector).find(':input:not(button)').on('blur change', function (e) {
+            e.preventDefault();
+            $.formwizard.resetCurrentTarget = true;
         });
     },
     persistence: {
