@@ -45,8 +45,6 @@ or add into the `composer.json` file under `require` section
 ```
 
 ### Demos
-**Note : The demo site is not working i forgot to renew the domain. will be up soon, you can see the wiki for detailed docs**
-
 - [Minimal Options](https://yii2plugins.omaraslam.com/formwizard/index#minimal-options)
 - [Add Custom Buttons](https://yii2plugins.omaraslam.com/formwizard/index#add-custom-buttons)
 - [Custom Field Order](https://yii2plugins.omaraslam.com/formwizard/index#custom-field-order)
