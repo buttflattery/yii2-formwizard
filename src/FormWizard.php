@@ -589,7 +589,12 @@ JS;
         //when the child HTMl elements are populated
         //necessary for material themes and the button
         //events for tabular row
-        $.formwizard.observer.start('#{$wizardContainerId}');
+
+        //added delay for multiple instances bug failing to stat the observer on the last formwizard
+        //since @1.4.6
+        setTimeout(function(){
+            $.formwizard.observer.start('#{$wizardContainerId}');
+        },1);
 
         // Step show event
         $.formwizard.helper.updateButtons('#{$wizardContainerId}');
