@@ -14,6 +14,7 @@ namespace buttflattery\formwizard;
 
 use buttflattery\formwizard\assetbundles\bs3\FormWizardAsset as Bs3Assets;
 use buttflattery\formwizard\assetbundles\bs4\FormWizardAsset as Bs4Assets;
+use buttflattery\formwizard\traits\WizardTrait;
 use Yii;
 use yii\base\InvalidArgumentException as ArgException;
 use yii\base\Widget;
@@ -25,7 +26,6 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\web\View;
-use buttflattery\formwizard\traits\WizardTrait;
 
 /**
  * A Yii2 plugin used for creating stepped form or form wizard using
@@ -76,8 +76,8 @@ class FormWizard extends Widget
     private $_tabularEventJs;
 
     /**
-     * Used for adding limit var for the tabular steps to be used in javascript 
-     * 
+     * Used for adding limit var for the tabular steps to be used in javascript
+     *
      * @var mixed
      */
     private $_rowLimitJs;
@@ -88,7 +88,6 @@ class FormWizard extends Widget
      * @var mixed
      */
     private $_persistenceEvents;
-
 
     //options widget
 
@@ -373,7 +372,6 @@ class FormWizard extends Widget
      * @var string
      */
     public $classListGroupBadge = 'success';
-
 
     /**
      * ICONS
@@ -892,7 +890,7 @@ JS;
                 }
             }
 
-            //generate the html for the step 
+            //generate the html for the step
             $htmlFields .= $this->_createStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings);
 
             //is tabular step
@@ -981,14 +979,14 @@ JS;
         //register plugin assets
         $this->_bsVersion == 3
             ?
-            Bs3Assets::register($view)
+        Bs3Assets::register($view)
             : Bs4Assets::register($view);
 
         //is supported theme
         if (in_array($themeSelected, array_keys($this->themesSupported))) {
             $themeAsset = __NAMESPACE__ . '\assetbundles\bs' .
-                $this->_bsVersion . '\Theme' .
-                $this->themesSupported[$themeSelected] . 'Asset';
+            $this->_bsVersion . '\Theme' .
+            $this->themesSupported[$themeSelected] . 'Asset';
 
             $themeAsset::register($view);
         }
