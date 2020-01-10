@@ -247,20 +247,35 @@ $.formwizard = {
         },
         bindAfterValidate: function (form) {
             $(form)
+                .on("beforeValidate", function (event, messages, deferreds) {
+                    let formName = $(this).attr("id");
+                    let currentIndex = $.formwizard.helper.currentIndex(form);
+                    const isSkippableStep = $("#step-" + currentIndex).data('step').skippable;
+                    if (isSkippableStep) {
+                        $.each($.formwizard.fields[formName][currentIndex], function (index, fieldId) {
+                            $("#" + formName).yiiActiveForm("remove", fieldId);
+                        });
+                    }
+                })
                 .on("afterValidate", function (event, messages, errorAttributes) {
-                    //reset the current target button if not clicked on the next button
 
+                    //reset the current target button if not clicked on the next button
                     if ($.formwizard.resetCurrentTarget) {
                         $.formwizard.currentButtonTarget = null;
                     }
+
                     event.preventDefault();
+
                     let formName = $(this).attr("id");
                     let currentIndex = $.formwizard.helper.currentIndex(form);
                     const isLastStep = currentIndex == $(form + " .step-anchor").find("li").length - 1;
+                    const isPreviewEnabled = $.formwizard.options[formName].enablePreview && isLastStep;
+                    const isSkippableStep = $("#step-" + currentIndex).data('step').skippable;
+
                     let res;
 
                     //check if the preview step then skip validation messages check
-                    if ($.formwizard.options[formName].enablePreview && isLastStep) {
+                    if (isPreviewEnabled || isSkippableStep) {
                         res = 0;
                     } else {
                         res = $.formwizard.fields[formName][currentIndex].diff(messages);
@@ -289,9 +304,11 @@ $.formwizard = {
                     return false;
                 })
                 .on("beforeSubmit", function (event) {
+                    console.log('submit');
                     event.preventDefault();
                     if ($.formwizard.submit) {
                         $.formwizard.persistence.clearStorage();
+                        console.log("returning");
                         return true;
                     }
                     return false;
