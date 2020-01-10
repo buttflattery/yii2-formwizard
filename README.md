@@ -6,7 +6,7 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 
 **_Note : It uses limited features of the jquery plugin SmartWizard that suite the needs of the ActiveForm validation so not all options in the javascript plugin library are allowed to be changed or customized from within this plugin._**
 
-![preview](https://yii2plugins.idowstech.com/theme/assets/img/form-wizard.jpg)
+![preview](https://yii2plugins.omaraslam.com/theme/assets/img/form-wizard.jpg)
 
 ### External Libraries Used
 
@@ -45,8 +45,29 @@ or add into the `composer.json` file under `require` section
 ```
 
 ### Demos
+- [Minimal Options](https://yii2plugins.omaraslam.com/formwizard/index#minimal-options)
+- [Add Custom Buttons](https://yii2plugins.omaraslam.com/formwizard/index#add-custom-buttons)
+- [Custom Field Order](https://yii2plugins.omaraslam.com/formwizard/index#custom-field-order)
+- [Enable Ajax Validation](https://yii2plugins.omaraslam.com/formwizard/index#enable-ajax-validation)
+- [Disable ActiveForm Validation](https://yii2plugins.omaraslam.com/formwizard/index#disable-activeform-validation)
+- [Customizing Form Fields](https://yii2plugins.omaraslam.com/formwizard/index#customize-form-fields)
+- [Single Model Across Steps](https://yii2plugins.omaraslam.com/formwizard/index#single-model-across-steps)
+- [Multiple Models Single Steps](https://yii2plugins.omaraslam.com/formwizard/index#multi-model-single-step)
+- [Tabular Steps](https://yii2plugins.omaraslam.com/formwizard/index#tabular-step)
+- [Enable Preview Step](https://yii2plugins.omaraslam.com/formwizard/index#preview-steps)
+- [Enable Form Persistence](https://yii2plugins.omaraslam.com/formwizard/index#form-persistence)
+- [Group Step Fields](https://yii2plugins.omaraslam.com/formwizard/index#group-fields)
 
-See all [demos](http://yii2plugins.idowstech.com/formwizard/index) with all options.
+- Themes
+  - [Theme Arrows](https://yii2plugins.omaraslam.com/formwizard/index#theme-arrows)
+  - [Theme Circles](https://yii2plugins.omaraslam.com/formwizard/index#theme-circles)
+  - [Theme Dots](https://yii2plugins.omaraslam.com/formwizard/index#theme-dots)
+  - [Theme Material](https://yii2plugins.omaraslam.com/formwizard/index#theme-material)
+  - [Theme Material Veritcal](https://yii2plugins.omaraslam.com/formwizard/index#theme-material-v)
+  - [THeme Tags](https://yii2plugins.omaraslam.com/formwizard/index#theme-tags)
+
+### Docs
+- [Github Wiki](https://github.com/buttflattery/yii2-formwizard/wiki)
 
 ### Available Options
 
@@ -267,4 +288,4 @@ Only the following options of the plugin SmartWizard are allowed to be customize
 ### Who do I talk to?
 
 - buttflattery@hotmail.com
-- omeraslam@idowstech.com
+- yii2plugins@omaraslam.com
