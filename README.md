@@ -58,6 +58,7 @@ or add into the `composer.json` file under `require` section
 - [Tabular Steps](https://yii2plugins.omaraslam.com/formwizard/index#tabular-step)
 - [Enable Preview Step](https://yii2plugins.omaraslam.com/formwizard/index#preview-steps)
 - [Enable Form Persistence](https://yii2plugins.omaraslam.com/formwizard/index#form-persistence)
+- [Enable Skip Step](https://yii2plugins.omaraslam.com/formwizard/skip-step)
 - [Group Step Fields](https://yii2plugins.omaraslam.com/formwizard/index#group-fields)
 
 - Themes
