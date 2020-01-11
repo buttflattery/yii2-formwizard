@@ -18,6 +18,8 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 
 ### New Features Added
 
+#### 24th April, 2019 : [Skip Step Validation](https://github.com/buttflattery/yii2-formwizard/wiki/Skip-Step-Validation)
+
 #### 24th April, 2019 : [Group Step Fields](https://github.com/buttflattery/yii2-formwizard/wiki/Group-Step-Fields-using-Heading)
 
 #### 2nd April, 2019 : [Enable Persistence](https://github.com/buttflattery/yii2-formwizard/wiki/Form-Persistence)
