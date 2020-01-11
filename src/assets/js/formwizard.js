@@ -247,12 +247,13 @@ $.formwizard = {
         },
         bindAfterValidate: function (form) {
             $(form)
-                .on("beforeValidate", function (event, messages, deferreds) {
+                .on("beforeValidate", function (event, messages, deferreds) { //added beforeValidate event for the skippable step
                     let formName = $(this).attr("id");
                     let currentIndex = $.formwizard.helper.currentIndex(form);
                     const isSkippableStep = $("#step-" + currentIndex).data('step').skippable;
                     let allEmpty = true;
 
+                    //check all input types if any of the inputs are not empty
                     $("#step-" + currentIndex + ' .fields_container').find(":input").each(function (index, input) {
                         inputTypes = {
                             text: function (input) {
@@ -304,6 +305,8 @@ $.formwizard = {
                         
                     });
 
+                    //if skippable step and all the inputs are empty then 
+                    //remove all the fields of the step from the validation
                     if (isSkippableStep && allEmpty) {
                         $.each($.formwizard.fields[formName][currentIndex], function (index, fieldId) {
                             $("#" + formName).yiiActiveForm("remove", fieldId);
@@ -327,7 +330,7 @@ $.formwizard = {
 
                     let res;
 
-                    //check if the preview step then skip validation messages check
+                    //check if the preview step OR skippable step then skip validation messages check
                     if (isPreviewEnabled || isSkippableStep) {
                         res = 0;
                     } else {
