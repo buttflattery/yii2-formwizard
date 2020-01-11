@@ -251,7 +251,60 @@ $.formwizard = {
                     let formName = $(this).attr("id");
                     let currentIndex = $.formwizard.helper.currentIndex(form);
                     const isSkippableStep = $("#step-" + currentIndex).data('step').skippable;
-                    if (isSkippableStep) {
+                    let allEmpty = true;
+
+                    $("#step-" + currentIndex + ' .fields_container').find(":input").each(function (index, input) {
+                        inputTypes = {
+                            text: function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            radio: function (input) {
+                                return !$(input).is(':checked');
+                            },
+                            "select-one": function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            "select-multiple": function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            number: function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            range: function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            password: function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            file: function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                        };
+                        
+                        if(inputTypes.hasOwnProperty(input.type)){
+                            if(inputTypes[input.type].call(this,input)===false){
+                                allEmpty=false;
+                                return false;
+                            }
+                        }
+                        
+                    });
+
+                    if (isSkippableStep && allEmpty) {
                         $.each($.formwizard.fields[formName][currentIndex], function (index, fieldId) {
                             $("#" + formName).yiiActiveForm("remove", fieldId);
                         });
@@ -304,11 +357,9 @@ $.formwizard = {
                     return false;
                 })
                 .on("beforeSubmit", function (event) {
-                    console.log('submit');
                     event.preventDefault();
                     if ($.formwizard.submit) {
                         $.formwizard.persistence.clearStorage();
-                        console.log("returning");
                         return true;
                     }
                     return false;
