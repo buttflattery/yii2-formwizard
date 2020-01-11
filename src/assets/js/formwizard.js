@@ -250,7 +250,7 @@ $.formwizard = {
                 .on("beforeValidate", function (event, messages, deferreds) { //added beforeValidate event for the skippable step
                     let formName = $(this).attr("id");
                     let currentIndex = $.formwizard.helper.currentIndex(form);
-                    const isSkippableStep = $("#step-" + currentIndex).data('step').skippable;
+                    const isSkippableStep = $("#step-" + currentIndex).data('step').skipable;
                     let allEmpty = true;
 
                     //check all input types if any of the inputs are not empty
@@ -326,7 +326,7 @@ $.formwizard = {
                     let currentIndex = $.formwizard.helper.currentIndex(form);
                     const isLastStep = currentIndex == $(form + " .step-anchor").find("li").length - 1;
                     const isPreviewEnabled = $.formwizard.options[formName].enablePreview && isLastStep;
-                    const isSkippableStep = $("#step-" + currentIndex).data('step').skippable;
+                    const isSkippableStep = $("#step-" + currentIndex).data('step').skipable;
 
                     let res;
 

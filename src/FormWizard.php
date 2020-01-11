@@ -711,7 +711,7 @@ JS;
         //get the step type
         $stepType = ArrayHelper::getValue($step, 'type', self::STEP_TYPE_DEFAULT);
 
-        $isSkippable = ArrayHelper::getValue($step, 'isSkippable', false);
+        $isSkipable = ArrayHelper::getValue($step, 'isSkipable', false);
 
         //check if tabular step
         $isTabularStep = $stepType == self::STEP_TYPE_TABULAR;
@@ -728,7 +728,7 @@ JS;
         $dataStep = [
             'number' => $index,
             'type' => $stepType,
-            'skippable' => $isSkippable,
+            'skipable' => $isSkipable,
         ];
 
         //start step wrapper div
