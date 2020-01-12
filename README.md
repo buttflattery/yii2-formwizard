@@ -291,5 +291,5 @@ Only the following options of the plugin SmartWizard are allowed to be customize
 
 ### Who do I talk to?
 
-- buttflattery@hotmail.com
+- buttflattery@gmail.com
 - yii2plugins@omaraslam.com
