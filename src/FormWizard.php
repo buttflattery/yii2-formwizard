@@ -6,26 +6,25 @@
  * @package   Yii2-formwizard
  * @author    Muhammad Omer Aslam <buttflattery@gmail.com>
  * @copyright 2018 IdowsTECH
- * @license   https://github.com/buttflattery/yii2-formwizard/blob/master/LICENSE
- *            BSD License 3.01
+ * @license   https://github.com/buttflattery/yii2-formwizard/blob/master/LICENSE BSD License 3.01
  * @link      https://github.com/buttflattery/yii2-formwizard
  */
 namespace buttflattery\formwizard;
 
-use buttflattery\formwizard\assetbundles\bs3\FormWizardAsset as Bs3Assets;
-use buttflattery\formwizard\assetbundles\bs4\FormWizardAsset as Bs4Assets;
-use buttflattery\formwizard\traits\WizardTrait;
 use Yii;
-use yii\base\InvalidArgumentException as ArgException;
+use yii\web\View;
 use yii\base\Widget;
-use yii\bootstrap4\ActiveForm as BS4ActiveForm;
-use yii\bootstrap4\BootstrapAsset as BS4Asset;
-use yii\bootstrap\ActiveForm as BS3ActiveForm;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\JsExpression;
-use yii\web\View;
+use yii\helpers\ArrayHelper;
+use yii\bootstrap4\BootstrapAsset as BS4Asset;
+use yii\bootstrap\ActiveForm as BS3ActiveForm;
+use buttflattery\formwizard\traits\WizardTrait;
+use yii\bootstrap4\ActiveForm as BS4ActiveForm;
+use yii\base\InvalidArgumentException as ArgException;
+use buttflattery\formwizard\assetbundles\bs3\FormWizardAsset as Bs3Assets;
+use buttflattery\formwizard\assetbundles\bs4\FormWizardAsset as Bs4Assets;
 
 /**
  * A Yii2 plugin used for creating stepped form or form wizard using
@@ -37,8 +36,7 @@ use yii\web\View;
  * @package   Yii2-formwizard
  * @author    Muhammad Omer Aslam <buttflattery@gmail.com>
  * @copyright 2018 IdowsTECH
- * @license   https://github.com/buttflattery/yii2-formwizard/blob/master/LICENSE
- *            BSD License 3.01
+ * @license   https://github.com/buttflattery/yii2-formwizard/blob/master/LICENSE BSDLicense 3.01
  * @version   Release: 1.0
  * @link      https://github.com/buttflattery/yii2-formwizard
  */
@@ -415,7 +413,7 @@ class FormWizard extends Widget
         self::THEME_ARROWS => 'Arrows',
         self::THEME_MATERIAL => 'Material',
         self::THEME_MATERIAL_V => 'MaterialVerticle',
-        self::THEME_TAGS => 'Tags'
+        self::THEME_TAGS => 'Tags',
     ];
 
     /**
@@ -493,7 +491,7 @@ class FormWizard extends Widget
                 'toolbarPosition' => $this->toolbarPosition,
                 'showNextButton' => false,
                 'showPreviousButton' => false,
-                'toolbarExtraButtons' => $this->toolbarExtraButtons
+                'toolbarExtraButtons' => $this->toolbarExtraButtons,
             ],
             'anchorSettings' => [
                 'anchorClickable' => false,
@@ -501,8 +499,8 @@ class FormWizard extends Widget
                 'markDoneStep' => $this->markDoneStep,
                 'markAllPreviousStepsAsDone' => $this->markAllPreviousStepsAsDone,
                 'removeDoneStepOnNavigateBack' => $this->removeDoneStepOnNavigateBack,
-                'enableAnchorOnDoneStep' => $this->enableAnchorOnDoneStep
-            ]
+                'enableAnchorOnDoneStep' => $this->enableAnchorOnDoneStep,
+            ],
         ];
     }
 
@@ -516,11 +514,13 @@ class FormWizard extends Widget
     {
         parent::run();
 
-        $wizardContainerId = $this->wizardContainerId;
-
+        //get the plugin options
         $pluginOptions = $this->getPluginOptions();
+
+        //get the persistence option for js use when creating buttons in toolbar
         $jsOptionsPersistence = Json::encode($this->enablePersistence);
 
+        //create custom buttons for the navigation
         $jsButton = <<< JS
         $.formwizard.helper.appendButtons({
             form:'#{$this->formOptions["id"]}',
@@ -541,10 +541,32 @@ class FormWizard extends Widget
         }).concat({$pluginOptions['toolbarSettings']['toolbarExtraButtons']})
 JS;
 
+        //add buttons to the smartwizard plugin toolbar option
         $pluginOptions['toolbarSettings']['toolbarExtraButtons'] = new JsExpression($jsButton);
+
         //if bootstrap3 loaded
         $isBs3 = $this->_bsVersion == 3;
 
+        //cerate the form
+        $this->createForm($isBs3);
+
+        //register the assets and rutime script
+        $this->registerScripts($pluginOptions, $isBs3, $jsOptionsPersistence);
+    }
+
+    /**
+     * Creates the form for the form wizard
+     *
+     * @param boolean $isBs3 is bootstrapV3 loaded
+     *
+     * @return null
+     */
+    public function createForm($isBs3)
+    {
+        //get the container id
+        $wizardContainerId = $this->wizardContainerId;
+
+        //load respective bootstrap assets
         if ($isBs3) {
             $activeForm = BS3ActiveForm::class;
         } else {
@@ -565,81 +587,6 @@ JS;
 
         //end form tag
         $this->_form->end();
-
-        //get current view object
-        $view = $this->getView();
-
-        //get all fields json for javascript processing
-        $fieldsJSON = Json::encode($this->_allFields);
-
-        //encode plugin options
-        $pluginOptionsJson = Json::encode($pluginOptions);
-
-        $this->registerScripts();
-        //add tabular events call back js
-        $js = $this->_tabularEventJs;
-        $js .= $this->_persistenceEvents;
-
-        //init script for the wizard
-        $js .= <<<JS
-
-        //start observer for the smart wizard to run the script
-        //when the child HTMl elements are populated
-        //necessary for material themes and the button
-        //events for tabular row
-
-        //added delay for multiple instances bug failing to stat the observer on the last formwizard
-        //since @1.4.6
-        setTimeout(function(){
-            $.formwizard.observer.start('#{$wizardContainerId}');
-        },1);
-
-        // Step show event
-        $.formwizard.helper.updateButtons('#{$wizardContainerId}');
-
-        // Smart Wizard
-        $('#{$wizardContainerId}').smartWizard({$pluginOptionsJson});
-
-        //bind Yii ActiveForm event afterValidate to check
-        //only current steps fields for validation and allow to next step
-        if($('#{$this->formOptions["id"]}').yiiActiveForm('data').attributes.length){
-            $.formwizard.validation.bindAfterValidate('#{$this->formOptions["id"]}');
-        }
-
-        //fields list
-        $.formwizard.fields.{$this->formOptions['id']}={$fieldsJSON};
-
-        $.formwizard.options.{$this->formOptions['id']}={
-            wizardContainerId:'{$wizardContainerId}',
-            classAddRow:'{$this->classAdd}',
-            labelNext:'{$this->labelNext}',
-            labelPrev:'{$this->labelPrev}',
-            labelFinish:'{$this->labelFinish}',
-            iconNext:'{$this->iconNext}',
-            iconPrev:'{$this->iconPrev}',
-            iconFinish:'{$this->iconFinish}',
-            iconAdd:'{$this->iconAdd}',
-            classNext:'{$this->classNext}',
-            classPrev:'{$this->classPrev}',
-            classFinish:'{$this->classFinish}',
-            enablePreview:'{$this->enablePreview}',
-            bsVersion:'{$this->_bsVersion}',
-            classListGroup:'{$this->classListGroup}',
-            classListGroupHeading:'{$this->classListGroupHeading}',
-            classListGroupItem:'{$this->classListGroupItem}',
-            classListGroupBadge:'{$this->classListGroupBadge}'
-        };
-
-        //init the data persistence if enabled
-
-        if(true =={$jsOptionsPersistence}){
-            $.formwizard.persistence.init('{$this->formOptions["id"]}');
-        }
-
-JS;
-
-        //register script
-        $view->registerJs($js, View::POS_READY);
     }
 
     /**
@@ -666,8 +613,8 @@ JS;
                         'type' => self::STEP_TYPE_PREVIEW,
                         'title' => 'Final Preview',
                         'description' => 'Final Preview of all Steps',
-                        'formInfoText' => 'Click any of the steps below to edit them'
-                    ]
+                        'formInfoText' => 'Click any of the steps below to edit them',
+                    ],
                 ]
             );
         }
@@ -764,6 +711,8 @@ JS;
         //get the step type
         $stepType = ArrayHelper::getValue($step, 'type', self::STEP_TYPE_DEFAULT);
 
+        $isSkippable = ArrayHelper::getValue($step, 'isSkippable', false);
+
         //check if tabular step
         $isTabularStep = $stepType == self::STEP_TYPE_TABULAR;
 
@@ -778,7 +727,8 @@ JS;
         //step data
         $dataStep = [
             'number' => $index,
-            'type' => $stepType
+            'type' => $stepType,
+            'skippable' => $isSkippable,
         ];
 
         //start step wrapper div
@@ -794,7 +744,7 @@ JS;
             $html .= Html::button(
                 $this->iconAdd . '&nbsp;Add',
                 [
-                    'class' => $this->classAdd . (($this->_bsVersion == 3) ? ' pull-right add_row' : ' float-right add_row')
+                    'class' => $this->classAdd . (($this->_bsVersion == 3) ? ' pull-right add_row' : ' float-right add_row'),
                     // 'id'=>'add_row'
                 ]
             );
@@ -932,7 +882,7 @@ JS;
             [
                 'template' => $template,
                 'options' => $containerOptions,
-                'inputOptions' => $inputOptions
+                'inputOptions' => $inputOptions,
             ],
             $isMultiField
         );
@@ -957,27 +907,34 @@ JS;
             'options' => $options,
             'labelOptions' => $labelOptions,
             'label' => $label,
-            'itemsList' => $itemsList
+            'itemsList' => $itemsList,
         ];
 
-        //creae the field
+        //create the field
         return $this->_createField($fieldType, $fieldTypeOptions, $hintText);
     }
 
     /**
      * Registers the necessary AssetBundles for the widget
      *
+     * @param array   $pluginOptions the plugin options initialized for the runtime
+     * @param boolean $isBs3         is bootstrapV3 loaded
+     *
      * @return null
      */
-    public function registerScripts()
+    public function registerScripts($pluginOptions, $isBs3, $jsOptionsPersistence)
     {
+        //get the container id
+        $wizardContainerId = $this->wizardContainerId;
+
+        //get the view
         $view = $this->getView();
 
         //register theme specific files
         $themeSelected = $this->theme;
 
         //register plugin assets
-        $this->_bsVersion == 3
+        $isBs3
             ?
         Bs3Assets::register($view)
             : Bs4Assets::register($view);
@@ -990,5 +947,78 @@ JS;
 
             $themeAsset::register($view);
         }
+
+        //get current view object
+        $view = $this->getView();
+
+        //get all fields json for javascript processing
+        $fieldsJSON = Json::encode($this->_allFields);
+
+        //encode plugin options
+        $pluginOptionsJson = Json::encode($pluginOptions);
+
+        //register inline js
+        //add tabular events call back js
+        $js = $this->_tabularEventJs;
+        $js .= $this->_persistenceEvents;
+
+        //init script for the wizard
+
+        $js .= <<<JS
+
+        //start observer for the smart wizard to run the script
+        //when the child HTMl elements are populated
+        //necessary for material themes and the button
+        //events for tabular row
+         //added delay for multiple instances bug failing to stat the observer on the last formwizard
+        //since @1.4.6
+        setTimeout(function(){
+            $.formwizard.observer.start('#{$wizardContainerId}');
+        },1);
+
+        // Step show event
+        $.formwizard.helper.updateButtons('#{$wizardContainerId}');
+
+        // Smart Wizard
+        $('#{$wizardContainerId}').smartWizard({$pluginOptionsJson});
+
+        //bind Yii ActiveForm event afterValidate to check
+        //only current steps fields for validation and allow to next step
+        if($('#{$this->formOptions["id"]}').yiiActiveForm('data').attributes.length){
+            $.formwizard.validation.bindAfterValidate('#{$this->formOptions["id"]}');
+        }
+
+        //fields list
+        $.formwizard.fields.{$this->formOptions['id']}={$fieldsJSON};
+
+        $.formwizard.options.{$this->formOptions['id']}={
+            wizardContainerId:'{$wizardContainerId}',
+            classAddRow:'{$this->classAdd}',
+            labelNext:'{$this->labelNext}',
+            labelPrev:'{$this->labelPrev}',
+            labelFinish:'{$this->labelFinish}',
+            iconNext:'{$this->iconNext}',
+            iconPrev:'{$this->iconPrev}',
+            iconFinish:'{$this->iconFinish}',
+            iconAdd:'{$this->iconAdd}',
+            classNext:'{$this->classNext}',
+            classPrev:'{$this->classPrev}',
+            classFinish:'{$this->classFinish}',
+            enablePreview:'{$this->enablePreview}',
+            bsVersion:'{$this->_bsVersion}',
+            classListGroup:'{$this->classListGroup}',
+            classListGroupHeading:'{$this->classListGroupHeading}',
+            classListGroupItem:'{$this->classListGroupItem}',
+            classListGroupBadge:'{$this->classListGroupBadge}'
+        };
+
+        //init the data persistence if enabled
+
+        if(true =={$jsOptionsPersistence}){
+            $.formwizard.persistence.init('{$this->formOptions["id"]}');
+        }
+JS;
+        //register script
+        $view->registerJs($js, View::POS_READY);
     }
 }
