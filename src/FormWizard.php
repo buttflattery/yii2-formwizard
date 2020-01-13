@@ -97,6 +97,15 @@ class FormWizard extends Widget
     public $wizardContainerId;
 
     /**
+     * Force use of the bootstrap version in case you have some
+     * extension having dependencies on BS4 even though you are
+     * using BS3 on the site overall
+     *
+     * @var mixed
+     */
+    public $forceBsVersion = false;
+
+    /**
      * The array of steps that are to be created for the FormWizard,
      * this option is compulsary.
      *
@@ -466,9 +475,15 @@ class FormWizard extends Widget
             $this->classFinish .= 'waves-effect';
         }
 
-        //is bs4 version
-        $isBs4 = class_exists(BS4Asset::class);
-        $this->_bsVersion = $isBs4 ? 4 : 3;
+        //force bootstrap version usage
+        if ($this->forceBsVersion) {
+            $this->_bsVersion = $this->forceBsVersion;
+        } else {
+            //is bs4 version
+            $isBs4 = class_exists(BS4Asset::class);
+            $this->_bsVersion = $isBs4 ? 4 : 3;
+        }
+
     }
 
     /**
