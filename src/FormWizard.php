@@ -711,7 +711,7 @@ JS;
         //get the step type
         $stepType = ArrayHelper::getValue($step, 'type', self::STEP_TYPE_DEFAULT);
 
-        $isSkippable = ArrayHelper::getValue($step, 'isSkippable', false);
+        $isSkipable = ArrayHelper::getValue($step, 'isSkipable', false);
 
         //check if tabular step
         $isTabularStep = $stepType == self::STEP_TYPE_TABULAR;
@@ -728,7 +728,7 @@ JS;
         $dataStep = [
             'number' => $index,
             'type' => $stepType,
-            'skippable' => $isSkippable,
+            'skipable' => $isSkipable,
         ];
 
         //start step wrapper div
@@ -970,11 +970,7 @@ JS;
         //when the child HTMl elements are populated
         //necessary for material themes and the button
         //events for tabular row
-         //added delay for multiple instances bug failing to stat the observer on the last formwizard
-        //since @1.4.6
-        setTimeout(function(){
-            $.formwizard.observer.start('#{$wizardContainerId}');
-        },1);
+        $.formwizard.observer.start('#{$wizardContainerId}');
 
         // Step show event
         $.formwizard.helper.updateButtons('#{$wizardContainerId}');
