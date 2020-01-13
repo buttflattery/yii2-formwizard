@@ -381,6 +381,12 @@ class FormWizard extends Widget
     public $classListGroupBadge = 'success';
 
     /**
+     * BS VERSION
+     */
+    const BS_3 = 3;
+    const BS_4 = 4;
+
+    /**
      * ICONS
      * */
 
@@ -481,7 +487,7 @@ class FormWizard extends Widget
         } else {
             //is bs4 version
             $isBs4 = class_exists(BS4Asset::class);
-            $this->_bsVersion = $isBs4 ? 4 : 3;
+            $this->_bsVersion = $isBs4 ? self::BS_3 : self::BS_4;
         }
 
     }
@@ -560,7 +566,7 @@ JS;
         $pluginOptions['toolbarSettings']['toolbarExtraButtons'] = new JsExpression($jsButton);
 
         //if bootstrap3 loaded
-        $isBs3 = $this->_bsVersion == 3;
+        $isBs3 = $this->_bsVersion == self::BS_3;
 
         //cerate the form
         $this->createForm($isBs3);
@@ -759,7 +765,7 @@ JS;
             $html .= Html::button(
                 $this->iconAdd . '&nbsp;Add',
                 [
-                    'class' => $this->classAdd . (($this->_bsVersion == 3) ? ' pull-right add_row' : ' float-right add_row'),
+                    'class' => $this->classAdd . (($this->_bsVersion == self::BS_3) ? ' pull-right add_row' : ' float-right add_row'),
                     // 'id'=>'add_row'
                 ]
             );
