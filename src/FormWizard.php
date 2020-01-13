@@ -551,14 +551,14 @@ JS;
         $this->createForm($isBs3);
 
         //register the assets and rutime script
-        $this->registerScripts($pluginOptions, $isBs3,$jsOptionsPersistence);
+        $this->registerScripts($pluginOptions, $isBs3, $jsOptionsPersistence);
     }
 
     /**
      * Creates the form for the form wizard
-     * 
+     *
      * @param boolean $isBs3 is bootstrapV3 loaded
-     * 
+     *
      * @return null
      */
     public function createForm($isBs3)
@@ -957,7 +957,7 @@ JS;
         //encode plugin options
         $pluginOptionsJson = Json::encode($pluginOptions);
 
-        //register inline js 
+        //register inline js
         //add tabular events call back js
         $js = $this->_tabularEventJs;
         $js .= $this->_persistenceEvents;
