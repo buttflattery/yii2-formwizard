@@ -4,11 +4,13 @@ All notable changes to this project will be documented in this file.
 <h1>1.5.0 - 11-01-2020</h1>
 
 <h3>Added</h3>
+
 - [FEATURE:4fb9198](https://github.com/buttflattery/yii2-formwizard/commit/8985c826ce58e53ab05a0ebd8f018958e3466f9a) Added skippable step feature.
 - [ENH:3b85d9b](https://github.com/buttflattery/yii2-formwizard/commit/efcdd423fe4547f36915aed9c58f774cfb4b6116) Updated code comments and optimization, moved code to the relevant areas from the run method.
 - [ENH:a3c0509](https://github.com/buttflattery/yii2-formwizard/commit/a3c05091c982daac8542680ea0e74a09367cbee4) added enhancement for the skippable step to detect if any input is filled in the skippable step then it wont skip and ask for validation.
 
 <h3>Updated</h3>
+
 - [HOTFIX:64c6590](https://github.com/buttflattery/yii2-formwizard/commit/64c6590deaa8b813ddc609f5694d5bfcaa464f9d) Added hotfix for the latest Yii 2.0.22 updates to activeform js file.
 - [BUG:3e1c668](https://github.com/buttflattery/yii2-formwizard/commit/64c6590deaa8b813ddc609f5694d5bfcaa464f9d) Added fix for multiple instances bug failing to stat the observer on the last.
 
