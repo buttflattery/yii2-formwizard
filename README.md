@@ -2,7 +2,7 @@
 
 ### What is this repository for?
 
-A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\ActiveForm` and `\yii\db\ActiveRecord`, it uses [smart wizard library](https://github.com/mstratman/jQuery-Smart-Wizard) for creating the form interface that uses 3 builtin and 2 extra themes, moreover you can also create your own customized theme too.
+A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\ActiveForm` and `\yii\db\ActiveRecord`, it uses [smart wizard library](https://github.com/mstratman/jQuery-Smart-Wizard) for creating the form interface that uses 3 builtin and 3 extra themes, moreover you can also create your own customized theme too.
 
 **_Note : It uses limited features of the jquery plugin SmartWizard that suite the needs of the ActiveForm validation so not all options in the javascript plugin library are allowed to be changed or customized from within this plugin._**
 
@@ -74,7 +74,7 @@ or add into the `composer.json` file under `require` section
 #### Widget options
 
 - `wizardContainerId (string)`: Id of the main container for the wizard.
-- `forceBsVersion (int)`: Force use of the bootstrap version in case you have some extension having dependencies on `yiisoft\yii2-bootstrap4` even though you are using `yiisoft\yii2-bootstrap` on the site overall, and have both of the extensions installed. although we dont recommend doing that but still there are scenarios wher people are using. default value for this option is `false` which means widget will detect automatically.
+- `forceBsVersion (int)`: Force use of the bootstrap version in case you have some extension having dependencies on `yiisoft\yii2-bootstrap4` even though you are using `yiisoft\yii2-bootstrap` on the site overall, since the extension checks for yii2-bootstrap4 first and if it finds it will load the yii2-bootstrap4 assets and having both of the extensions installed the widget will always go for the bootstrap4. although we dont recommend doing that but still there are scenarios wher people are using in this manner and fce layout problems. default value for this option is `false` which means widget will detect automatically.
 - `formOptions (array)`: Specify the [ActiveForm](https://www.yiiframework.com/doc/api/2.0/yii-widgets-activeform) properties.
 - `labelNext (string)` : Next button label, default value `Next`.
 - `labelPrev (string)` : Previous button label, default value `Previous`.
