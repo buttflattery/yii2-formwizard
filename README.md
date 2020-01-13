@@ -74,6 +74,7 @@ or add into the `composer.json` file under `require` section
 #### Widget options
 
 - `wizardContainerId (string)`: Id of the main container for the wizard.
+- `forceBsVersion (int)`: Force use of the bootstrap version in case you have some extension having dependencies on `yiisoft\yii2-bootstrap4` even though you are using `yiisoft\yii2-bootstrap` on the site overall, and have both of the extensions installed. although we dont recommend doing that but still there are scenarios wher people are using. default value for this option is `false` which means widget will detect automatically.
 - `formOptions (array)`: Specify the [ActiveForm](https://www.yiiframework.com/doc/api/2.0/yii-widgets-activeform) properties.
 - `labelNext (string)` : Next button label, default value `Next`.
 - `labelPrev (string)` : Previous button label, default value `Previous`.
