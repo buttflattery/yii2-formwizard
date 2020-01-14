@@ -1,4 +1,4 @@
-# Yii2-FormWizard (v1.4.6)
+# Yii2-FormWizard (v1.5.0)
 
 ### What is this repository for?
 
@@ -17,6 +17,8 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 ---
 
 ### New Features Added
+
+#### 11th Jan, 2020 : [Skip Step Validation](https://github.com/buttflattery/yii2-formwizard/wiki/Skip-Step-Validation)
 
 #### 24th April, 2019 : [Group Step Fields](https://github.com/buttflattery/yii2-formwizard/wiki/Group-Step-Fields-using-Heading)
 
@@ -56,6 +58,7 @@ or add into the `composer.json` file under `require` section
 - [Tabular Steps](https://yii2plugins.omaraslam.com/formwizard/index#tabular-step)
 - [Enable Preview Step](https://yii2plugins.omaraslam.com/formwizard/index#preview-steps)
 - [Enable Form Persistence](https://yii2plugins.omaraslam.com/formwizard/index#form-persistence)
+- [Enable Skip Step](https://yii2plugins.omaraslam.com/formwizard/skip-step)
 - [Group Step Fields](https://yii2plugins.omaraslam.com/formwizard/index#group-fields)
 
 - Themes
@@ -100,6 +103,7 @@ or add into the `composer.json` file under `require` section
 - `steps (array)` : An array of the steps(`array`), the steps can have models dedicated to each step, or a single model for all steps. Following options are recognized when specifying a step.
 
   - `type (string)` : The type of the step, defaults to `default`. This option is used if you need to have tabular inputs for the step by specifying the type as `tabular`, you can use the provided constants like `FormWizard::STEP_TYPE_TABULAR` or `FormWizard::STEP_TYPE_DEFAULT`.
+  - `isSkipable (boolean)` : If current step can be skipped or not, see [wiki](https://github.com/buttflattery/yii2-formwizard/wiki/Skip-Step-Validation) for details.
   - `limitRows (int)` : The number of rows to limit the tabular step Add Rows functionality in combination with the `FormWizard::STEP_TYPE_TABULAR`, default is unlimited `-1`. [See Wiki](https://github.com/buttflattery/yii2-formwizard/wiki/Tabular-Steps:-Limiting-Rows).
   - `model (object | array of models)` : The `\yii\model\ActiveRecord` model object or array of models to create step fields.
 
@@ -287,5 +291,5 @@ Only the following options of the plugin SmartWizard are allowed to be customize
 
 ### Who do I talk to?
 
-- buttflattery@hotmail.com
+- buttflattery@gmail.com
 - yii2plugins@omaraslam.com

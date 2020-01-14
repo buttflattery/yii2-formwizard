@@ -247,11 +247,67 @@ $.formwizard = {
         },
         bindAfterValidate: function (form) {
             $(form)
-                .on("beforeValidate", function (event, messages, deferreds) {
+                .on("beforeValidate", function (event, messages, deferreds) { //added beforeValidate event for the skippable step
                     let formName = $(this).attr("id");
                     let currentIndex = $.formwizard.helper.currentIndex(form);
-                    const isSkippableStep = $("#step-" + currentIndex).data('step').skippable;
-                    if (isSkippableStep) {
+                    const isSkippableStep = $("#step-" + currentIndex).data('step').skipable;
+                    let allEmpty = true;
+
+                    //check all input types if any of the inputs are not empty
+                    $("#step-" + currentIndex + ' .fields_container').find(":input").each(function (index, input) {
+                        inputTypes = {
+                            text: function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            radio: function (input) {
+                                return !$(input).is(':checked');
+                            },
+                            "select-one": function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            "select-multiple": function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            number: function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            range: function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            password: function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                            file: function (input) {
+                                if ($(input).val() !== '') {
+                                    return false;
+                                }
+                            },
+                        };
+                        
+                        if(inputTypes.hasOwnProperty(input.type)){
+                            if(inputTypes[input.type].call(this,input)===false){
+                                allEmpty=false;
+                                return false;
+                            }
+                        }
+                        
+                    });
+
+                    //if skippable step and all the inputs are empty then 
+                    //remove all the fields of the step from the validation
+                    if (isSkippableStep && allEmpty) {
                         $.each($.formwizard.fields[formName][currentIndex], function (index, fieldId) {
                             $("#" + formName).yiiActiveForm("remove", fieldId);
                         });
@@ -270,11 +326,11 @@ $.formwizard = {
                     let currentIndex = $.formwizard.helper.currentIndex(form);
                     const isLastStep = currentIndex == $(form + " .step-anchor").find("li").length - 1;
                     const isPreviewEnabled = $.formwizard.options[formName].enablePreview && isLastStep;
-                    const isSkippableStep = $("#step-" + currentIndex).data('step').skippable;
+                    const isSkippableStep = $("#step-" + currentIndex).data('step').skipable;
 
                     let res;
 
-                    //check if the preview step then skip validation messages check
+                    //check if the preview step OR skippable step then skip validation messages check
                     if (isPreviewEnabled || isSkippableStep) {
                         res = 0;
                     } else {
