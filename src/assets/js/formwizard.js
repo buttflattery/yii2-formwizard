@@ -111,7 +111,7 @@ $.formwizard = {
                 setTimeout(
                     function () {
                         if ($(form).yiiActiveForm("data").attributes.length) {
-                            return $.formwizard.validation.run(form, e);
+                            return $.formwizard.formValidation.run(form, e);
                         }
                         if ($(e.target).hasClass("formwizard_finish")) {
                             $(form).yiiActiveForm("submitForm");
@@ -238,7 +238,7 @@ $.formwizard = {
                     </button>`;
         }
     },
-    validation: {
+    formValidation: {
         run: function (form, event) {
 
             $.formwizard.resetCurrentTarget = false;
@@ -295,14 +295,14 @@ $.formwizard = {
                                 }
                             },
                         };
-                        
-                        if(inputTypes.hasOwnProperty(input.type)){
-                            if(inputTypes[input.type].call(this,input)===false){
-                                allEmpty=false;
+
+                        if (inputTypes.hasOwnProperty(input.type)) {
+                            if (inputTypes[input.type].call(this, input) === false) {
+                                allEmpty = false;
                                 return false;
                             }
                         }
-                        
+
                     });
 
                     //if skippable step and all the inputs are empty then 
@@ -322,19 +322,52 @@ $.formwizard = {
 
                     event.preventDefault();
 
+                    //form name
                     let formName = $(this).attr("id");
+                    //current step index
                     let currentIndex = $.formwizard.helper.currentIndex(form);
+                    //is last step
                     const isLastStep = currentIndex == $(form + " .step-anchor").find("li").length - 1;
-                    const isPreviewEnabled = $.formwizard.options[formName].enablePreview && isLastStep;
+                    //is preview step
+                    const isPreviewStep = $.formwizard.options[formName].enablePreview && isLastStep;
+                    //is skipable step
                     const isSkippableStep = $("#step-" + currentIndex).data('step').skipable;
-
+                    
                     let res;
 
                     //check if the preview step OR skippable step then skip validation messages check
-                    if (isPreviewEnabled || isSkippableStep) {
+                    if (isPreviewStep || isSkippableStep) {
                         res = 0;
                     } else {
                         res = $.formwizard.fields[formName][currentIndex].diff(messages);
+                    }
+
+                    //if edit mode then highlight error steps
+                    if ($.formwizard.options[formName].editMode) {
+                        //get all fields
+                        let allFields = $.formwizard.fields[formName];
+                        let errorSteps = [];
+
+                        //iterate all the fields
+                        $.each(allFields, function (index, stepFields) {
+                            //if the step is skipable 
+                            let isSkippable = $("#step-" + index).data('step').skipable;
+
+                            //if not skipable and has errors
+                            if (!isSkippable && stepFields.diff(messages).length) {
+                                //push the step index to the errorsteps array
+                                errorSteps.push(index);
+                            }
+                        });
+
+                        //update error step higlightening
+                        let wizardContainerId = $.formwizard.options[formName].wizardContainerId;
+                        $("#" + wizardContainerId).smartWizard('updateErrorStep', errorSteps);
+
+                        //if no error steps then slear errors
+                        if (errorSteps.length) {
+                            $.formwizard.formNavigation.goToStep("#"+wizardContainerId, errorSteps[0]);
+                        }
                     }
 
                     if (!res.length) {
@@ -533,7 +566,7 @@ $.formwizard = {
                         newFields.push(element.id);
                         if (typeof fieldOptions !== 'undefined') {
                             //add field to the activeform validation
-                            $.formwizard.validation.addField(formId, fieldOptions);
+                            $.formwizard.formValidation.addField(formId, fieldOptions);
                         }
                     }
                 });
@@ -559,7 +592,7 @@ $.formwizard = {
                 $.formwizard.helper.removeField(element);
 
                 //remove from the ActiveForm validation list
-                $.formwizard.validation.removeField(element);
+                $.formwizard.formValidation.removeField(element);
             });
 
             rowContainer.remove();
