@@ -77,6 +77,7 @@ or add into the `composer.json` file under `require` section
 #### Widget options
 
 - `wizardContainerId (string)`: Id of the main container for the wizard.
+- `editMode (boolean)` : if wizard is in edit mode. Default value is `false`. see [wiki](https://github.com/buttflattery/yii2-formwizard/wiki/Edit-Mode) for details.
 - `formOptions (array)`: Specify the [ActiveForm](https://www.yiiframework.com/doc/api/2.0/yii-widgets-activeform) properties.
 - `labelNext (string)` : Next button label, default value `Next`.
 - `labelPrev (string)` : Previous button label, default value `Previous`.
