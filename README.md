@@ -78,6 +78,7 @@ or add into the `composer.json` file under `require` section
 
 - `wizardContainerId (string)`: Id of the main container for the wizard.
 - `forceBsVersion (int)`: Force use of the bootstrap version in case you have some extension having dependencies on `yiisoft\yii2-bootstrap4` even though you are using `yiisoft\yii2-bootstrap` on the site overall, since the extension checks for yii2-bootstrap4 first and if it finds it will load the yii2-bootstrap4 assets and having both of the extensions installed the widget will always go for the bootstrap4. although we dont recommend doing that but still there are scenarios wher people are using in this manner and fce layout problems. default value for this option is `false` which means widget will detect automatically, you can use the provided constants `FormWizard::BS_3` or `FormWizard::BS_4`.
+- `editMode (boolean)` : if form wizard should be loaded in edit mode. Default value is `false`. see [wiki](https://github.com/buttflattery/yii2-formwizard/wiki/Edit-Mode) for details.
 - `formOptions (array)`: Specify the [ActiveForm](https://www.yiiframework.com/doc/api/2.0/yii-widgets-activeform) properties.
 - `labelNext (string)` : Next button label, default value `Next`.
 - `labelPrev (string)` : Previous button label, default value `Previous`.
