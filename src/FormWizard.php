@@ -503,7 +503,7 @@ class FormWizard extends Widget
             $this->_bsVersion = $this->forceBsVersion;
         } else {
             //is bs4 version
-            $isBs4 = class_exists(BS4Asset::class);
+            $isBs4 = class_exists(Bs4Assets::class);
             $this->_bsVersion = $isBs4 ? self::BS_3 : self::BS_4;
         }
 
@@ -585,7 +585,7 @@ JS;
 
         //if bootstrap3 loaded
         $isBs3 = $this->_bsVersion == self::BS_3;
-
+        
         //cerate the form
         $this->createForm($isBs3);
 
