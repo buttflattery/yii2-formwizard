@@ -7,7 +7,7 @@ class FormWizardAsset extends BaseTheme
 {
 
     public $js = [
-        'js/formwizard.js',
+        'js/formwizard.min.js',
         'js/jquery.smartWizard.js',
     ];
 

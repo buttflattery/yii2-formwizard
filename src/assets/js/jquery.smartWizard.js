@@ -140,9 +140,7 @@
             }
             // Error steps
             if (this.options.errorSteps && this.options.errorSteps.length > 0) {
-                $.each(this.options.errorSteps, function (i, n) {
-                    mi.steps.eq(n).parent('li').addClass('danger');
-                });
+                mi.updateErrorStep(this.options.errorSteps);
             }
             // Hidden steps
             if (this.options.hiddenSteps && this.options.hiddenSteps.length > 0) {
@@ -625,7 +623,25 @@
                         break;
                 }
             }
-        }
+        },
+        updateErrorStep: function (errorSteps = []) { //update error step highlightening
+            var mi = this;
+            //if errorSteps array not empty
+            if (errorSteps.length) {
+
+                //add error classes to steps
+                $.each(errorSteps, function (i, n) {
+                    mi.steps.eq(n).parent('li').addClass('danger');
+                });
+                return;
+            }
+
+            //remove the error class from the steps if empty array
+            $.each(mi.steps, function (i, n) {
+                $(n).parent('li').removeClass('danger');
+            });
+        },
+
     });
 
     // Wrapper for the plugin
