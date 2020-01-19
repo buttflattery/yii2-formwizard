@@ -1,6 +1,18 @@
 <h1>Change Log</h1>
 All notable changes to this project will be documented in this file.
 
+<h1>1.6.4 - 19-01-2020</h1>
+
+<h3>Added</h3>
+
+- [FEATURE:e50321d](https://github.com/buttflattery/yii2-formwizard/commit/e50321d900e9c03754c1cabfb09e075118be2a36) Added editMode feature.
+
+<h3>Enhancements/Fixes</h3>
+- [ENH:096ef77](https://github.com/buttflattery/yii2-formwizard/commit/096ef77ce63b2bc4f40fb274396f0c3dbe2ef690) Added minified script.
+- [BUG:306ab54](https://github.com/buttflattery/yii2-formwizard/commit/306ab5480a7848276b0b27fcf2a1332262329215) Fixed class name assets.
+- [ENH:aab5a18](https://github.com/buttflattery/yii2-formwizard/commit/aab5a180150b1b298af9b83b515105c76a5aaefb) Minify file js.
+- [ENH:1940ec9](https://github.com/buttflattery/yii2-formwizard/commit/1940ec95fd7a2741616f5ae300602c20dc1d2326) Added forceBsVersion to force the bootstrap class to use only the specific version.
+
 <h1>1.5.0 - 11-01-2020</h1>
 
 <h3>Added</h3>
@@ -9,12 +21,10 @@ All notable changes to this project will be documented in this file.
 - [ENH:3b85d9b](https://github.com/buttflattery/yii2-formwizard/commit/efcdd423fe4547f36915aed9c58f774cfb4b6116) Updated code comments and optimization, moved code to the relevant areas from the run method.
 - [ENH:a3c0509](https://github.com/buttflattery/yii2-formwizard/commit/a3c05091c982daac8542680ea0e74a09367cbee4) added enhancement for the skippable step to detect if any input is filled in the skippable step then it wont skip and ask for validation.
 
-<h3>Updated</h3>
+<h3>Changes/Fixes</h3>
 
 - [HOTFIX:64c6590](https://github.com/buttflattery/yii2-formwizard/commit/64c6590deaa8b813ddc609f5694d5bfcaa464f9d) Added hotfix for the latest Yii 2.0.22 updates to activeform js file.
 - [BUG:3e1c668](https://github.com/buttflattery/yii2-formwizard/commit/64c6590deaa8b813ddc609f5694d5bfcaa464f9d) Added fix for multiple instances bug failing to stat the observer on the last.
-
-
 
 <h1>1.4.6 - 17/05/2019</h1>
 
