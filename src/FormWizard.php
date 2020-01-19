@@ -97,6 +97,15 @@ class FormWizard extends Widget
     public $wizardContainerId;
 
     /**
+     * Force use of the bootstrap version in case you have some
+     * extension having dependencies on BS4 even though you are
+     * using BS3 on the site overall
+     *
+     * @var mixed
+     */
+    public $forceBsVersion = false;
+
+    /**
      * The array of steps that are to be created for the FormWizard,
      * this option is compulsary.
      *
@@ -115,6 +124,23 @@ class FormWizard extends Widget
      * @var array
      */
     public $steps = [];
+
+    /**
+     * Enable Edit mode for a saved record, it will enable all the steps
+     * and user can jump to any steps by just clicking on the step anchor
+     * so that if any single information needs to be changed in any step
+     * he/she wont have to go through every step serially.
+     *
+     * @var mixed
+     */
+    public $editMode = false;
+
+    /**
+     * The array of steps that have errors
+     *
+     * @var array
+     */
+    public $errorSteps = [];
 
     /**
      * The Options for the ActiveForm see the
@@ -372,6 +398,12 @@ class FormWizard extends Widget
     public $classListGroupBadge = 'success';
 
     /**
+     * BS VERSION
+     */
+    const BS_3 = 3;
+    const BS_4 = 4;
+
+    /**
      * ICONS
      * */
 
@@ -466,9 +498,15 @@ class FormWizard extends Widget
             $this->classFinish .= 'waves-effect';
         }
 
-        //is bs4 version
-        $isBs4 = class_exists(BS4Asset::class);
-        $this->_bsVersion = $isBs4 ? 4 : 3;
+        //force bootstrap version usage
+        if ($this->forceBsVersion) {
+            $this->_bsVersion = $this->forceBsVersion;
+        } else {
+            //is bs4 version
+            $isBs4 = class_exists(Bs4Assets::class);
+            $this->_bsVersion = $isBs4 ? self::BS_3 : self::BS_4;
+        }
+
     }
 
     /**
@@ -483,6 +521,7 @@ class FormWizard extends Widget
             'keyNavigation' => false,
             'autoAdjustHeight' => $this->autoAdjustHeight,
             'disabledSteps' => $this->disabledSteps,
+            'errorSteps' => $this->errorSteps,
             'backButtonSupport' => false,
             'theme' => $this->theme,
             'transitionEffect' => $this->transitionEffect,
@@ -494,8 +533,8 @@ class FormWizard extends Widget
                 'toolbarExtraButtons' => $this->toolbarExtraButtons,
             ],
             'anchorSettings' => [
-                'anchorClickable' => false,
-                'enableAllAnchors' => false,
+                'anchorClickable' => $this->editMode,
+                'enableAllAnchors' => $this->editMode,
                 'markDoneStep' => $this->markDoneStep,
                 'markAllPreviousStepsAsDone' => $this->markAllPreviousStepsAsDone,
                 'removeDoneStepOnNavigateBack' => $this->removeDoneStepOnNavigateBack,
@@ -545,8 +584,8 @@ JS;
         $pluginOptions['toolbarSettings']['toolbarExtraButtons'] = new JsExpression($jsButton);
 
         //if bootstrap3 loaded
-        $isBs3 = $this->_bsVersion == 3;
-
+        $isBs3 = $this->_bsVersion == self::BS_3;
+        
         //cerate the form
         $this->createForm($isBs3);
 
@@ -744,7 +783,7 @@ JS;
             $html .= Html::button(
                 $this->iconAdd . '&nbsp;Add',
                 [
-                    'class' => $this->classAdd . (($this->_bsVersion == 3) ? ' pull-right add_row' : ' float-right add_row'),
+                    'class' => $this->classAdd . (($this->_bsVersion == self::BS_3) ? ' pull-right add_row' : ' float-right add_row'),
                     // 'id'=>'add_row'
                 ]
             );
@@ -981,7 +1020,7 @@ JS;
         //bind Yii ActiveForm event afterValidate to check
         //only current steps fields for validation and allow to next step
         if($('#{$this->formOptions["id"]}').yiiActiveForm('data').attributes.length){
-            $.formwizard.validation.bindAfterValidate('#{$this->formOptions["id"]}');
+            $.formwizard.formValidation.bindAfterValidate('#{$this->formOptions["id"]}');
         }
 
         //fields list
@@ -1001,6 +1040,7 @@ JS;
             classPrev:'{$this->classPrev}',
             classFinish:'{$this->classFinish}',
             enablePreview:'{$this->enablePreview}',
+            editMode:'{$this->editMode}',
             bsVersion:'{$this->_bsVersion}',
             classListGroup:'{$this->classListGroup}',
             classListGroupHeading:'{$this->classListGroupHeading}',
