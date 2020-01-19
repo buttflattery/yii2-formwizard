@@ -1,4 +1,4 @@
-# Yii2-FormWizard (v1.5.0)
+# Yii2-FormWizard (v1.6.4)
 
 ### What is this repository for?
 
@@ -17,6 +17,8 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 ---
 
 ### New Features Added
+
+#### 19th Jan, 2020 : [Enable Edit Mode](https://github.com/buttflattery/yii2-formwizard/wiki/Edit-Mode)
 
 #### 11th Jan, 2020 : [Skip Step Validation](https://github.com/buttflattery/yii2-formwizard/wiki/Skip-Step-Validation)
 
