@@ -18,6 +18,8 @@ A Yii2 plugin used for creating stepped form or form wizard using `yii\widgets\A
 
 ### New Features Added
 
+#### 19th Jan, 2020 : [Enable Edit Mode](https://github.com/buttflattery/yii2-formwizard/wiki/Edit-Mode)
+
 #### 11th Jan, 2020 : [Skip Step Validation](https://github.com/buttflattery/yii2-formwizard/wiki/Skip-Step-Validation)
 
 #### 24th April, 2019 : [Group Step Fields](https://github.com/buttflattery/yii2-formwizard/wiki/Group-Step-Fields-using-Heading)
