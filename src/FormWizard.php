@@ -18,7 +18,6 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
-use yii\bootstrap4\BootstrapAsset as BS4Asset;
 use yii\bootstrap\ActiveForm as BS3ActiveForm;
 use buttflattery\formwizard\traits\WizardTrait;
 use yii\bootstrap4\ActiveForm as BS4ActiveForm;
@@ -585,7 +584,7 @@ JS;
 
         //if bootstrap3 loaded
         $isBs3 = $this->_bsVersion == self::BS_3;
-        
+
         //cerate the form
         $this->createForm($isBs3);
 
@@ -722,8 +721,11 @@ JS;
     {
         $html = '';
 
+        //add edit mode class for material theme to make all anchors visible
+        $isEdit = !$this->editMode ?: 'edit';
+
         //make tabs
-        $html .= Html::beginTag('li');
+        $html .= Html::beginTag('li', ['class' => "{$isEdit}"]);
         $html .= Html::beginTag('a', ['href' => '#step-' . $index]);
         $html .= $stepTitle . '<br />';
         $html .= Html::tag('small', $stepDescription);
