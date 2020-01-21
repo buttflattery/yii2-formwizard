@@ -48,7 +48,7 @@ or add into the `composer.json` file under `require` section
 "buttflattery/yii2-formwizard":"@dev"
 ```
 
-### Demos
+### Demos for all the Features & Themes
 
 - [Minimal Options](https://yii2plugins.omaraslam.com/formwizard/index#minimal-options)
 - [Add Custom Buttons](https://yii2plugins.omaraslam.com/formwizard/index#add-custom-buttons)
