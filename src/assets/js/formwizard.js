@@ -240,7 +240,6 @@ $.formwizard = {
     },
     formValidation: {
         run: function (form, event) {
-
             $.formwizard.resetCurrentTarget = false;
             $.formwizard.currentButtonTarget = event.target;
             $(form).yiiActiveForm("validate", true);
@@ -304,7 +303,6 @@ $.formwizard = {
                         }
 
                     });
-
                     //if skippable step and all the inputs are empty then 
                     //remove all the fields of the step from the validation
                     if (isSkippableStep && allEmpty) {
@@ -364,9 +362,10 @@ $.formwizard = {
                         let wizardContainerId = $.formwizard.options[formName].wizardContainerId;
                         $("#" + wizardContainerId).smartWizard('updateErrorStep', errorSteps);
 
-                        //if no error steps then slear errors
+                        //if no error steps then clear errors
                         if (errorSteps.length) {
                             $.formwizard.formNavigation.goToStep("#"+wizardContainerId, errorSteps[0]);
+                            return;
                         }
                     }
 
@@ -381,7 +380,6 @@ $.formwizard = {
 
                             //check if target null dont call the next navigation
                             if ($.formwizard.currentButtonTarget !== null) {
-
                                 $.formwizard.formNavigation.next(
                                     $.formwizard.currentButtonTarget
                                 );
@@ -393,11 +391,9 @@ $.formwizard = {
                     return false;
                 })
                 .on("beforeSubmit", function (event) {
-                    console.log('submit');
                     event.preventDefault();
                     if ($.formwizard.submit) {
                         $.formwizard.persistence.clearStorage();
-                        console.log("returning");
                         return true;
                     }
                     return false;
@@ -435,6 +431,7 @@ $.formwizard = {
                 .parent()
                 .closest(".sw-main")
                 .attr("id");
+                console.log("next");
             $("#" + containerId).smartWizard("next");
         },
         goToStep: (wizardContainerId, stepno) => {
