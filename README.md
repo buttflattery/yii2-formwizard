@@ -1,4 +1,4 @@
-# Yii2-FormWizard (v1.6.4)
+# Yii2-FormWizard (v1.6.8)
 
 ## What is this repository for?
 
@@ -237,7 +237,7 @@ An array of the steps(`array`), the steps can have models dedicated to each step
 
 - `only (array)` : list of the fields that should be populated for the step, only the fields specified in the list will be available and all other fields will be ignored.
 
-  Apart from the above options the `fieldConfig` recognizes some special options specific to every field separately when customizing a field, for example
+- Apart from the above options the `fieldConfig` recognizes some special options specific to every field separately when customizing a field, for example
 
   ```php
   'fieldConfig'=>[
