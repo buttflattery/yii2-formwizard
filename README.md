@@ -247,7 +247,28 @@ An array of the steps(`array`), the steps can have models dedicated to each step
           ]
       ]
   ]
-    ```
+  ```
+    
+  #### Since V1.6.8
+  when using multi model step you may encounter the situation where you have similar column/field names in both the models and specifying the field name only wont help, you can prefix the field names with the model name, the widget uses `$model->formName()` method so be careful if you have overridden the `formName()` function in your model then use the relevant name. 
+
+  See an example below where you need to use the `book` and `user` model both in one step and you have the `name` field in both the tables
+
+  ```php
+ 
+  'fieldConfig'=>[
+      'user.name'=>[
+          'options'=>[
+              'class'=>'my-class'
+          ]
+      ],
+      'book.name'=>[
+          'options'=>[
+              'class'=>'my-class'
+          ]
+      ],
+   ]
+   ```
 
     you should specify the field name of the model and its customization settings in form of `name=>value` pairs. The following special options can be used when specifying the form/model `field_name`.
 
