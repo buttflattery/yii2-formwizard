@@ -4,10 +4,10 @@
  */
 namespace buttflattery\formwizard\traits;
 
+use yii\helpers\Html;
+use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
 use yii\base\InvalidArgumentException as ArgException;
-use yii\web\JsExpression;
-use yii\helpers\Html;
 
 trait WizardTrait
 {
@@ -58,7 +58,6 @@ trait WizardTrait
             $attributes = array_merge($orderedAttributes, $unorderedAttributes);
         }
     }
-
 
     /**
      * Check if tabular step has the multiple models if the same type or throw an exception
@@ -117,13 +116,13 @@ trait WizardTrait
 
     /**
      * Binds the tabular events provided by the user
-     * 
+     *
      * @param string   $eventName     the name of the event to bind
      * @param callable $eventCallBack the callback event provided by the user
      * @param string   $formId        the id of the form
      * @param integer  $index         the current model index
      * @param string   $attributeId   the attribute id to triger the event for
-     * 
+     *
      * @return null
      */
     private function _bindEvents($eventName, $eventCallBack, $formId, $index, $attributeId)
@@ -172,11 +171,11 @@ JS;
 
     /**
      * Creates a custom field of the given type
-     * 
+     *
      * @param string         $fieldType        the type of the field to be created
      * @param array          $fieldTypeOptions the optinos for the field to be created
      * @param boolean|string $hintText         the hint text to be used
-     * 
+     *
      * @return yii\widgets\ActiveField;
      */
     private function _createField($fieldType, $fieldTypeOptions, $hintText = false)
@@ -271,7 +270,7 @@ JS;
                 $labelOptions = $params['labelOptions'];
 
                 return $field->passwordInput($options)->label($label, $labelOptions);
-            }
+            },
         ];
 
         //create field depending on the type of the value provided
@@ -284,7 +283,7 @@ JS;
 
     /**
      * Generates Html for the step fields
-     * 
+     *
      * @param array          $attributes    the attributes to iterate
      * @param integer        $modelIndex    the index of the current model
      * @param integer        $index         the index of the current step
@@ -292,18 +291,22 @@ JS;
      * @param boolean        $isTabularStep if the current step is tabular
      * @param array          $fieldConfig   customer field confitigurations
      * @param boolean|string $stepHeadings  the headings for the current step
-     * 
+     *
      * @return mixed
      */
     private function _createStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings)
     {
         $htmlFields = '';
+
+        //prefix attributes with model name
+        $attributesPrefixed = preg_filter('/^/', strtolower($model->formName()) . '.', $attributes);
+
         //iterate all fields associated to the relevant model
-        foreach ($attributes as $attribute) {
+        foreach ($attributes as $attributeIndex => $attribute) {
 
             //attribute name
             $attributeName = ($isTabularStep) ? "[$modelIndex]" . $attribute : $attribute;
-            $customConfigDefinedForField = $fieldConfig && isset($fieldConfig[$attribute]);
+            $customConfigDefinedForField = $fieldConfig && (isset($fieldConfig[$attribute]) || isset($fieldConfig[$attributesPrefixed[$attributeIndex]]));
 
             //has heading for the field
             $hasHeading = false !== $stepHeadings;
@@ -322,28 +325,32 @@ JS;
 
             //if custom config available for field
             if ($customConfigDefinedForField) {
+                
+                $customFieldConfig=(isset($fieldConfig[$attributesPrefixed[$attributeIndex]]))?$fieldConfig[$attributesPrefixed[$attributeIndex]]:$fieldConfig[$attribute];
+
                 //if filtered field
-                $isFilteredField = $fieldConfig[$attribute] === false;
+                $isFilteredField = $customFieldConfig === false;
 
                 //skip the field and go to next
                 if ($isFilteredField) {
                     continue;
                 }
 
+                
                 //custom field population
                 $htmlFields .= $this->createCustomInput(
                     $model,
                     $attributeName,
-                    $fieldConfig[$attribute]
+                    $customFieldConfig
                 );
                 //id of the input
                 $attributeId = Html::getInputId($model, $attributeName);
 
                 //add tabular events
-                $this->_addTabularEvents($fieldConfig[$attribute], $isTabularStep, $modelIndex, $attributeId, $index);
+                $this->_addTabularEvents($customFieldConfig, $isTabularStep, $modelIndex, $attributeId, $index);
 
                 //add the restore events
-                $this->_addRestoreEvents($fieldConfig[$attribute], $attributeId);
+                $this->_addRestoreEvents($customFieldConfig, $attributeId);
             } else {
                 //default field population
                 $htmlFields .= $this->createDefaultInput($model, $attributeName);
@@ -370,9 +377,9 @@ JS;
 
     /**
      * Parse the configurations for the field
-     * 
+     *
      * @param array $fieldConfig the configurations array passed by the user
-     * 
+     *
      * @return array
      */
     private function _parseFieldConfig($fieldConfig)
@@ -475,7 +482,7 @@ JS;
      *
      * @return array $fields
      */
-    public function getStepFields($model, $onlyFields, $disabledFields)
+    public function getStepFields($model, $onlyFields = [], $disabledFields = [])
     {
         if (!empty($onlyFields)) {
             return array_values(
