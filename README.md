@@ -48,29 +48,30 @@ or add into the `composer.json` file under `require` section
 "buttflattery/yii2-formwizard":"@dev"
 ```
 
-### Demos
+### Demos for all the Features & Themes
 
-- [Minimal Options](https://yii2plugins.omaraslam.com/formwizard/index#minimal-options)
-- [Add Custom Buttons](https://yii2plugins.omaraslam.com/formwizard/index#add-custom-buttons)
-- [Custom Field Order](https://yii2plugins.omaraslam.com/formwizard/index#custom-field-order)
-- [Enable Ajax Validation](https://yii2plugins.omaraslam.com/formwizard/index#enable-ajax-validation)
-- [Disable ActiveForm Validation](https://yii2plugins.omaraslam.com/formwizard/index#disable-activeform-validation)
-- [Customizing Form Fields](https://yii2plugins.omaraslam.com/formwizard/index#customize-form-fields)
-- [Single Model Across Steps](https://yii2plugins.omaraslam.com/formwizard/index#single-model-across-steps)
-- [Multiple Models Single Steps](https://yii2plugins.omaraslam.com/formwizard/index#multi-model-single-step)
-- [Tabular Steps](https://yii2plugins.omaraslam.com/formwizard/index#tabular-step)
-- [Enable Preview Step](https://yii2plugins.omaraslam.com/formwizard/index#preview-steps)
-- [Enable Form Persistence](https://yii2plugins.omaraslam.com/formwizard/index#form-persistence)
+- [Minimal Options](https://yii2plugins.omaraslam.com/formwizard/minimal-options)
+- [Add Custom Buttons](https://yii2plugins.omaraslam.com/formwizard/custom-buttons)
+- [Custom Field Order](https://yii2plugins.omaraslam.com/formwizard/custom-field-order)
+- [Enable Ajax Validation](https://yii2plugins.omaraslam.com/formwizard/ajax-validation)
+- [Disable ActiveForm Validation](https://yii2plugins.omaraslam.com/formwizard/disable-validation)
+- [Customizing Form Fields](https://yii2plugins.omaraslam.com/formwizard/customize-fields)
+- [Single Model Across Steps](https://yii2plugins.omaraslam.com/formwizard/single-model)
+- [Multiple Models Single Steps](https://yii2plugins.omaraslam.com/formwizard/multiple-model)
+- [Tabular Steps](https://yii2plugins.omaraslam.com/formwizard/tabular-step)
+- [Enable Preview Step](https://yii2plugins.omaraslam.com/formwizard/preview-step)
+- [Enable Form Persistence](https://yii2plugins.omaraslam.com/formwizard/form-persistence)
 - [Enable Skip Step](https://yii2plugins.omaraslam.com/formwizard/skip-step)
-- [Group Step Fields](https://yii2plugins.omaraslam.com/formwizard/index#group-fields)
+- [Enable Edit Step](https://yii2plugins.omaraslam.com/formwizard/edit-step)
+- [Group Step Fields](https://yii2plugins.omaraslam.com/formwizard/group-fields)
 
 - Themes
-  - [Theme Arrows](https://yii2plugins.omaraslam.com/formwizard/index#theme-arrows)
-  - [Theme Circles](https://yii2plugins.omaraslam.com/formwizard/index#theme-circles)
-  - [Theme Dots](https://yii2plugins.omaraslam.com/formwizard/index#theme-dots)
-  - [Theme Material](https://yii2plugins.omaraslam.com/formwizard/index#theme-material)
-  - [Theme Material Veritcal](https://yii2plugins.omaraslam.com/formwizard/index#theme-material-v)
-  - [THeme Tags](https://yii2plugins.omaraslam.com/formwizard/index#theme-tags)
+  - [Theme Arrows](https://yii2plugins.omaraslam.com/formwizard/theme-arrows)
+  - [Theme Circles](https://yii2plugins.omaraslam.com/formwizard/theme-circles)
+  - [Theme Dots](https://yii2plugins.omaraslam.com/formwizard/theme-dots)
+  - [Theme Material](https://yii2plugins.omaraslam.com/formwizard/theme-material)
+  - [Theme Material Veritcal](https://yii2plugins.omaraslam.com/formwizard/theme-material-v)
+  - [THeme Tags](https://yii2plugins.omaraslam.com/formwizard/theme-tags)
 
 ### Docs
 
@@ -246,7 +247,28 @@ An array of the steps(`array`), the steps can have models dedicated to each step
           ]
       ]
   ]
-    ```
+  ```
+    
+  #### Since V1.6.8
+  when using multi model step you may encounter the situation where you have similar column/field names in both the models and specifying the field name only wont help, you can prefix the field names with the model name, the widget uses `$model->formName()` method so be careful if you have overridden the `formName()` function in your model then use the relevant name. 
+
+  See an example below where you need to use the `book` and `user` model both in one step and you have the `name` field in both the tables
+
+  ```php
+ 
+  'fieldConfig'=>[
+      'user.name'=>[
+          'options'=>[
+              'class'=>'my-class'
+          ]
+      ],
+      'book.name'=>[
+          'options'=>[
+              'class'=>'my-class'
+          ]
+      ],
+   ]
+   ```
 
     you should specify the field name of the model and its customization settings in form of `name=>value` pairs. The following special options can be used when specifying the form/model `field_name`.
 

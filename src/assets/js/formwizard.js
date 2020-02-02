@@ -240,7 +240,6 @@ $.formwizard = {
     },
     formValidation: {
         run: function (form, event) {
-
             $.formwizard.resetCurrentTarget = false;
             $.formwizard.currentButtonTarget = event.target;
             $(form).yiiActiveForm("validate", true);
@@ -304,7 +303,6 @@ $.formwizard = {
                         }
 
                     });
-
                     //if skippable step and all the inputs are empty then 
                     //remove all the fields of the step from the validation
                     if (isSkippableStep && allEmpty) {
@@ -332,42 +330,12 @@ $.formwizard = {
                     const isPreviewStep = $.formwizard.options[formName].enablePreview && isLastStep;
                     //is skipable step
                     const isSkippableStep = $("#step-" + currentIndex).data('step').skipable;
-                    
-                    let res;
 
                     //check if the preview step OR skippable step then skip validation messages check
-                    if (isPreviewStep || isSkippableStep) {
-                        res = 0;
-                    } else {
-                        res = $.formwizard.fields[formName][currentIndex].diff(messages);
-                    }
+                    let res = (isPreviewStep || isSkippableStep) ? 0 : $.formwizard.fields[formName][currentIndex].diff(messages);
 
-                    //if edit mode then highlight error steps
-                    if ($.formwizard.options[formName].editMode) {
-                        //get all fields
-                        let allFields = $.formwizard.fields[formName];
-                        let errorSteps = [];
-
-                        //iterate all the fields
-                        $.each(allFields, function (index, stepFields) {
-                            //if the step is skipable 
-                            let isSkippable = $("#step-" + index).data('step').skipable;
-
-                            //if not skipable and has errors
-                            if (!isSkippable && stepFields.diff(messages).length) {
-                                //push the step index to the errorsteps array
-                                errorSteps.push(index);
-                            }
-                        });
-
-                        //update error step higlightening
-                        let wizardContainerId = $.formwizard.options[formName].wizardContainerId;
-                        $("#" + wizardContainerId).smartWizard('updateErrorStep', errorSteps);
-
-                        //if no error steps then slear errors
-                        if (errorSteps.length) {
-                            $.formwizard.formNavigation.goToStep("#"+wizardContainerId, errorSteps[0]);
-                        }
+                    if ($.formwizard.formValidation.editModeErrors(formName, messages)) {
+                        return;
                     }
 
                     if (!res.length) {
@@ -380,12 +348,7 @@ $.formwizard = {
                             $(form).yiiActiveForm("resetForm");
 
                             //check if target null dont call the next navigation
-                            if ($.formwizard.currentButtonTarget !== null) {
-
-                                $.formwizard.formNavigation.next(
-                                    $.formwizard.currentButtonTarget
-                                );
-                            }
+                            ($.formwizard.currentButtonTarget !== null) && $.formwizard.formNavigation.next($.formwizard.currentButtonTarget);
                         }
                     } else if ($.formwizard.resetCurrentTarget === false) {
                         $.formwizard.helper.shake(form);
@@ -393,15 +356,41 @@ $.formwizard = {
                     return false;
                 })
                 .on("beforeSubmit", function (event) {
-                    console.log('submit');
                     event.preventDefault();
                     if ($.formwizard.submit) {
                         $.formwizard.persistence.clearStorage();
-                        console.log("returning");
                         return true;
                     }
                     return false;
                 });
+        },
+        editModeErrors: function (formName, messages) {
+            //if edit mode then highlight error steps
+            if ($.formwizard.options[formName].editMode) {
+                //get all fields
+                let allFields = $.formwizard.fields[formName];
+                let errorSteps = [];
+
+                //iterate all the fields
+                $.each(allFields, function (index, stepFields) {
+                    //if the step is skipable 
+                    let isSkippable = $("#step-" + index).data('step').skipable;
+
+                    //if not skipable and has errors
+                    //push the step index to the errorsteps array
+                    (!isSkippable && stepFields.diff(messages).length) && errorSteps.push(index);
+                });
+
+                //update error step higlightening
+                let wizardContainerId = $.formwizard.options[formName].wizardContainerId;
+                $("#" + wizardContainerId).smartWizard('updateErrorStep', errorSteps);
+
+                //if no error steps then clear errors
+                if (errorSteps.length) {
+                    $.formwizard.formNavigation.goToStep("#" + wizardContainerId, errorSteps[0]);
+                    return true;
+                }
+            }
         },
         isValid: function (messages) {
             for (var i in messages) {
@@ -435,6 +424,7 @@ $.formwizard = {
                 .parent()
                 .closest(".sw-main")
                 .attr("id");
+            console.log("next");
             $("#" + containerId).smartWizard("next");
         },
         goToStep: (wizardContainerId, stepno) => {
@@ -878,9 +868,14 @@ $.formwizard = {
 
             //iterate an retore data for all the fields
             for (let steps in storageFields) {
-                let stepData = storageFields[steps];
+                if (storageFields.hasOwnProperty(steps)) {
+                    let stepData = storageFields[steps];
 
-                if (stepData.stepType !== 'tabular') {
+                    if (stepData.stepType == 'tabular') {
+                        $.formwizard.persistence.tabularData(stepData, steps, fieldTypes);
+                        continue;
+                    }
+
                     let fields = stepData.fields;
 
                     for (let id in fields) {
@@ -894,42 +889,44 @@ $.formwizard = {
                             fieldTypes.hasOwnProperty(fieldType) && fieldTypes[fieldType].call(this, id, value);
                         }
                     }
-                } else {
-                    let rows = stepData.fields;
+                }
+            }
+        },
+        tabularData: function (stepData, steps, fieldTypes) {
+            let rows = stepData.fields;
 
-                    //get the rows length
-                    let rowsLength = Object.keys(rows).length;
+            //get the rows length
+            let rowsLength = Object.keys(rows).length;
 
-                    //trigger click for add row if more than 1
-                    if (rowsLength > 1) {
-                        for (let iter = 1; iter <= rowsLength - 1; iter++) {
-                            //trigger the click for the Add Row button
-                            $("#" + steps + " .add_row").trigger('click');
-                        }
-                    }
-
-                    //iterate the rows
-                    for (let row in rows) {
-
-                        if (rows.hasOwnProperty(row)) {
-                            let fields = rows[row];
-
-                            //iterate the fields
-                            for (let id in fields) {
-
-                                let value = fields[id];
-
-                                //get the field type
-                                let fieldType = $("#" + id).get(0).type;
-
-                                //cal the relative method to restore the value
-                                fieldTypes.hasOwnProperty(fieldType) && fieldTypes[fieldType].call(this, id, value);
-                            }
-                        }
-                    }
+            //trigger click for add row if more than 1
+            if (rowsLength > 1) {
+                for (let iter = 1; iter <= rowsLength - 1; iter++) {
+                    //trigger the click for the Add Row button
+                    $("#" + steps + " .add_row").trigger('click');
                 }
             }
 
+            //iterate the rows
+            for (let row in rows) {
+
+                if (rows.hasOwnProperty(row)) {
+                    let fields = rows[row];
+
+                    //iterate the fields
+                    for (let id in fields) {
+                        if (fields.hasOwnProperty(id)) {
+                            let value = fields[id];
+
+                            //get the field type
+                            let fieldType = $("#" + id).get(0).type;
+
+                            //cal the relative method to restore the value
+                            fieldTypes.hasOwnProperty(fieldType) && fieldTypes[fieldType].call(this, id, value);
+                        }
+
+                    }
+                }
+            }
         },
         init: (formId) => {
 
