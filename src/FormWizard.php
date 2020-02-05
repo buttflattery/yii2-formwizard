@@ -651,7 +651,7 @@ JS;
                         'type' => self::STEP_TYPE_PREVIEW,
                         'title' => 'Final Preview',
                         'description' => 'Final Preview of all Steps',
-                        'formInfoText' => 'Click any of the steps below to edit them',
+                        'formInfoText' => 'Review information below and click to change',
                     ],
                 ]
             );
@@ -755,7 +755,7 @@ JS;
         $isSkipable = ArrayHelper::getValue($step, 'isSkipable', false);
 
         //check if tabular step
-        $isTabularStep = $stepType == self::STEP_TYPE_TABULAR;
+        $isTabularStep = $stepType === self::STEP_TYPE_TABULAR;
 
         //tabular rows limit
         $limitRows = ArrayHelper::getValue($step, 'limitRows', self::ROWS_UNLIMITED);
