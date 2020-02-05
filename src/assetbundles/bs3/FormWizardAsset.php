@@ -12,8 +12,8 @@ class FormWizardAsset extends ThemeBase
     ];
 
     public $css = [
-        'css/animate.css',
-        'css/shake.css',
+        'css/animate.min.css',
+        'css/shake.min.css',
         'css/smart_wizard.min.css',
         'css/icons-theme.min.css',
     ];
