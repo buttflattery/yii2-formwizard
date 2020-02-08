@@ -403,9 +403,17 @@ class FormWizard extends Widget
     const BS_4 = 4;
 
     /**
+     * TEXT LABELS CONSTANTS
+     * */
+    const DEFAULT_FORM_INFO_TEXT = 'Add details below';
+    const DEFAULT_STEP_DESCRIPTION = 'Description';
+    const PREVIEW_TITLE = 'Final Preview';
+    const PREVIEW_DESCRIPTION = 'Final Preview of all Steps';
+    const PREVIEW_FORM_INFO_TEXT = 'Review information below and click to change';
+
+    /**
      * ICONS
      * */
-
     const ICON_NEXT = '<i class="formwizard-arrow-right-alt1-ico"></i>';
     const ICON_PREV = '<i class="formwizard-arrow-left-alt1-ico"></i>';
     const ICON_FINISH = '<i class="formwizard-check-alt-ico"></i>';
@@ -649,9 +657,9 @@ JS;
                 [
                     [
                         'type' => self::STEP_TYPE_PREVIEW,
-                        'title' => 'Final Preview',
-                        'description' => 'Final Preview of all Steps',
-                        'formInfoText' => 'Review information below and click to change',
+                        'title' => self::PREVIEW_TITLE,
+                        'description' => self::PREVIEW_DESCRIPTION,
+                        'formInfoText' => self::PREVIEW_FORM_INFO_TEXT,
                     ],
                 ]
             );
@@ -693,10 +701,10 @@ JS;
         $stepTitle = ArrayHelper::getValue($step, 'title', 'Step-' . ($index + 1));
 
         //step description
-        $stepDescription = ArrayHelper::getValue($step, 'description', 'Description');
+        $stepDescription = ArrayHelper::getValue($step, 'description', self::DEFAULT_STEP_DESCRIPTION);
 
         //form body info text
-        $formInfoText = ArrayHelper::getValue($step, 'formInfoText', 'Add details below');
+        $formInfoText = ArrayHelper::getValue($step, 'formInfoText', self::DEFAULT_FORM_INFO_TEXT);
 
         //get html tabs
         $htmlTabs = $this->createTabs($index, $stepDescription, $stepTitle);
@@ -982,8 +990,8 @@ JS;
 
         //is supported theme
         if (in_array($themeSelected, array_keys($this->themesSupported))) {
-            $themeAsset = __NAMESPACE__ . '\assetbundles\bs' .
-            $this->_bsVersion . '\Theme' .
+            $themeAsset = __NAMESPACE__ . '\\assetbundles\\bs' .
+            $this->_bsVersion . '\\Theme' .
             $this->themesSupported[$themeSelected] . 'Asset';
 
             $themeAsset::register($view);
