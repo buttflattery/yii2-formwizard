@@ -510,8 +510,8 @@ class FormWizard extends Widget
             $this->_bsVersion = $this->forceBsVersion;
         } else {
             //is bs4 version
-            $isBs4 = class_exists(Bs4Assets::class);
-            $this->_bsVersion = $isBs4 ? self::BS_3 : self::BS_4;
+            $isBs4 = class_exists(BS4ActiveForm::class);
+            $this->_bsVersion = !$isBs4 ? self::BS_3 : self::BS_4;
         }
 
     }
