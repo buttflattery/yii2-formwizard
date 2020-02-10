@@ -155,7 +155,7 @@ $.formwizard = {
                     btnFinish.removeClass("hidden d-none");
                     btnPrev.removeClass("disabled hidden d-none");
                     //call preview step if enabled
-                    $.formwizard.helper.addPreviewStep(wizardContainerId);
+                    $.formwizard.previewStep.add(wizardContainerId);
                 } else {
                     btnPrev.removeClass("disabled");
                     btnNext.removeClass("disabled hidden d-none");
@@ -167,7 +167,10 @@ $.formwizard = {
         currentIndex: function (form) {
             return $(form + " ul.step-anchor>li.active").index();
         },
-        addPreviewStep: (wizardContainerId) => {
+
+    },
+    previewStep: {
+        add: (wizardContainerId) => {
             let formwizardOptions = $.formwizard.options;
             let formId = $(wizardContainerId).closest('form').attr('id');
             let fragment = document.createDocumentFragment();
@@ -183,20 +186,22 @@ $.formwizard = {
 
             if (formwizardOptions.hasOwnProperty(formId) && formwizardOptions[formId].enablePreview) {
                 let fields = $.formwizard.fields[formId];
+
                 fields.forEach(function (stepFields, step) {
                     let stepPreviewContainer = document.createElement("div");
                     stepPreviewContainer.setAttribute('class', classListGroup + ' preview-container');
                     stepPreviewContainer.dataset.step = step;
                     let rowHtml = '<h4 class="' + classListGroupHeading + '">Step ' + parseInt(step + 1) + '</h4>';
                     stepFields.forEach(function (fieldName, index) {
-                        let inputLabel = $.formwizard.helper.getpreviewInputLabel(fieldName);
-                        let inputValue = $.formwizard.helper.getpreviewInputValue(formId, fieldName);
+                        let inputLabel = $.formwizard.previewStep.getLabel(fieldName);
+                        let inputValue = $.formwizard.previewStep.getValue(formId, fieldName);
                         let stepData = {
-                            label: inputLabel == '' ? 'NA' : inputLabel,
-                            value: inputValue == '' ? 'NA' : inputValue
+                            "label": inputLabel == '' ? 'NA' : inputLabel,
+                            "value": inputValue == '' ? 'NA' : inputValue,
+                            "target": fieldName
                         };
 
-                        rowHtml += $.formwizard.helper.previewTemplate(stepData, bsVersion, formwizardOptions[formId]);
+                        rowHtml += $.formwizard.previewStep.getTemplate(stepData, bsVersion, formwizardOptions[formId]);
                     });
 
                     stepPreviewContainer.innerHTML = rowHtml;
@@ -207,35 +212,57 @@ $.formwizard = {
                 $(".preview-button").on('click', function (e) {
                     let stepNo = $(this).closest('div.preview-container').data('step');
                     $.formwizard.formNavigation.goToStep(wizardContainerId, stepNo);
+                    $.formwizard.previewStep.highlightTarget($(this).val());
                 });
             }
         },
-        getpreviewInputLabel: (fieldName) => {
+        getLabel: (fieldName) => {
             let text = $('#' + fieldName).siblings('label').text();
             if (text !== '') {
                 return text;
             }
             return $('#' + fieldName).attr("placeholder");
         },
-        getpreviewInputValue: (formId, fieldName) => {
+        getValue: (formId, fieldName) => {
             let inputType = $('#' + formId + ' #' + fieldName);
 
             if (inputType.is("select")) {
                 // <select> element.
                 return $('#' + formId + ' #' + fieldName + ' option:selected').text();
-            } else {
-                // <textarea> element.
-                return inputType.val();
             }
+
+            if (inputType.is('div') && inputType.attr('role') == 'radiogroup') {
+                let radio = inputType.find('input:checked');
+                return (radio.length) ? radio.val() : '';
+            }
+
+            if (inputType.is('div')) {
+                let checkboxes = inputType.find('input:checked');
+                let choices = '';
+                checkboxes.each(function (index, checkbox) {
+                    choices += $(checkbox).val() + ',';
+                });
+                return choices;
+            }
+
+            // <textarea> <input> element.
+            return inputType.val();
+
         },
-        previewTemplate: (params, bsVersion, formwizardOptions) => {
+        getTemplate: (params, bsVersion, formwizardOptions) => {
             let bsClass = bsVersion == 4 ? 'list-group-item-action' : '';
-            return `<button type="button" class="list-group-item ${formwizardOptions.classListGroupItem} ${bsClass} preview-button">
+            return `<button type="button" class="list-group-item ${formwizardOptions.classListGroupItem} ${bsClass} preview-button" value="${params.target}">
                     <span class="badge ${formwizardOptions.classListGroupBadge}">
                         ${params.label}
                     </span>
                     ${params.value}
                     </button>`;
+        },
+        highlightTarget: function (target) {
+            $('.field-' + target).addClass('notify-target');
+            setTimeout(function () {
+                $('.field-' + target).removeClass('notify-target');
+            }, 2000);
         }
     },
     formValidation: {
@@ -748,9 +775,6 @@ $.formwizard = {
                             $.formwizard.persistence.storageFields['step-' + stepNumber].fields[fieldId] = $("#" + formId + " #" + fieldId).is(":checked");
                         }
                     }
-
-
-
                 },
                 checkbox: (fieldId) => {
                     let isCheckBoxList = $('#' + formId + " #" + fieldId).attr('name').match(/\[\]$/g);
@@ -771,7 +795,7 @@ $.formwizard = {
                             $.formwizard.persistence.storageFields['step-' + stepNumber].fields[rowId][fieldId] = $("#" + formId + " #" + fieldId).is(":checked");
                         }
                     } else {
-                        if (isCheckBoxList.length) {
+                        if (isCheckBoxList && isCheckBoxList.length) {
                             let checkboxList = $("input[name='" + $("#" + formId + " #" + fieldId).attr('name') + "']");
                             checkboxList.each(function (index, element) {
                                 //add fields to the local fieldstorage property

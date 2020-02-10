@@ -34,22 +34,15 @@ trait WizardTrait
             $orderedAttributes = [];
             $unorderedAttributes = [];
 
-            array_walk(
-                $attributes,
-                function (&$item, $index, $fieldOrder) use (
-                    &$orderedAttributes,
-                    &$unorderedAttributes
-                ) {
-                    $moveToIndex = array_search($item, $fieldOrder);
+            foreach ($attributes as $item) {
+                $moveToIndex = array_search($item, $fieldOrder);
 
-                    if ($moveToIndex !== false) {
-                        $orderedAttributes[$moveToIndex] = $item;
-                    } else {
-                        $unorderedAttributes[] = $item;
-                    }
-                },
-                $fieldOrder
-            );
+                if ($moveToIndex !== false) {
+                    $orderedAttributes[$moveToIndex] = $item;
+                    continue;
+                }
+                $unorderedAttributes[] = $item;
+            }
 
             //sort new order according to keys
             ksort($orderedAttributes);
@@ -325,8 +318,8 @@ JS;
 
             //if custom config available for field
             if ($customConfigDefinedForField) {
-                
-                $customFieldConfig=(isset($fieldConfig[$attributesPrefixed[$attributeIndex]]))?$fieldConfig[$attributesPrefixed[$attributeIndex]]:$fieldConfig[$attribute];
+
+                $customFieldConfig = (isset($fieldConfig[$attributesPrefixed[$attributeIndex]])) ? $fieldConfig[$attributesPrefixed[$attributeIndex]] : $fieldConfig[$attribute];
 
                 //if filtered field
                 $isFilteredField = $customFieldConfig === false;
@@ -336,7 +329,6 @@ JS;
                     continue;
                 }
 
-                
                 //custom field population
                 $htmlFields .= $this->createCustomInput(
                     $model,
