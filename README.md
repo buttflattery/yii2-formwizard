@@ -208,6 +208,8 @@ An array of the steps(`array`), the steps can have models dedicated to each step
 
 - `title (string)` : The title of the step to be displayed inside the step Tab.
 
+- `previewHeading` : The heading for the preview step, if enabled the text will show up as the heading for the step fields in the preview step.
+
 - `description (string)` : The short description for the step.
 
 - `formInfoText (text)` : The text to be displayed on the top of the form fields inside the step.
