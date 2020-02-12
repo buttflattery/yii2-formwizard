@@ -13,6 +13,7 @@ $.formwizard = {
     resetCurrentTarget: true,
     observerObj: null,
     fields: [],
+    previewHeadings: [],
     options: [],
     submit: false,
     helper: {
@@ -187,11 +188,17 @@ $.formwizard = {
             if (formwizardOptions.hasOwnProperty(formId) && formwizardOptions[formId].enablePreview) {
                 let fields = $.formwizard.fields[formId];
 
+                //iterate steps
                 fields.forEach(function (stepFields, step) {
                     let stepPreviewContainer = document.createElement("div");
                     stepPreviewContainer.setAttribute('class', classListGroup + ' preview-container');
                     stepPreviewContainer.dataset.step = step;
-                    let rowHtml = '<h4 class="' + classListGroupHeading + '">Step ' + parseInt(step + 1) + '</h4>';
+
+                    let stepHeading = $.formwizard.previewHeadings[step] == '' ? 'Step ' + parseInt(step + 1) : $.formwizard.previewHeadings[step];
+
+                    let rowHtml = '<h4 class="' + classListGroupHeading + '">' + stepHeading + '</h4>';
+
+                    //iterate step fields
                     stepFields.forEach(function (fieldName, index) {
                         let inputLabel = $.formwizard.previewStep.getLabel(fieldName);
                         let inputValue = $.formwizard.previewStep.getValue(formId, fieldName);
