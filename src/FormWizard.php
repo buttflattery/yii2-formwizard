@@ -86,6 +86,11 @@ class FormWizard extends Widget
      */
     private $_persistenceEvents;
 
+    /**
+     * @var array
+     */
+    private $_previewHeadings = [];
+
     //options widget
 
     /**
@@ -671,8 +676,15 @@ JS;
             //create wizard steps
             list($tabs, $steps) = $this->createStep($index, $step);
 
+            //tabs html
             $htmlTabs .= $tabs;
+
+            //steps html
             $htmlSteps .= $steps;
+
+            //get preview headings for Javascript
+            $this->_previewHeadings[] = ArrayHelper::getValue($step, 'previewHeading', '');
+
         }
 
         //end tabs html
@@ -794,7 +806,6 @@ JS;
                 $this->iconAdd . '&nbsp;Add',
                 [
                     'class' => $this->classAdd . (($this->_bsVersion == self::BS_3) ? ' pull-right add_row' : ' float-right add_row'),
-                    // 'id'=>'add_row'
                 ]
             );
         }
@@ -1003,6 +1014,9 @@ JS;
         //get all fields json for javascript processing
         $fieldsJSON = Json::encode($this->_allFields);
 
+        //preview headings
+        $headingsJSON = Json::encode($this->_previewHeadings);
+
         //encode plugin options
         $pluginOptionsJson = Json::encode($pluginOptions);
 
@@ -1035,6 +1049,7 @@ JS;
 
         //fields list
         $.formwizard.fields.{$this->formOptions['id']}={$fieldsJSON};
+        $.formwizard.previewHeadings={$headingsJSON};
 
         $.formwizard.options.{$this->formOptions['id']}={
             wizardContainerId:'{$wizardContainerId}',
