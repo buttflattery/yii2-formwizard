@@ -251,6 +251,11 @@ $.formwizard = {
                 });
                 return choices;
             }
+            
+            //check if single checkbox input
+            if (inputType.attr("type") == 'checkbox') {
+                return inputType.is(":checked") ? inputType.val() : '';
+            }
 
             // <textarea> <input> element.
             return inputType.val();
