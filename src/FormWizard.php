@@ -252,6 +252,13 @@ class FormWizard extends Widget
     public $enablePreview = false;
 
     /**
+     * Label used for the empty input in the preview step, default `NA`
+     * 
+     * @var string
+     */
+    public $previewEmptyText = 'NA';
+
+    /**
      * Enables restoring of the data for the unsaved form
      *
      * @var boolean
@@ -1026,6 +1033,7 @@ JS;
 
         //encode plugin options
         $pluginOptionsJson = Json::encode($pluginOptions);
+        $previewEmptyText=$this->previewEmptyText;
 
         //register inline js
         //add tabular events call back js
@@ -1057,6 +1065,7 @@ JS;
         //fields list
         $.formwizard.fields.{$this->formOptions['id']}={$fieldsJSON};
         $.formwizard.previewHeadings={$headingsJSON};
+        $.formwizard.previewEmptyText="{$previewEmptyText}";
 
         $.formwizard.options.{$this->formOptions['id']}={
             wizardContainerId:'{$wizardContainerId}',
