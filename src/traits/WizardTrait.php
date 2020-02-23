@@ -25,7 +25,7 @@ trait WizardTrait
      *
      * @return null
      */
-    private function _sortFields($fieldConfig, &$attributes, $step)
+    public function sortFields($fieldConfig, &$attributes, $step)
     {
         $defaultOrder = $fieldConfig !== false ? array_keys($fieldConfig) : false;
         $fieldOrder = ArrayHelper::getValue($step, 'fieldOrder', $defaultOrder);
@@ -35,7 +35,8 @@ trait WizardTrait
             $unorderedAttributes = [];
 
             foreach ($attributes as $item) {
-                $moveToIndex = array_search($item, $fieldOrder);
+                $attribute = isset($item['attribute']) ? $item['attribute'] : $item;
+                $moveToIndex = array_search($attribute, $fieldOrder);
 
                 if ($moveToIndex !== false) {
                     $orderedAttributes[$moveToIndex] = $item;
@@ -275,7 +276,7 @@ JS;
     }
 
     /**
-     * Generates Html for the step fields
+     * Generates Html for the tabular step fields
      *
      * @param array          $attributes    the attributes to iterate
      * @param integer        $modelIndex    the index of the current model
@@ -287,7 +288,7 @@ JS;
      *
      * @return mixed
      */
-    private function _createStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings)
+    private function _createTabularStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings)
     {
         $htmlFields = '';
 
@@ -298,7 +299,7 @@ JS;
         foreach ($attributes as $attributeIndex => $attribute) {
 
             //attribute name
-            $attributeName = ($isTabularStep) ? "[$modelIndex]" . $attribute : $attribute;
+            $attributeName = "[$modelIndex]" . $attribute;
             $customConfigDefinedForField = $fieldConfig && (isset($fieldConfig[$attribute]) || isset($fieldConfig[$attributesPrefixed[$attributeIndex]]));
 
             //has heading for the field
@@ -306,14 +307,7 @@ JS;
 
             //add heading
             if ($hasHeading) {
-                $headingFields = ArrayHelper::getColumn($stepHeadings, 'before', true);
-                if (in_array($attribute, $headingFields)) {
-                    $currentIndex = array_search($attribute, array_values($headingFields));
-                    $headingConfig = $stepHeadings[$currentIndex];
-
-                    //add heading
-                    $htmlFields .= $this->_addHeading($headingConfig);
-                }
+                $htmlFields .= $this->addHeading($stepHeadings, $attribute);
             }
 
             //if custom config available for field
@@ -335,11 +329,96 @@ JS;
                     $attributeName,
                     $customFieldConfig
                 );
+
                 //id of the input
                 $attributeId = Html::getInputId($model, $attributeName);
 
                 //add tabular events
                 $this->_addTabularEvents($customFieldConfig, $isTabularStep, $modelIndex, $attributeId, $index);
+
+                //add the restore events
+                $this->_addRestoreEvents($customFieldConfig, $attributeId);
+            } else {
+                //default field population
+                $htmlFields .= $this->createDefaultInput($model, $attributeName);
+            }
+        }
+        return $htmlFields;
+    }
+
+    /**
+     * @param $stepHeadings
+     * @param $attribute
+     */
+    public function addHeading($stepHeadings, $attribute)
+    {
+        $headingFields = ArrayHelper::getColumn($stepHeadings, 'before', true);
+        if (in_array($attribute, $headingFields)) {
+            $currentIndex = array_search($attribute, array_values($headingFields));
+            $headingConfig = $stepHeadings[$currentIndex];
+
+            //add heading
+            return $this->_addHeading($headingConfig);
+        }
+        return '';
+    }
+
+    /**
+     * Generates Html for normal steps fields
+     *
+     * @param array          $attributes    the attributes to iterate
+     * @param integer        $index         the index of the current step
+     * @param boolean        $isTabularStep if the current step is tabular
+     * @param array          $fieldConfig   customer field confitigurations
+     * @param boolean|string $stepHeadings  the headings for the current step
+     *
+     * @return mixed
+     */
+    private function _createStepHtml($attributes, $fieldConfig, $stepHeadings)
+    {
+        $htmlFields = '';
+        foreach ($attributes as $row) {
+
+            $model = $row['model'];
+            $attribute = $row['attribute'];
+
+            //prefix attributes with model name
+            $attributePrefixed = strtolower($model->formName()) . '.' . $attribute;
+
+            //attribute name
+            $attributeName = $attribute;
+            $customConfigDefinedForField = $fieldConfig && (isset($fieldConfig[$attribute]) || isset($fieldConfig[$attributePrefixed]));
+
+            //has heading for the field
+            $hasHeading = false !== $stepHeadings;
+
+            //add heading
+            if ($hasHeading) {
+                $htmlFields .= $this->addHeading($stepHeadings, $attribute);
+            }
+
+            //if custom config available for field
+            if ($customConfigDefinedForField) {
+
+                $customFieldConfig = (isset($fieldConfig[$attributePrefixed])) ? $fieldConfig[$attributePrefixed] : $fieldConfig[$attribute];
+
+                //if filtered field
+                $isFilteredField = $customFieldConfig === false;
+
+                //skip the field and go to next
+                if ($isFilteredField) {
+                    continue;
+                }
+
+                //custom field population
+                $htmlFields .= $this->createCustomInput(
+                    $model,
+                    $attributeName,
+                    $customFieldConfig
+                );
+
+                //id of the input
+                $attributeId = Html::getInputId($model, $attributeName);
 
                 //add the restore events
                 $this->_addRestoreEvents($customFieldConfig, $attributeId);
@@ -476,6 +555,7 @@ JS;
      */
     public function getStepFields($model, $onlyFields = [], $disabledFields = [])
     {
+        //return $onlyFields list
         if (!empty($onlyFields)) {
             return array_values(
                 array_filter(
@@ -486,6 +566,8 @@ JS;
                 )
             );
         }
+
+        //return all fields list for the model
         return array_filter(
             array_keys($model->getAttributes($model->safeAttributes())),
             function ($item) use ($disabledFields) {
