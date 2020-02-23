@@ -62,7 +62,7 @@ or add into the `composer.json` file under `require` section
 - [Enable Preview Step](https://yii2plugins.omaraslam.com/formwizard/preview-step)
 - [Enable Form Persistence](https://yii2plugins.omaraslam.com/formwizard/form-persistence)
 - [Enable Skip Step](https://yii2plugins.omaraslam.com/formwizard/skip-step)
-- [Enable Edit Step](https://yii2plugins.omaraslam.com/formwizard/edit-step)
+- [Enable Edit Step](https://yii2plugins.omaraslam.com/formwizard/edit-mode)
 - [Group Step Fields](https://yii2plugins.omaraslam.com/formwizard/group-fields)
 
 - Themes
