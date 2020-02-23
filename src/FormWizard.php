@@ -852,14 +852,14 @@ JS;
         //is array of models
         $isArrayOfModels = is_array($step['model']);
 
-        $models = $step['model'];
+        $models = !$isArrayOfModels ? [$step['model']] : $step['model'];
 
-        if (!$isArrayOfModels) {
-            $models = [$step['model']];
-        }
+        //get the step headings
+        $stepHeadings = ArrayHelper::getValue($step, 'stepHeadings', false);
 
         //current step fields
         $fields = [];
+        $mappedFields = [];
 
         //iterate models
         foreach ($models as $modelIndex => $model) {
@@ -867,11 +867,10 @@ JS;
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
 
-            //get the step headings
-            $stepHeadings = ArrayHelper::getValue($step, 'stepHeadings', false);
-
             //field order
-            $this->_sortFields($fieldConfig, $attributes, $step);
+            foreach ($attributes as $attribute) {
+                $mappedFields[] = ['model' => $model, 'attribute' => $attribute];
+            }
 
             //add all the field ids to array
             $fields = array_merge(
@@ -883,6 +882,9 @@ JS;
                     $attributes
                 )
             );
+
+            //sort fields
+            $this->sortFields($fieldConfig, $attributes, $step);
 
             //is tabular step
             if ($isTabularStep) {
@@ -898,17 +900,22 @@ JS;
                     //terminate the loop for the tabular step if the limit exceeds
                     break;
                 }
-            }
 
-            //generate the html for the step
-            $htmlFields .= $this->_createStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings);
-
-            //is tabular step
-            if ($isTabularStep) {
+                //generate the html for the step
+                $htmlFields .= $this->_createTabularStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings);
 
                 //close row div
                 $htmlFields .= Html::endTag('div');
             }
+        }
+
+        //create normal step html
+        if (!$isTabularStep) {
+            //sort fields
+            $this->sortFields($fieldConfig, $mappedFields, $step);
+
+            //generate the html for the step
+            $htmlFields = $this->_createStepHtml($mappedFields, $fieldConfig, $stepHeadings);
         }
 
         //copy the fields to the javascript array for validation
