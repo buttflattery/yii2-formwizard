@@ -14,6 +14,7 @@ $.formwizard = {
     observerObj: null,
     fields: [],
     previewHeadings: [],
+    previewEmptyText:'',
     options: [],
     submit: false,
     helper: {
@@ -203,8 +204,8 @@ $.formwizard = {
                         let inputLabel = $.formwizard.previewStep.getLabel(fieldName);
                         let inputValue = $.formwizard.previewStep.getValue(formId, fieldName);
                         let stepData = {
-                            "label": inputLabel == '' ? 'NA' : inputLabel,
-                            "value": inputValue == '' ? 'NA' : inputValue,
+                            "label": inputLabel == '' ? $.formwizard.previewEmptyText : inputLabel,
+                            "value": inputValue == '' ? $.formwizard.previewEmptyText : inputValue,
                             "target": fieldName
                         };
 
