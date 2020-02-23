@@ -1,4 +1,4 @@
-# Yii2-FormWizard (v1.6.13)
+# Yii2-FormWizard (v1.6.17)
 
 ## What is this repository for?
 
