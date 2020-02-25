@@ -14,7 +14,7 @@ $.formwizard = {
     observerObj: null,
     fields: [],
     previewHeadings: [],
-    previewEmptyText:'',
+    previewEmptyText: '',
     options: [],
     submit: false,
     helper: {
@@ -194,9 +194,8 @@ $.formwizard = {
                     let stepPreviewContainer = document.createElement("div");
                     stepPreviewContainer.setAttribute('class', classListGroup + ' preview-container');
                     stepPreviewContainer.dataset.step = step;
-
+                    let stepType = $(wizardContainerId).find('#step-' + step).data('step').type;
                     let stepHeading = $.formwizard.previewHeadings[step] == '' ? 'Step ' + parseInt(step + 1) : $.formwizard.previewHeadings[step];
-
                     let rowHtml = '<h4 class="' + classListGroupHeading + '">' + stepHeading + '</h4>';
 
                     //iterate step fields
@@ -210,6 +209,15 @@ $.formwizard = {
                         };
 
                         rowHtml += $.formwizard.previewStep.getTemplate(stepData, bsVersion, formwizardOptions[formId]);
+
+                        //if tabular step then add divider after every model 
+                        if (stepType == 'tabular') {
+                            let rows = $(wizardContainerId).find('#step-' + step).find('.fields_container .tabular-row').length;
+                            divider = stepFields.length / rows;
+                            if (((index+1) % divider)==0) {
+                                rowHtml += '<hr class="tabular-divider" />';
+                            }
+                        }
                     });
 
                     stepPreviewContainer.innerHTML = rowHtml;
@@ -236,6 +244,16 @@ $.formwizard = {
 
             if (inputType.is("select")) {
                 // <select> element.
+                if ($.formwizard.previewEmptyText !== '') {
+                    let selectValue = $('#' + formId + ' #' + fieldName + ' option:selected').val();
+                    let selectLabel = $('#' + formId + ' #' + fieldName + ' option:selected').text();
+
+                    if (selectValue == '') {
+                        return $.formwizard.previewEmptyText == 'NA' ? selectLabel : $.formwizard.previewEmptyText;
+                    }
+                    return $('#' + formId + ' #' + fieldName + ' option:selected').text();
+                }
+
                 return $('#' + formId + ' #' + fieldName + ' option:selected').text();
             }
 
@@ -252,7 +270,7 @@ $.formwizard = {
                 });
                 return choices;
             }
-            
+
             //check if single checkbox input
             if (inputType.attr("type") == 'checkbox') {
                 return inputType.is(":checked") ? inputType.val() : '';
