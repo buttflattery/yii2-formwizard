@@ -1,4 +1,4 @@
-# Yii2-FormWizard (v1.6.13)
+# Yii2-FormWizard (v1.6.17)
 
 ## What is this repository for?
 
@@ -147,6 +147,7 @@ Adds a Preview Step as the last step in the form wizard where you can preview al
 
 When using `'enablePreview'=>true` you can customize the classes using the below options.
 
+- `previewEmptyText (string)` : Text used for showing the value for the empty inputs, default is `NA`.
 - `classListGroup (string)` : Css class for the list group defaults to `'list-group'`.
 - `classListGroupHeading (string)` : Css class for the list group heading element, defaults to `'list-group-heading'`.
 - `classListGroupItem (string)` : Css class for the list group item, defaults to `'list-group-item-success'`.
