@@ -91,6 +91,11 @@ class FormWizard extends Widget
      */
     private $_previewHeadings = [];
 
+    /**
+     * @var mixed
+     */
+    private $_dependentInputScript;
+
     //options widget
 
     /**
@@ -253,7 +258,7 @@ class FormWizard extends Widget
 
     /**
      * Label used for the empty input in the preview step, default `NA`
-     * 
+     *
      * @var string
      */
     public $previewEmptyText = 'NA';
@@ -948,7 +953,7 @@ JS;
         list(
             $options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText
         ) = $this->_parseFieldConfig($fieldConfig);
-
+        
         //create field
         $field = $this->createField(
             $model,
@@ -1033,12 +1038,13 @@ JS;
 
         //encode plugin options
         $pluginOptionsJson = Json::encode($pluginOptions);
-        $previewEmptyText=$this->previewEmptyText;
+        $previewEmptyText = $this->previewEmptyText;
 
         //register inline js
         //add tabular events call back js
         $js = $this->_tabularEventJs;
         $js .= $this->_persistenceEvents;
+        $js .= $this->_dependentInputScript;
 
         //init script for the wizard
 
