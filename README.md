@@ -287,6 +287,7 @@ An array of the steps(`array`), the steps can have models dedicated to each step
   - `persistenceEvents` (effective with `enablePersistence`) [See Wiki](https://github.com/buttflattery/yii2-formwizard/wiki/Form-Persistence)
      [See Wiki For Customizing Fields using options above](https://github.com/buttflattery/yii2-formwizard/wiki/Customizing-form-fields)
     Details
+  - `depends (array)` Since V 1.7.2 (used with tabular step) .
 
   - `options (array)` : You can specify the HTML attributes (name-value pairs) for the field
 
@@ -320,6 +321,12 @@ An array of the steps(`array`), the steps can have models dedicated to each step
   - `persistenceEvents (array)` : it accepts an array of events with the following name. (currently only `afterRestore` is supported).
 
     - `afteRestore` : take a callback as string `"function(event,params){}"` to be called for post-restore operations, it provides 2 parameters `event` and `params` where params is a JSON `{fieldId: "field_name",fieldValue: "field_value"}`.
+  - `depends (array)` : used with tabular step when you have dependent inputs and you want to show or hide them based on the value in the input it depends on when form is loaded to edit the values, see [WIKI](https://github.com/buttflattery/yii2-formwizard/wiki/Dependent-Inputs) for code samples. It takes the following special parameters
+    - `attribute (string)` : the name of the attribute/fields the current field depends on, this parameter is required.
+    - `when (string)` : the value to check, or the value which is compared with the on which you need to show the current input, this parameter is required.
+    - `condition (string)` : the condition to evaluate the value of the dependent input with the given value in `when`. default condition used is `==`.
+    - `then (callback)` : takes a `new JsExpression()` encoded callback function `function(id){}`, it takes one parameter `id` that holds the id of the current input. If not provided it will call `jQuery.show()` on the id of input it is applied on if the value matches in the `when` option.
+    - `else (callback)` : takes a `new JsExpression()` encoded callback function `function(id){}`, it takes one parameter `id` that holds the id of the current input. If not provided it will call `jQuery.show()` on the id of input it is applied on if the value matches in the `when` option.
 
 #### Widget Plugin (SmartWizard) Options
 
