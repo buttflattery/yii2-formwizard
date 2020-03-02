@@ -369,6 +369,7 @@ JS;
         $dependentAttribute = $dependentInput['attribute'];
         $dependentValue = $model->$dependentAttribute;
         $dependentValueRequired = $dependentInput['when'];
+        $dependentCondition = ArrayHelper::getValue($dependentInput, 'condition', '==');
 
         $dependentActionThen = ArrayHelper::getValue(
             $dependentInput,
@@ -387,7 +388,7 @@ JS;
         let thenCallback_{$modelIndex}={$dependentActionThen};
         let elseCallback_{$modelIndex}={$dependentActionElse};
 
-        if('{$dependentValue}'=='{$dependentValueRequired}'){
+        if('{$dependentValue}'$dependentCondition'{$dependentValueRequired}'){
             thenCallback_{$modelIndex}.call(this,'{$attributeId}');
         }else{
             elseCallback_{$modelIndex}.call(this,'{$attributeId}');
