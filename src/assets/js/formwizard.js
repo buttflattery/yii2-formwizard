@@ -214,7 +214,7 @@ $.formwizard = {
                         if (stepType == 'tabular') {
                             let rows = $(wizardContainerId).find('#step-' + step).find('.fields_container .tabular-row').length;
                             divider = stepFields.length / rows;
-                            if (((index+1) % divider)==0) {
+                            if (((index + 1) % divider) == 0) {
                                 rowHtml += '<hr class="tabular-divider" />';
                             }
                         }
@@ -242,38 +242,53 @@ $.formwizard = {
         getValue: (formId, fieldName) => {
             let inputType = $('#' + formId + ' #' + fieldName);
 
-            if (inputType.is("select")) {
-                // <select> element.
-                if ($.formwizard.previewEmptyText !== '') {
-                    let selectValue = $('#' + formId + ' #' + fieldName + ' option:selected').val();
-                    let selectLabel = $('#' + formId + ' #' + fieldName + ' option:selected').text();
+            let inputPackage = {
+                select: function () {
+                    // <select> element.
+                    if ($.formwizard.previewEmptyText !== '') {
+                        let selectValue = $('#' + formId + ' #' + fieldName + ' option:selected').val();
+                        let selectLabel = $('#' + formId + ' #' + fieldName + ' option:selected').text();
 
-                    if (selectValue == '') {
-                        return $.formwizard.previewEmptyText == 'NA' ? selectLabel : $.formwizard.previewEmptyText;
+                        if (selectValue == '') {
+                            return $.formwizard.previewEmptyText == 'NA' ? selectLabel : $.formwizard.previewEmptyText;
+                        }
+                        return $('#' + formId + ' #' + fieldName + ' option:selected').text();
                     }
-                    return $('#' + formId + ' #' + fieldName + ' option:selected').text();
-                }
 
-                return $('#' + formId + ' #' + fieldName + ' option:selected').text();
+                    return $('#' + formId + ' #' + fieldName + ' option:selected').text();
+                },
+                radiogroup: function () {
+                    let radio = inputType.find('input:checked');
+                    return (radio.length) ? radio.val() : '';
+                },
+                checkboxgroup: function () {
+                    let checkboxes = inputType.find('input:checked');
+                    let choices = '';
+                    checkboxes.each(function (index, checkbox) {
+                        choices += $(checkbox).val() + ',';
+                    });
+                    return choices;
+                },
+                checkbox: function () {
+                    return inputType.is(":checked") ? inputType.val() : '';
+                }
+            };
+            
+            if (inputType.is("select")) {
+                inputPackage.select();
             }
 
             if (inputType.is('div') && inputType.attr('role') == 'radiogroup') {
-                let radio = inputType.find('input:checked');
-                return (radio.length) ? radio.val() : '';
+                inputPackage.radiogroup();
             }
 
             if (inputType.is('div')) {
-                let checkboxes = inputType.find('input:checked');
-                let choices = '';
-                checkboxes.each(function (index, checkbox) {
-                    choices += $(checkbox).val() + ',';
-                });
-                return choices;
+                inputPackage.checkboxgroup();
             }
 
             //check if single checkbox input
             if (inputType.attr("type") == 'checkbox') {
-                return inputType.is(":checked") ? inputType.val() : '';
+                inputPackage.checkbox();
             }
 
             // <textarea> <input> element.
@@ -482,7 +497,6 @@ $.formwizard = {
                 .parent()
                 .closest(".sw-main")
                 .attr("id");
-            console.log("next");
             $("#" + containerId).smartWizard("next");
         },
         goToStep: (wizardContainerId, stepno) => {
