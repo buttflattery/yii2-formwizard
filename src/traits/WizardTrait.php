@@ -314,6 +314,7 @@ JS;
             if ($customConfigDefinedForField) {
 
                 $customFieldConfig = (isset($fieldConfig[$attributesPrefixed[$attributeIndex]])) ? $fieldConfig[$attributesPrefixed[$attributeIndex]] : $fieldConfig[$attribute];
+                $dependentInput = ArrayHelper::getValue($customFieldConfig, 'depends', false);
 
                 //if filtered field
                 $isFilteredField = $customFieldConfig === false;
@@ -338,12 +339,61 @@ JS;
 
                 //add the restore events
                 $this->_addRestoreEvents($customFieldConfig, $attributeId);
+
+                //add dependent input script if available
+                if (false !== $dependentInput) {
+                    $this->_addDependentInputScript($dependentInput, $attributeId, $model, $modelIndex);
+                }
+
             } else {
                 //default field population
                 $htmlFields .= $this->createDefaultInput($model, $attributeName);
             }
         }
+
         return $htmlFields;
+    }
+
+    /**
+     * Adds the dependent input script for the inputs
+     *
+     * @param array   $dependentInput the dependent input configurations
+     * @param string  $attributeId    the id of the input it is applied on
+     * @param object  $model          the model object for the dependent input
+     * @param integer $modelIndex     the model index of the current row
+     *
+     * @return null
+     */
+    private function _addDependentInputScript($dependentInput, $attributeId, $model, $modelIndex)
+    {
+        $dependentAttribute = $dependentInput['attribute'];
+        $dependentValue = $model->$dependentAttribute;
+        $dependentValueRequired = $dependentInput['when'];
+        $dependentCondition = ArrayHelper::getValue($dependentInput, 'condition', '==');
+
+        $dependentActionThen = ArrayHelper::getValue(
+            $dependentInput,
+            'then',
+            "function(){\$('#{$attributeId}').show();}"
+        );
+
+        $dependentActionElse = ArrayHelper::getValue(
+            $dependentInput,
+            'else',
+            "function(){\$('#{$attributeId}').hide();}"
+        );
+
+        $this->_dependentInputScript .= <<<JS
+
+        let thenCallback_{$modelIndex}={$dependentActionThen};
+        let elseCallback_{$modelIndex}={$dependentActionElse};
+
+        if('{$dependentValue}'$dependentCondition'{$dependentValueRequired}'){
+            thenCallback_{$modelIndex}.call(this,'{$attributeId}');
+        }else{
+            elseCallback_{$modelIndex}.call(this,'{$attributeId}');
+        }
+JS;
     }
 
     /**
