@@ -202,7 +202,7 @@ $.formwizard = {
                     stepFields.forEach(function (fieldName, index) {
                         let inputLabel = $.formwizard.previewStep.getLabel(fieldName);
                         let inputValue = $.formwizard.previewStep.getValue(formId, fieldName);
-                        
+
                         let stepData = {
                             "label": inputLabel == '' ? $.formwizard.previewEmptyText : inputLabel,
                             "value": inputValue == '' ? $.formwizard.previewEmptyText : inputValue,
@@ -274,6 +274,9 @@ $.formwizard = {
                 },
                 checkbox: function () {
                     return inputType.is(":checked") ? inputType.val() : '';
+                },
+                file: function () {
+                    return inputType.get(0).files.length+' files';
                 }
             };
 
@@ -294,7 +297,9 @@ $.formwizard = {
                 return inputPackage.checkbox();
             }
 
-
+            if (inputType.attr("type") == "file") {
+                return inputPackage.file();
+            }
 
             // <textarea> <input> element.
             return inputType.val();
