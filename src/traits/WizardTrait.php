@@ -268,8 +268,8 @@ JS;
         ];
 
         //create field depending on the type of the value provided
+        // NOTE: change to array_key_exists
         if (isset($defaultFieldTypes[$fieldType])) {
-
             $field = $defaultFieldTypes[$fieldType]($fieldTypeOptions);
             return (!$hintText) ? $field : $field->hint($hintText);
         }
@@ -341,14 +341,14 @@ JS;
                 $this->_addRestoreEvents($customFieldConfig, $attributeId);
 
                 //add dependent input script if available
-                if (false !== $dependentInput) {
-                    $this->_addDependentInputScript($dependentInput, $attributeId, $model, $modelIndex);
-                }
+                $dependentInput && $this->_addDependentInputScript($dependentInput, $attributeId, $model, $modelIndex);
 
-            } else {
-                //default field population
-                $htmlFields .= $this->createDefaultInput($model, $attributeName);
+                //go to next iteration, add after removing the else part of this if statement 
+                continue;
             }
+            
+            //default field population
+            $htmlFields .= $this->createDefaultInput($model, $attributeName);
         }
 
         return $htmlFields;
@@ -624,5 +624,24 @@ JS;
                 return !in_array($item, $disabledFields);
             }
         );
+    }
+
+    protected function addTabularRow($limitRows,$modelIndex,&$htmlFields,$attributes,$index,$model,$isTabularStep,$fieldConfig,$stepHeadings){
+        //limit not exceeded
+        if ($limitRows === self::ROWS_UNLIMITED || $limitRows > $modelIndex) {
+            //start the row constainer
+            $htmlFields .= Html::beginTag('div', ['id' => 'row_' . $modelIndex, 'class' => 'tabular-row']);
+
+            //add the remove icon if edit mode and more than one rows
+            ($modelIndex > 0) && $htmlFields .= Html::tag('i', '', ['class' => 'remove-row formwizard-x-ico', 'data' => ['rowid' => $modelIndex]]);
+
+            //generate the html for the step
+            $htmlFields .= $this->_createTabularStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings);
+
+            //close row div
+            $htmlFields .= Html::endTag('div');
+            return true;
+        } 
+        return false;
     }
 }

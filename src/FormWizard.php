@@ -526,12 +526,12 @@ class FormWizard extends Widget
         //force bootstrap version usage
         if ($this->forceBsVersion) {
             $this->_bsVersion = $this->forceBsVersion;
-        } else {
-            //is bs4 version
-            $isBs4 = class_exists(BS4ActiveForm::class);
-            $this->_bsVersion = !$isBs4 ? self::BS_3 : self::BS_4;
+            return;
         }
 
+        //is bs4 version
+        $isBs4 = class_exists(BS4ActiveForm::class);
+        $this->_bsVersion = !$isBs4 ? self::BS_3 : self::BS_4;
     }
 
     /**
@@ -669,6 +669,7 @@ JS;
         //start Body steps html
         $htmlSteps = Html::beginTag('div');
 
+        //add preview step config if enabled
         if ($this->enablePreview) {
             $steps = array_merge(
                 $steps,
@@ -794,9 +795,7 @@ JS;
         $limitRows = ArrayHelper::getValue($step, 'limitRows', self::ROWS_UNLIMITED);
 
         //check if tabular step
-        if ($isTabularStep) {
-            $this->_checkTabularConstraints($step['model']);
-        }
+        $isTabularStep && $this->_checkTabularConstraints($step['model']);
 
         //step data
         $dataStep = [
@@ -815,6 +814,7 @@ JS;
 
         //Add Row Buton to add fields dynamically
         if ($isTabularStep) {
+
             $html .= Html::button(
                 $this->iconAdd . '&nbsp;Add',
                 [
@@ -823,7 +823,9 @@ JS;
             );
         }
 
+        //check if not preview step and add fields container
         if (!empty($step['model'])) {
+
             //start field container tag <div class="fields_container">
             $html .= Html::beginTag('div', ["class" => "fields_container", 'data' => ['rows-limit' => $limitRows]]);
             //create step fields
@@ -900,25 +902,8 @@ JS;
             $this->sortFields($fieldConfig, $attributes, $step);
 
             //is tabular step
-            if ($isTabularStep) {
-
-                //limit not exceeded
-                if ($limitRows === self::ROWS_UNLIMITED || $limitRows > $modelIndex) {
-                    //start the row constainer
-                    $htmlFields .= Html::beginTag('div', ['id' => 'row_' . $modelIndex, 'class' => 'tabular-row']);
-
-                    //add the remove icon if edit mode and more than one rows
-                    ($modelIndex > 0) && $htmlFields .= Html::tag('i', '', ['class' => 'remove-row formwizard-x-ico', 'data' => ['rowid' => $modelIndex]]);
-                } else {
-                    //terminate the loop for the tabular step if the limit exceeds
-                    break;
-                }
-
-                //generate the html for the step
-                $htmlFields .= $this->_createTabularStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings);
-
-                //close row div
-                $htmlFields .= Html::endTag('div');
+            if ($isTabularStep && !$this->addTabularRow($limitRows,$modelIndex,$htmlFields,$attributes,$index,$model,$isTabularStep,$fieldConfig,$stepHeadings)) {
+                break;
             }
         }
 
@@ -954,7 +939,7 @@ JS;
         list(
             $options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText
         ) = $this->_parseFieldConfig($fieldConfig);
-        
+
         //create field
         $field = $this->createField(
             $model,
