@@ -13,6 +13,7 @@ namespace buttflattery\formwizard;
 
 use Yii;
 use yii\web\View;
+use yii\base\Model;
 use yii\base\Widget;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -721,7 +722,7 @@ JS;
      *
      * @return array
      */
-    public function createStep($index, $step)
+    public function createStep($index, array $step)
     {
         //step title
         $stepTitle = ArrayHelper::getValue($step, 'title', 'Step-' . ($index + 1));
@@ -779,7 +780,7 @@ JS;
      *
      * @return HTML $html
      */
-    public function createBody($index, $formInfoText, $step)
+    public function createBody($index, $formInfoText, array $step)
     {
         $html = '';
 
@@ -850,7 +851,7 @@ JS;
      *
      * @return HTML
      */
-    public function createStepFields($stepIndex, $step, $isTabularStep, $limitRows)
+    public function createStepFields($stepIndex, array $step, $isTabularStep, $limitRows)
     {
 
         $htmlFields = '';
@@ -932,7 +933,7 @@ JS;
      *
      * @return \yii\widgets\ActiveField
      */
-    public function createCustomInput($model, $attribute, $fieldConfig)
+    public function createCustomInput(Model $model, $attribute, array $fieldConfig)
     {
 
         //get the options
@@ -982,12 +983,13 @@ JS;
     /**
      * Registers the necessary AssetBundles for the widget
      *
-     * @param array   $pluginOptions the plugin options initialized for the runtime
-     * @param boolean $isBs3         is bootstrapV3 loaded
+     * @param array   $pluginOptions        the plugin options initialized for the runtime
+     * @param boolean $isBs3                is bootstrapV3 loaded
+     * @param string  $jsOptionsPersistence the json string for the persistence option
      *
      * @return null
      */
-    public function registerScripts($pluginOptions, $isBs3, $jsOptionsPersistence)
+    public function registerScripts(array $pluginOptions, $isBs3, $jsOptionsPersistence)
     {
         //get the container id
         $wizardContainerId = $this->wizardContainerId;
