@@ -4,6 +4,7 @@
  */
 namespace buttflattery\formwizard\traits;
 
+use yii\base\Model;
 use yii\helpers\Html;
 use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
@@ -25,7 +26,7 @@ trait WizardTrait
      *
      * @return null
      */
-    public function sortFields($fieldConfig, &$attributes, $step)
+    public function sortFields(array $fieldConfig, array &$attributes, array $step)
     {
         $defaultOrder = $fieldConfig !== false ? array_keys($fieldConfig) : false;
         $fieldOrder = ArrayHelper::getValue($step, 'fieldOrder', $defaultOrder);
@@ -61,7 +62,7 @@ trait WizardTrait
      * @return null
      * @throws ArgException
      */
-    private function _checkTabularConstraints($models)
+    private function _checkTabularConstraints(array $models)
     {
         $classes = [];
         foreach ($models as $model) {
@@ -80,20 +81,19 @@ trait WizardTrait
      * Adds tabular events for the attribute
      *
      * @param array   $attributeConfig attribute configurations passed
-     * @param boolean $isTabularStep   boolean if current step is tabular
      * @param int     $modelIndex      the index of the current model
      * @param string  $attributeId     the id of the current field
      * @param int     $index           the index of the current step
      *
      * @return null
      */
-    private function _addTabularEvents($attributeConfig, $isTabularStep, $modelIndex, $attributeId, $index)
+    private function _addTabularEvents(array $attributeConfig, $modelIndex, $attributeId, $index)
     {
         //get the tabular events for the field
         $tabularEvents = ArrayHelper::getValue($attributeConfig, 'tabularEvents', false);
 
         //check if tabular step and tabularEvents provided for field
-        if ($isTabularStep && is_array($tabularEvents) && $modelIndex == 0) {
+        if (is_array($tabularEvents) && $modelIndex == 0) {
 
             //id of the form
             $formId = $this->formOptions['id'];
@@ -111,11 +111,11 @@ trait WizardTrait
     /**
      * Binds the tabular events provided by the user
      *
-     * @param string   $eventName     the name of the event to bind
-     * @param callable $eventCallBack the callback event provided by the user
-     * @param string   $formId        the id of the form
-     * @param integer  $index         the current model index
-     * @param string   $attributeId   the attribute id to triger the event for
+     * @param string  $eventName     the name of the event to bind
+     * @param string  $eventCallBack the js callback event provided by the user
+     * @param string  $formId        the id of the form
+     * @param integer $index         the current model index
+     * @param string  $attributeId   the attribute id to triger the event for
      *
      * @return null
      */
@@ -139,7 +139,7 @@ JS;
             },
         ];
         //call the event array literals
-        isset($formEvents[$eventName]) && $formEvents[$eventName]($eventName, $formId, $index, $eventCallBack, $attributeId);
+        array_key_exists($eventName, $formEvents) && $formEvents[$eventName]($eventName, $formId, $index, $eventCallBack, $attributeId);
     }
 
     /**
@@ -150,7 +150,7 @@ JS;
      *
      * @return null
      */
-    private function _addRestoreEvents($attributeConfig, $attributeId)
+    private function _addRestoreEvents(array $attributeConfig, $attributeId)
     {
         $persistenceEvents = ArrayHelper::getValue($attributeConfig, 'persistencEvents', []);
         $formId = $this->formOptions['id'];
@@ -172,7 +172,7 @@ JS;
      *
      * @return yii\widgets\ActiveField;
      */
-    private function _createField($fieldType, $fieldTypeOptions, $hintText = false)
+    private function _createField($fieldType, array $fieldTypeOptions, $hintText = false)
     {
         $defaultFieldTypes = [
             'text' => function ($params) {
@@ -268,8 +268,7 @@ JS;
         ];
 
         //create field depending on the type of the value provided
-        if (isset($defaultFieldTypes[$fieldType])) {
-
+        if (array_key_exists($fieldType, $defaultFieldTypes)) {
             $field = $defaultFieldTypes[$fieldType]($fieldTypeOptions);
             return (!$hintText) ? $field : $field->hint($hintText);
         }
@@ -278,17 +277,16 @@ JS;
     /**
      * Generates Html for the tabular step fields
      *
-     * @param array          $attributes    the attributes to iterate
-     * @param integer        $modelIndex    the index of the current model
-     * @param integer        $index         the index of the current step
-     * @param object         $model         the model object
-     * @param boolean        $isTabularStep if the current step is tabular
-     * @param array          $fieldConfig   customer field confitigurations
-     * @param boolean|string $stepHeadings  the headings for the current step
+     * @param array   $attributes    the attributes to iterate
+     * @param integer $modelIndex    the index of the current model
+     * @param integer $index         the index of the current step
+     * @param object  $model         the model object
+     * @param array   $fieldConfig   customer field confitigurations
+     * @param array   $stepHeadings  the headings for the current step
      *
      * @return mixed
      */
-    private function _createTabularStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings)
+    private function _createTabularStepHtml(array $attributes, $modelIndex, $index, Model $model, array $fieldConfig, array $stepHeadings)
     {
         $htmlFields = '';
 
@@ -335,20 +333,20 @@ JS;
                 $attributeId = Html::getInputId($model, $attributeName);
 
                 //add tabular events
-                $this->_addTabularEvents($customFieldConfig, $isTabularStep, $modelIndex, $attributeId, $index);
+                $this->_addTabularEvents($customFieldConfig, $modelIndex, $attributeId, $index);
 
                 //add the restore events
                 $this->_addRestoreEvents($customFieldConfig, $attributeId);
 
                 //add dependent input script if available
-                if (false !== $dependentInput) {
-                    $this->_addDependentInputScript($dependentInput, $attributeId, $model, $modelIndex);
-                }
+                $dependentInput && $this->_addDependentInputScript($dependentInput, $attributeId, $model, $modelIndex);
 
-            } else {
-                //default field population
-                $htmlFields .= $this->createDefaultInput($model, $attributeName);
+                //go to next iteration, add after removing the else part of this if statement
+                continue;
             }
+
+            //default field population
+            $htmlFields .= $this->createDefaultInput($model, $attributeName);
         }
 
         return $htmlFields;
@@ -364,7 +362,7 @@ JS;
      *
      * @return null
      */
-    private function _addDependentInputScript($dependentInput, $attributeId, $model, $modelIndex)
+    private function _addDependentInputScript(array $dependentInput, $attributeId, Model $model, $modelIndex)
     {
         $dependentAttribute = $dependentInput['attribute'];
         $dependentValue = $model->$dependentAttribute;
@@ -397,10 +395,14 @@ JS;
     }
 
     /**
-     * @param $stepHeadings
-     * @param $attribute
+     * Adds the Heading for the Step
+     *
+     * @param array  $stepHeadings the step headings configurations array
+     * @param string $attribute    the name of the attribute
+     *
+     * @return mixed
      */
-    public function addHeading($stepHeadings, $attribute)
+    public function addHeading(array $stepHeadings, $attribute)
     {
         $headingFields = ArrayHelper::getColumn($stepHeadings, 'before', true);
         if (in_array($attribute, $headingFields)) {
@@ -416,15 +418,13 @@ JS;
     /**
      * Generates Html for normal steps fields
      *
-     * @param array          $attributes    the attributes to iterate
-     * @param integer        $index         the index of the current step
-     * @param boolean        $isTabularStep if the current step is tabular
-     * @param array          $fieldConfig   customer field confitigurations
-     * @param boolean|string $stepHeadings  the headings for the current step
+     * @param array $attributes   the attributes to iterate
+     * @param array $fieldConfig  customer field confitigurations
+     * @param array $stepHeadings the headings for the current step
      *
      * @return mixed
      */
-    private function _createStepHtml($attributes, $fieldConfig, $stepHeadings)
+    private function _createStepHtml(array $attributes, array $fieldConfig, array $stepHeadings)
     {
         $htmlFields = '';
         foreach ($attributes as $row) {
@@ -487,7 +487,7 @@ JS;
      *
      * @return HTML
      */
-    private function _addHeading($headingConfig)
+    private function _addHeading(array $headingConfig)
     {
         $headingText = $headingConfig['text'];
         $headingClass = ArrayHelper::getValue($headingConfig, 'className', 'field-heading');
@@ -503,7 +503,7 @@ JS;
      *
      * @return array
      */
-    private function _parseFieldConfig($fieldConfig)
+    private function _parseFieldConfig(array $fieldConfig)
     {
         //options
         $options = ArrayHelper::getValue($fieldConfig, 'options', []);
@@ -566,9 +566,9 @@ JS;
      * @return \yii\widgets\ActiveField
      */
     public function createField(
-        $model,
+        Model $model,
         $attribute,
-        $fieldOptions = [],
+        array $fieldOptions = [],
         $isMulti = false
     ) {
         return $this->_form->field(
@@ -587,7 +587,7 @@ JS;
      *
      * @return \yii\widgets\ActiveField
      */
-    public function createDefaultInput($model, $attribute)
+    public function createDefaultInput(Model $model, $attribute)
     {
         //create field
         $field = $this->createField($model, $attribute);
@@ -603,7 +603,7 @@ JS;
      *
      * @return array $fields
      */
-    public function getStepFields($model, $onlyFields = [], $disabledFields = [])
+    public function getStepFields(Model $model, array $onlyFields = [], array $disabledFields = [])
     {
         //return $onlyFields list
         if (!empty($onlyFields)) {
@@ -624,5 +624,42 @@ JS;
                 return !in_array($item, $disabledFields);
             }
         );
+    }
+
+    /**
+     * Adds a tabular row in the tabular step
+     *
+     * @param object  $model        the model object
+     * @param integer $modelIndex   the model index for the tabular step model
+     * @param integer $stepIndex    the current step index
+     * @param string  $htmlFields   the html for the fields
+     * @param array   $fieldConfig  the field configurations
+     * @param array   $attributes   the list of the attributes in the current model
+     * @param integer $limitRows    the rows limit if set
+     * @param array   $stepHeadings the stepheadings configurations
+     *
+     * @return boolean
+     */
+    protected function addTabularRow(
+        Model $model, $modelIndex, $stepIndex, &$htmlFields,
+        array $fieldConfig, array $attributes, $limitRows,
+        array $stepHeadings
+    ) {
+        //limit not exceeded
+        if ($limitRows === self::ROWS_UNLIMITED || $limitRows > $modelIndex) {
+            //start the row constainer
+            $htmlFields .= Html::beginTag('div', ['id' => 'row_' . $modelIndex, 'class' => 'tabular-row']);
+
+            //add the remove icon if edit mode and more than one rows
+            ($modelIndex > 0) && $htmlFields .= Html::tag('i', '', ['class' => 'remove-row formwizard-x-ico', 'data' => ['rowid' => $modelIndex]]);
+
+            //generate the html for the step
+            $htmlFields .= $this->_createTabularStepHtml($attributes, $modelIndex, $stepIndex, $model, $fieldConfig, $stepHeadings);
+
+            //close row div
+            $htmlFields .= Html::endTag('div');
+            return true;
+        }
+        return false;
     }
 }
