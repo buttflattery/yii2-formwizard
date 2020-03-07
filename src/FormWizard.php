@@ -500,9 +500,10 @@ class FormWizard extends Widget
         if (!isset($this->formOptions['id'])) {
             $this->formOptions['id'] = $this->getId() . '_form_wizard';
         } else {
-            preg_match('/\b(\w+)\b/', $this->formOptions['id'], $matches);
+            $formId = $this->formOptions['id'];
+            preg_match('/\b(?<valid_form_id>\w+)\b/', $formId, $matches);
 
-            if ($matches[0] !== $this->formOptions['id']) {
+            if ($matches['valid_form_id'] !== $formId) {
                 throw new ArgException(
                     'You must provide the id for the form that matches
                     any word character (equal to [a-zA-Z0-9_])'
