@@ -843,14 +843,14 @@ JS;
     /**
      * Creates the fields for the current step
      *
-     * @param int     $index         index of the current step
+     * @param int     $stepIndex     index of the current step
      * @param array   $step          config for the current step
      * @param boolean $isTabularStep if the current step is tabular or not
      * @param int     $limitRows     the rows limit for the tabular step
      *
      * @return HTML
      */
-    public function createStepFields($index, $step, $isTabularStep, $limitRows)
+    public function createStepFields($stepIndex, $step, $isTabularStep, $limitRows)
     {
 
         $htmlFields = '';
@@ -902,7 +902,7 @@ JS;
             $this->sortFields($fieldConfig, $attributes, $step);
 
             //is tabular step
-            if ($isTabularStep && !$this->addTabularRow($limitRows,$modelIndex,$htmlFields,$attributes,$index,$model,$isTabularStep,$fieldConfig,$stepHeadings)) {
+            if ($isTabularStep && !$this->addTabularRow($model, $modelIndex, $stepIndex, $htmlFields, $fieldConfig, $attributes, $limitRows, $stepHeadings)) {
                 break;
             }
         }
@@ -917,7 +917,7 @@ JS;
         }
 
         //copy the fields to the javascript array for validation
-        $this->_allFields[$index] = $fields;
+        $this->_allFields[$stepIndex] = $fields;
 
         return $htmlFields;
     }

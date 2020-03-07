@@ -80,20 +80,19 @@ trait WizardTrait
      * Adds tabular events for the attribute
      *
      * @param array   $attributeConfig attribute configurations passed
-     * @param boolean $isTabularStep   boolean if current step is tabular
      * @param int     $modelIndex      the index of the current model
      * @param string  $attributeId     the id of the current field
      * @param int     $index           the index of the current step
      *
      * @return null
      */
-    private function _addTabularEvents($attributeConfig, $isTabularStep, $modelIndex, $attributeId, $index)
+    private function _addTabularEvents($attributeConfig, $modelIndex, $attributeId, $index)
     {
         //get the tabular events for the field
         $tabularEvents = ArrayHelper::getValue($attributeConfig, 'tabularEvents', false);
 
         //check if tabular step and tabularEvents provided for field
-        if ($isTabularStep && is_array($tabularEvents) && $modelIndex == 0) {
+        if (is_array($tabularEvents) && $modelIndex == 0) {
 
             //id of the form
             $formId = $this->formOptions['id'];
@@ -139,7 +138,7 @@ JS;
             },
         ];
         //call the event array literals
-        isset($formEvents[$eventName]) && $formEvents[$eventName]($eventName, $formId, $index, $eventCallBack, $attributeId);
+        array_key_exists($eventName, $formEvents) && $formEvents[$eventName]($eventName, $formId, $index, $eventCallBack, $attributeId);
     }
 
     /**
@@ -268,8 +267,7 @@ JS;
         ];
 
         //create field depending on the type of the value provided
-        // NOTE: change to array_key_exists
-        if (isset($defaultFieldTypes[$fieldType])) {
+        if (array_key_exists($fieldType, $defaultFieldTypes)) {
             $field = $defaultFieldTypes[$fieldType]($fieldTypeOptions);
             return (!$hintText) ? $field : $field->hint($hintText);
         }
@@ -288,7 +286,7 @@ JS;
      *
      * @return mixed
      */
-    private function _createTabularStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings)
+    private function _createTabularStepHtml($attributes, $modelIndex, $index, $model, $fieldConfig, $stepHeadings)
     {
         $htmlFields = '';
 
@@ -335,7 +333,7 @@ JS;
                 $attributeId = Html::getInputId($model, $attributeName);
 
                 //add tabular events
-                $this->_addTabularEvents($customFieldConfig, $isTabularStep, $modelIndex, $attributeId, $index);
+                $this->_addTabularEvents($customFieldConfig, $modelIndex, $attributeId, $index);
 
                 //add the restore events
                 $this->_addRestoreEvents($customFieldConfig, $attributeId);
@@ -343,10 +341,10 @@ JS;
                 //add dependent input script if available
                 $dependentInput && $this->_addDependentInputScript($dependentInput, $attributeId, $model, $modelIndex);
 
-                //go to next iteration, add after removing the else part of this if statement 
+                //go to next iteration, add after removing the else part of this if statement
                 continue;
             }
-            
+
             //default field population
             $htmlFields .= $this->createDefaultInput($model, $attributeName);
         }
@@ -626,7 +624,22 @@ JS;
         );
     }
 
-    protected function addTabularRow($limitRows,$modelIndex,&$htmlFields,$attributes,$index,$model,$isTabularStep,$fieldConfig,$stepHeadings){
+    /**
+     * Adds a tabular row in the tabular step
+     *
+     * @param object  $model        the model object
+     * @param integer $modelIndex   the model index for the tabular step model
+     * @param integer $stepIndex    the current step index
+     * @param string  $htmlFields   the html for the fields
+     * @param array   $fieldConfig  the field configurations
+     * @param array   $attributes   the list of the attributes in the current model
+     * @param integer $limitRows    the rows limit if set
+     * @param array   $stepHeadings the stepheadings configurations
+     *
+     * @return boolean
+     */
+    protected function addTabularRow($model, $modelIndex, $stepIndex, &$htmlFields, $fieldConfig, $attributes, $limitRows, $stepHeadings)
+    {
         //limit not exceeded
         if ($limitRows === self::ROWS_UNLIMITED || $limitRows > $modelIndex) {
             //start the row constainer
@@ -636,12 +649,12 @@ JS;
             ($modelIndex > 0) && $htmlFields .= Html::tag('i', '', ['class' => 'remove-row formwizard-x-ico', 'data' => ['rowid' => $modelIndex]]);
 
             //generate the html for the step
-            $htmlFields .= $this->_createTabularStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings);
+            $htmlFields .= $this->_createTabularStepHtml($attributes, $modelIndex, $stepIndex, $model, $fieldConfig, $stepHeadings);
 
             //close row div
             $htmlFields .= Html::endTag('div');
             return true;
-        } 
+        }
         return false;
     }
 }
