@@ -2,10 +2,10 @@
 namespace buttflattery\formwizard\traits;
 
 use yii\base\Model;
+use yii\helpers\Html;
 use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
 use buttflattery\formwizard\FormWizard;
-use yii\helpers\Html;
 
 trait StepTrait
 {
