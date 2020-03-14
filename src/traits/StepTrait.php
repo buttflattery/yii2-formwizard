@@ -15,11 +15,11 @@ trait StepTrait
      * @param array   $dependentInput the dependent input configurations
      * @param string  $attributeId    the id of the input it is applied on
      * @param object  $model          the model object for the dependent input
-     * @param integer $modelIndex     the model index of the current row
+     * @param integer $attributeIndex the attribute index of the current attribute
      *
      * @return null
      */
-    private function _addDependentInputScript(array $dependentInput, $attributeId, Model $model, $modelIndex)
+    private function _addDependentInputScript(array $dependentInput, $attributeId, Model $model, $attributeIndex)
     {
         $dependentAttribute = $dependentInput['attribute'];
         $dependentValue = $model->$dependentAttribute;
@@ -40,13 +40,13 @@ trait StepTrait
 
         $this->_dependentInputScript .= <<<JS
 
-        let thenCallback_{$modelIndex}={$dependentActionThen};
-        let elseCallback_{$modelIndex}={$dependentActionElse};
+        let thenCallback_{$dependentAttribute}_{$attributeIndex}={$dependentActionThen};
+        let elseCallback_{$dependentAttribute}_{$attributeIndex}={$dependentActionElse};
 
         if('{$dependentValue}'$dependentCondition'{$dependentValueRequired}'){
-            thenCallback_{$modelIndex}.call(this,'{$attributeId}');
+            thenCallback_{$dependentAttribute}_{$attributeIndex}.call(this,'{$attributeId}');
         }else{
-            elseCallback_{$modelIndex}.call(this,'{$attributeId}');
+            elseCallback_{$dependentAttribute}_{$attributeIndex}.call(this,'{$attributeId}');
         }
 JS;
     }
