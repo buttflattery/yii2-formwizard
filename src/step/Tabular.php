@@ -16,61 +16,64 @@ class Tabular
 
     use StepTrait;
     /**
-     * The current form obect 
-     * 
+     * The current form obect
+     *
      * @var mixed
      */
     public $form;
 
     /**
      * The models for the tabular step
-     * 
+     *
      * @var mixed
      */
     public $models;
 
     /**
      * Step configuration
-     * 
+     *
      * @var mixed
      */
     public $stepConfig;
 
     /**
      * Step index
-     * 
+     *
      * @var mixed
      */
     public $index;
 
     /**
      * Form options
-     * 
+     *
      * @var mixed
      */
     public $formOptions;
 
     /**
      * Dependent input script
-     * 
+     *
      * @var mixed
      */
     private $_dependentInputScript;
 
     /**
      * Tabular event js
-     * 
+     *
      * @var mixed
      */
     private $_tabularEventJs;
 
     /**
-     * Persistence events script 
-     * 
+     * Persistence events script
+     *
      * @var mixed
      */
     private $_persistenceEvents;
 
+    /**
+     * @return mixed
+     */
     public function getPersistenceEvents()
     {
         return $this->_persistenceEvents;
@@ -78,7 +81,7 @@ class Tabular
 
     /**
      * Returns the tabularEventJs
-     * 
+     *
      * @return mixed
      */
     public function getTabularEventJs()
@@ -88,7 +91,7 @@ class Tabular
 
     /**
      * Sets the Dependent Input script
-     * 
+     *
      * @param string $script the script for the dependent input
      */
     public function setDependentInputScript($script)
@@ -98,7 +101,7 @@ class Tabular
 
     /**
      * Returns the dependent input script
-     * 
+     *
      * @return mixed
      */
     public function getDependentInputScript()
@@ -108,7 +111,7 @@ class Tabular
 
     /**
      * Creates the tabular step
-     * 
+     *
      * @return mixed
      */
     public function create()
@@ -136,7 +139,7 @@ class Tabular
         );
 
         foreach ($this->models as $modelIndex => $model) {
-            
+
             //get safe attributes
             $attributes = $sorter->getStepFields($model, $onlyFields, $disabledFields);
 
