@@ -13,12 +13,12 @@ namespace buttflattery\formwizard;
 
 use Yii;
 use yii\web\View;
-use yii\base\Model;
 use yii\base\Widget;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
+use buttflattery\formwizard\step\Generator;
 use yii\bootstrap\ActiveForm as BS3ActiveForm;
 use buttflattery\formwizard\traits\WizardTrait;
 use yii\bootstrap4\ActiveForm as BS4ActiveForm;
@@ -449,6 +449,13 @@ class FormWizard extends Widget
     const ROWS_UNLIMITED = '-1';
 
     /**
+     * MESSAGE CONSTANT
+     */
+    const MSG_TABULAR_CONSTRAINT = 'You cannot have multiple models in a step when the "type" property is set to "tabular", you must provide only a single model or remove the step "type" property.';
+    const MSG_EMPTY_STEP = 'You must provide steps for the form.';
+    const MSG_INVALID_FORM_ID = 'You must provide the id for the form that matches any word character (equal to [a-zA-Z0-9_])';
+
+    /**
      * THEMES
      * */
     const THEME_DEFAULT = 'default';
@@ -494,7 +501,7 @@ class FormWizard extends Widget
     private function _setDefaults()
     {
         if (empty($this->steps)) {
-            throw new ArgException('You must provide steps for the form.');
+            throw new ArgException(self::MSG_EMPTY_STEP);
         }
 
         //set the form id for the form if not set by the user
@@ -506,8 +513,7 @@ class FormWizard extends Widget
 
             if ($matches['valid_form_id'] !== $formId) {
                 throw new ArgException(
-                    'You must provide the id for the form that matches
-                    any word character (equal to [a-zA-Z0-9_])'
+                    self::MSG_INVALID_FORM_ID
                 );
             }
         }
@@ -845,139 +851,38 @@ JS;
      * Creates the fields for the current step
      *
      * @param int     $stepIndex     index of the current step
-     * @param array   $step          config for the current step
+     * @param array   $stepConfig          config for the current step
      * @param boolean $isTabularStep if the current step is tabular or not
      * @param int     $limitRows     the rows limit for the tabular step
      *
      * @return HTML
      */
-    public function createStepFields($stepIndex, array $step, $isTabularStep, $limitRows)
+    public function createStepFields($stepIndex, array $stepConfig, $isTabularStep, $limitRows)
     {
-
-        $htmlFields = '';
-
-        //field configurations
-        $fieldConfig = ArrayHelper::getValue($step, 'fieldConfig', false);
-
-        //disabled fields
-        $disabledFields = ArrayHelper::getValue($fieldConfig, 'except', []);
-
-        //only fields
-        $onlyFields = ArrayHelper::getValue($fieldConfig, 'only', []);
-
-        //is array of models
-        $isArrayOfModels = is_array($step['model']);
-
-        $models = !$isArrayOfModels ? [$step['model']] : $step['model'];
-
-        //get the step headings
-        $stepHeadings = ArrayHelper::getValue($step, 'stepHeadings', false);
-
-        //current step fields
-        $fields = [];
-        $mappedFields = [];
-
-        //iterate models
-        foreach ($models as $modelIndex => $model) {
-
-            //get safe attributes
-            $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
-
-            //field order
-            foreach ($attributes as $attribute) {
-                $mappedFields[] = ['model' => $model, 'attribute' => $attribute];
-            }
-
-            //add all the field ids to array
-            $fields = array_merge(
-                $fields,
-                array_map(
-                    function ($element) use ($model, $isTabularStep, $modelIndex) {
-                        return Html::getInputId($model, ($isTabularStep) ? "[$modelIndex]" . $element : $element);
-                    },
-                    $attributes
-                )
-            );
-
-            //sort fields
-            $this->sortFields($fieldConfig, $attributes, $step);
-
-            //is tabular step
-            if ($isTabularStep && !$this->addTabularRow($model, $modelIndex, $stepIndex, $htmlFields, $fieldConfig, $attributes, $limitRows, $stepHeadings)) {
-                break;
-            }
-        }
-
-        //create normal step html
-        if (!$isTabularStep) {
-            //sort fields
-            $this->sortFields($fieldConfig, $mappedFields, $step);
-
-            //generate the html for the step
-            $htmlFields = $this->_createStepHtml($mappedFields, $fieldConfig, $stepHeadings);
-        }
-
-        //copy the fields to the javascript array for validation
-        $this->_allFields[$stepIndex] = $fields;
-
-        return $htmlFields;
-    }
-
-    /**
-     * Creates a customized input field according to the
-     * structured option for the steps by user
-     *
-     * @param object $model       instance of the current model
-     * @param string $attribute   name of the current field
-     * @param array  $fieldConfig config for the current field
-     *
-     * @return \yii\widgets\ActiveField
-     */
-    public function createCustomInput(Model $model, $attribute, array $fieldConfig)
-    {
-
-        //get the options
-        list(
-            $options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText
-        ) = $this->_parseFieldConfig($fieldConfig);
-
-        //create field
-        $field = $this->createField(
-            $model,
-            $attribute,
+        //create step generator object
+        $stepGenerator = Yii::createObject(
             [
-                'template' => $template,
-                'options' => $containerOptions,
-                'inputOptions' => $inputOptions,
-            ],
-            $isMultiField
+                'class' => Generator::class,
+                'form' => $this->_form,
+                'formOptions' => $this->formOptions,
+                'stepConfig' => $stepConfig,
+                'stepIndex' => $stepIndex,
+                'isTabular' => $isTabularStep,
+                'limit' => $limitRows,
+            ]
         );
 
-        //widget
-        if ($widget) {
-            $field = $field->widget($widget, $options)->label($label, $labelOptions);
-            return (!$hintText) ? $field : $field->hint($hintText);
-        }
+        //draw the step
+        $response = $stepGenerator->draw();
 
-        //remove the type and itemList from options list
-        if (isset($options['type']) && $options['type'] !== 'number') {
-            unset($options['type']);
-        }
+        //parse response
+        $this->_dependentInputScript .= $response->dependentInputJs;
+        $this->_persistenceEvents .= $response->persistenceJs;
+        $this->_tabularEventJs .= $response->tabularEventsJs;
+        $this->_allFields[$stepIndex] = $response->jsFields;
 
-        //unset the itemsList from the options list
-        unset($options['itemsList']);
-
-        //init the options for the field types
-        $fieldTypeOptions = [
-            'field' => $field,
-            'options' => $options,
-            'labelOptions' => $labelOptions,
-            'label' => $label,
-            'itemsList' => $itemsList,
-        ];
-
-        //create the field
-        return $this->_createField($fieldType, $fieldTypeOptions, $hintText);
+        //return the html
+        return $response->html;
     }
 
     /**
