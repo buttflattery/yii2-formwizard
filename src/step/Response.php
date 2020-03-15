@@ -58,7 +58,7 @@ class Response
         $stepType = ArrayHelper::getValue($stepConfig, 'type', FormWizard::STEP_TYPE_DEFAULT);
 
         //is tabular
-        $isTabularStep = $stepType === FormWizard::STEP_TYPE_TABULAR;
+        $isTabularStep = $this->isTabularStep($stepType);
 
         foreach ($models as $modelIndex => $model) {
 
@@ -77,5 +77,14 @@ class Response
             );
         }
         $this->jsFields = $fields;
+    }
+
+    /**
+     * @param $stepType
+     * @return mixed
+     */
+    public function isTabularStep($stepType)
+    {
+        return $stepType === FormWizard::STEP_TYPE_TABULAR;
     }
 }

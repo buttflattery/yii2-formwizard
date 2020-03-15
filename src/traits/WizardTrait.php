@@ -30,4 +30,48 @@ trait WizardTrait
         }
         return true;
     }
+
+    public function isFormIdSet()
+    {
+        return isset($this->formOptions['id']);
+    }
+
+    public function isEmptySteps()
+    {
+        return empty($this->steps);
+    }
+
+    public function isContainerIdSet()
+    {
+        return isset($this->wizardContainerId);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isThemeMaterial()
+    {
+        return $this->theme == self::THEME_MATERIAL || $this->theme == self::THEME_MATERIAL_V;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isBs3()
+    {
+        return $this->_bsVersion == self::BS_3;
+    }
+
+    /**
+     * @param $stepType
+     * @return mixed
+     */
+    public function isTabularStep($stepType)
+    {
+        return $stepType === self::STEP_TYPE_TABULAR;
+    }
+
+    public function isPreviewStep($step){
+        return empty($step['model']);
+    }
 }
