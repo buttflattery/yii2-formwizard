@@ -500,12 +500,12 @@ class FormWizard extends Widget
      */
     private function _setDefaults()
     {
-        if (empty($this->steps)) {
+        if ($this->isEmptySteps()) {
             throw new ArgException(self::MSG_EMPTY_STEP);
         }
 
         //set the form id for the form if not set by the user
-        if (!isset($this->formOptions['id'])) {
+        if (!$this->isFormIdSet()) {
             $this->formOptions['id'] = $this->getId() . '_form_wizard';
         } else {
             $formId = $this->formOptions['id'];
@@ -519,12 +519,12 @@ class FormWizard extends Widget
         }
 
         //widget container ID
-        if (!isset($this->wizardContainerId)) {
+        if (!$this->isContainerIdSet()) {
             $this->wizardContainerId = $this->getId() . '-form_wizard_container';
         }
 
         //theme buttons material
-        if ($this->theme == self::THEME_MATERIAL || $this->theme == self::THEME_MATERIAL_V) {
+        if ($this->isThemeMaterial()) {
             $this->classNext .= 'waves-effect';
             $this->classPrev .= 'waves-effect';
             $this->classFinish .= 'waves-effect';
@@ -615,30 +615,25 @@ JS;
         //add buttons to the smartwizard plugin toolbar option
         $pluginOptions['toolbarSettings']['toolbarExtraButtons'] = new JsExpression($jsButton);
 
-        //if bootstrap3 loaded
-        $isBs3 = $this->_bsVersion == self::BS_3;
-
         //cerate the form
-        $this->createForm($isBs3);
+        $this->createForm();
 
         //register the assets and rutime script
-        $this->registerScripts($pluginOptions, $isBs3, $jsOptionsPersistence);
+        $this->registerScripts($pluginOptions, $jsOptionsPersistence);
     }
 
     /**
      * Creates the form for the form wizard
      *
-     * @param boolean $isBs3 is bootstrapV3 loaded
-     *
      * @return null
      */
-    public function createForm($isBs3)
+    public function createForm()
     {
         //get the container id
         $wizardContainerId = $this->wizardContainerId;
 
         //load respective bootstrap assets
-        if ($isBs3) {
+        if ($this->isBs3()) {
             $activeForm = BS3ActiveForm::class;
         } else {
             $activeForm = BS4ActiveForm::class;
@@ -796,7 +791,7 @@ JS;
         $isSkipable = ArrayHelper::getValue($step, 'isSkipable', false);
 
         //check if tabular step
-        $isTabularStep = $stepType === self::STEP_TYPE_TABULAR;
+        $isTabularStep = $this->isTabularStep($stepType);
 
         //tabular rows limit
         $limitRows = ArrayHelper::getValue($step, 'limitRows', self::ROWS_UNLIMITED);
@@ -831,7 +826,7 @@ JS;
         }
 
         //check if not preview step and add fields container
-        if (!empty($step['model'])) {
+        if (!$this->isPreviewStep($step)) {
 
             //start field container tag <div class="fields_container">
             $html .= Html::beginTag('div', ["class" => "fields_container", 'data' => ['rows-limit' => $limitRows]]);
@@ -889,12 +884,11 @@ JS;
      * Registers the necessary AssetBundles for the widget
      *
      * @param array   $pluginOptions        the plugin options initialized for the runtime
-     * @param boolean $isBs3                is bootstrapV3 loaded
      * @param string  $jsOptionsPersistence the json string for the persistence option
      *
      * @return null
      */
-    public function registerScripts(array $pluginOptions, $isBs3, $jsOptionsPersistence)
+    public function registerScripts(array $pluginOptions, $jsOptionsPersistence)
     {
         //get the container id
         $wizardContainerId = $this->wizardContainerId;
@@ -906,7 +900,7 @@ JS;
         $themeSelected = $this->theme;
 
         //register plugin assets
-        $isBs3
+        $this->isBs3()
             ?
         Bs3Assets::register($view)
             : Bs4Assets::register($view);

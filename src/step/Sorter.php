@@ -36,7 +36,7 @@ class Sorter
         $onlyFields = ArrayHelper::getValue($fieldConfig, 'only', []);
 
         //iterate models
-        foreach ($this->models as $modelIndex => $model) {
+        foreach ($this->models as $model) {
 
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);

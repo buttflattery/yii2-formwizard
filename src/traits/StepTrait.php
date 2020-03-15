@@ -374,4 +374,16 @@ JS;
 
         return [$options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText];
     }
+
+    /**
+     * Allowed Row limit
+     * 
+     * @param int $modelIndex the model index
+     * 
+     * @return mixed
+     */
+    public function allowedRowLimit($modelIndex)
+    {
+        return $this->limit === FormWizard::ROWS_UNLIMITED || $this->limit > $modelIndex;
+    }
 }

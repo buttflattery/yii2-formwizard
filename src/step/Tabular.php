@@ -177,7 +177,7 @@ class Tabular
     ) {
 
         //limit not exceeded
-        if ($this->limit === FormWizard::ROWS_UNLIMITED || $this->limit > $modelIndex) {
+        if ($this->allowedRowLimit($modelIndex)) {
             //start the row constainer
             $htmlFields .= Html::beginTag('div', ['id' => 'row_' . $modelIndex, 'class' => 'tabular-row']);
 
