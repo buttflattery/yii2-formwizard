@@ -18,6 +18,7 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
+use buttflattery\formwizard\step\Generator;
 use yii\bootstrap\ActiveForm as BS3ActiveForm;
 use buttflattery\formwizard\traits\WizardTrait;
 use yii\bootstrap4\ActiveForm as BS4ActiveForm;
@@ -448,6 +449,13 @@ class FormWizard extends Widget
     const ROWS_UNLIMITED = '-1';
 
     /**
+     * MESSAGE CONSTANT
+     */
+    const MSG_TABULAR_CONSTRAINT = 'You cannot have multiple models in a step when the "type" property is set to "tabular", you must provide only a single model or remove the step "type" property.';
+    const MSG_EMPTY_STEP = 'You must provide steps for the form.';
+    const MSG_INVALID_FORM_ID = 'You must provide the id for the form that matches any word character (equal to [a-zA-Z0-9_])';
+
+    /**
      * THEMES
      * */
     const THEME_DEFAULT = 'default';
@@ -492,31 +500,31 @@ class FormWizard extends Widget
      */
     private function _setDefaults()
     {
-        if (empty($this->steps)) {
-            throw new ArgException('You must provide steps for the form.');
+        if ($this->isEmptySteps()) {
+            throw new ArgException(self::MSG_EMPTY_STEP);
         }
 
         //set the form id for the form if not set by the user
-        if (!isset($this->formOptions['id'])) {
+        if (!$this->isFormIdSet()) {
             $this->formOptions['id'] = $this->getId() . '_form_wizard';
         } else {
-            preg_match('/\b(\w+)\b/', $this->formOptions['id'], $matches);
+            $formId = $this->formOptions['id'];
+            preg_match('/\b(?<valid_form_id>\w+)\b/', $formId, $matches);
 
-            if ($matches[0] !== $this->formOptions['id']) {
+            if ($matches['valid_form_id'] !== $formId) {
                 throw new ArgException(
-                    'You must provide the id for the form that matches
-                    any word character (equal to [a-zA-Z0-9_])'
+                    self::MSG_INVALID_FORM_ID
                 );
             }
         }
 
         //widget container ID
-        if (!isset($this->wizardContainerId)) {
+        if (!$this->isContainerIdSet()) {
             $this->wizardContainerId = $this->getId() . '-form_wizard_container';
         }
 
         //theme buttons material
-        if ($this->theme == self::THEME_MATERIAL || $this->theme == self::THEME_MATERIAL_V) {
+        if ($this->isThemeMaterial()) {
             $this->classNext .= 'waves-effect';
             $this->classPrev .= 'waves-effect';
             $this->classFinish .= 'waves-effect';
@@ -525,12 +533,12 @@ class FormWizard extends Widget
         //force bootstrap version usage
         if ($this->forceBsVersion) {
             $this->_bsVersion = $this->forceBsVersion;
-        } else {
-            //is bs4 version
-            $isBs4 = class_exists(BS4ActiveForm::class);
-            $this->_bsVersion = !$isBs4 ? self::BS_3 : self::BS_4;
+            return;
         }
 
+        //is bs4 version
+        $isBs4 = class_exists(BS4ActiveForm::class);
+        $this->_bsVersion = !$isBs4 ? self::BS_3 : self::BS_4;
     }
 
     /**
@@ -607,30 +615,25 @@ JS;
         //add buttons to the smartwizard plugin toolbar option
         $pluginOptions['toolbarSettings']['toolbarExtraButtons'] = new JsExpression($jsButton);
 
-        //if bootstrap3 loaded
-        $isBs3 = $this->_bsVersion == self::BS_3;
-
         //cerate the form
-        $this->createForm($isBs3);
+        $this->createForm();
 
         //register the assets and rutime script
-        $this->registerScripts($pluginOptions, $isBs3, $jsOptionsPersistence);
+        $this->registerScripts($pluginOptions, $jsOptionsPersistence);
     }
 
     /**
      * Creates the form for the form wizard
      *
-     * @param boolean $isBs3 is bootstrapV3 loaded
-     *
      * @return null
      */
-    public function createForm($isBs3)
+    public function createForm()
     {
         //get the container id
         $wizardContainerId = $this->wizardContainerId;
 
         //load respective bootstrap assets
-        if ($isBs3) {
+        if ($this->isBs3()) {
             $activeForm = BS3ActiveForm::class;
         } else {
             $activeForm = BS4ActiveForm::class;
@@ -668,6 +671,7 @@ JS;
         //start Body steps html
         $htmlSteps = Html::beginTag('div');
 
+        //add preview step config if enabled
         if ($this->enablePreview) {
             $steps = array_merge(
                 $steps,
@@ -719,7 +723,7 @@ JS;
      *
      * @return array
      */
-    public function createStep($index, $step)
+    public function createStep($index, array $step)
     {
         //step title
         $stepTitle = ArrayHelper::getValue($step, 'title', 'Step-' . ($index + 1));
@@ -777,7 +781,7 @@ JS;
      *
      * @return HTML $html
      */
-    public function createBody($index, $formInfoText, $step)
+    public function createBody($index, $formInfoText, array $step)
     {
         $html = '';
 
@@ -787,15 +791,13 @@ JS;
         $isSkipable = ArrayHelper::getValue($step, 'isSkipable', false);
 
         //check if tabular step
-        $isTabularStep = $stepType === self::STEP_TYPE_TABULAR;
+        $isTabularStep = $this->isTabularStep($stepType);
 
         //tabular rows limit
         $limitRows = ArrayHelper::getValue($step, 'limitRows', self::ROWS_UNLIMITED);
 
         //check if tabular step
-        if ($isTabularStep) {
-            $this->_checkTabularConstraints($step['model']);
-        }
+        $isTabularStep && $this->_checkTabularConstraints($step['model']);
 
         //step data
         $dataStep = [
@@ -814,6 +816,7 @@ JS;
 
         //Add Row Buton to add fields dynamically
         if ($isTabularStep) {
+
             $html .= Html::button(
                 $this->iconAdd . '&nbsp;Add',
                 [
@@ -822,7 +825,9 @@ JS;
             );
         }
 
-        if (!empty($step['model'])) {
+        //check if not preview step and add fields container
+        if (!$this->isPreviewStep($step)) {
+
             //start field container tag <div class="fields_container">
             $html .= Html::beginTag('div', ["class" => "fields_container", 'data' => ['rows-limit' => $limitRows]]);
             //create step fields
@@ -840,168 +845,50 @@ JS;
     /**
      * Creates the fields for the current step
      *
-     * @param int     $index         index of the current step
-     * @param array   $step          config for the current step
+     * @param int     $stepIndex     index of the current step
+     * @param array   $stepConfig          config for the current step
      * @param boolean $isTabularStep if the current step is tabular or not
      * @param int     $limitRows     the rows limit for the tabular step
      *
      * @return HTML
      */
-    public function createStepFields($index, $step, $isTabularStep, $limitRows)
+    public function createStepFields($stepIndex, array $stepConfig, $isTabularStep, $limitRows)
     {
-
-        $htmlFields = '';
-
-        //field configurations
-        $fieldConfig = ArrayHelper::getValue($step, 'fieldConfig', false);
-
-        //disabled fields
-        $disabledFields = ArrayHelper::getValue($fieldConfig, 'except', []);
-
-        //only fields
-        $onlyFields = ArrayHelper::getValue($fieldConfig, 'only', []);
-
-        //is array of models
-        $isArrayOfModels = is_array($step['model']);
-
-        $models = !$isArrayOfModels ? [$step['model']] : $step['model'];
-
-        //get the step headings
-        $stepHeadings = ArrayHelper::getValue($step, 'stepHeadings', false);
-
-        //current step fields
-        $fields = [];
-        $mappedFields = [];
-
-        //iterate models
-        foreach ($models as $modelIndex => $model) {
-
-            //get safe attributes
-            $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
-
-            //field order
-            foreach ($attributes as $attribute) {
-                $mappedFields[] = ['model' => $model, 'attribute' => $attribute];
-            }
-
-            //add all the field ids to array
-            $fields = array_merge(
-                $fields,
-                array_map(
-                    function ($element) use ($model, $isTabularStep, $modelIndex) {
-                        return Html::getInputId($model, ($isTabularStep) ? "[$modelIndex]" . $element : $element);
-                    },
-                    $attributes
-                )
-            );
-
-            //sort fields
-            $this->sortFields($fieldConfig, $attributes, $step);
-
-            //is tabular step
-            if ($isTabularStep) {
-
-                //limit not exceeded
-                if ($limitRows === self::ROWS_UNLIMITED || $limitRows > $modelIndex) {
-                    //start the row constainer
-                    $htmlFields .= Html::beginTag('div', ['id' => 'row_' . $modelIndex, 'class' => 'tabular-row']);
-
-                    //add the remove icon if edit mode and more than one rows
-                    ($modelIndex > 0) && $htmlFields .= Html::tag('i', '', ['class' => 'remove-row formwizard-x-ico', 'data' => ['rowid' => $modelIndex]]);
-                } else {
-                    //terminate the loop for the tabular step if the limit exceeds
-                    break;
-                }
-
-                //generate the html for the step
-                $htmlFields .= $this->_createTabularStepHtml($attributes, $modelIndex, $index, $model, $isTabularStep, $fieldConfig, $stepHeadings);
-
-                //close row div
-                $htmlFields .= Html::endTag('div');
-            }
-        }
-
-        //create normal step html
-        if (!$isTabularStep) {
-            //sort fields
-            $this->sortFields($fieldConfig, $mappedFields, $step);
-
-            //generate the html for the step
-            $htmlFields = $this->_createStepHtml($mappedFields, $fieldConfig, $stepHeadings);
-        }
-
-        //copy the fields to the javascript array for validation
-        $this->_allFields[$index] = $fields;
-
-        return $htmlFields;
-    }
-
-    /**
-     * Creates a customized input field according to the
-     * structured option for the steps by user
-     *
-     * @param object $model       instance of the current model
-     * @param string $attribute   name of the current field
-     * @param array  $fieldConfig config for the current field
-     *
-     * @return \yii\widgets\ActiveField
-     */
-    public function createCustomInput($model, $attribute, $fieldConfig)
-    {
-
-        //get the options
-        list(
-            $options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText
-        ) = $this->_parseFieldConfig($fieldConfig);
-        
-        //create field
-        $field = $this->createField(
-            $model,
-            $attribute,
+        //create step generator object
+        $stepGenerator = Yii::createObject(
             [
-                'template' => $template,
-                'options' => $containerOptions,
-                'inputOptions' => $inputOptions,
-            ],
-            $isMultiField
+                'class' => Generator::class,
+                'form' => $this->_form,
+                'formOptions' => $this->formOptions,
+                'stepConfig' => $stepConfig,
+                'stepIndex' => $stepIndex,
+                'isTabular' => $isTabularStep,
+                'limit' => $limitRows,
+            ]
         );
 
-        //widget
-        if ($widget) {
-            $field = $field->widget($widget, $options)->label($label, $labelOptions);
-            return (!$hintText) ? $field : $field->hint($hintText);
-        }
+        //draw the step
+        $response = $stepGenerator->draw();
 
-        //remove the type and itemList from options list
-        if (isset($options['type']) && $options['type'] !== 'number') {
-            unset($options['type']);
-        }
+        //parse response
+        $this->_dependentInputScript .= $response->dependentInputJs;
+        $this->_persistenceEvents .= $response->persistenceJs;
+        $this->_tabularEventJs .= $response->tabularEventsJs;
+        $this->_allFields[$stepIndex] = $response->jsFields;
 
-        //unset the itemsList from the options list
-        unset($options['itemsList']);
-
-        //init the options for the field types
-        $fieldTypeOptions = [
-            'field' => $field,
-            'options' => $options,
-            'labelOptions' => $labelOptions,
-            'label' => $label,
-            'itemsList' => $itemsList,
-        ];
-
-        //create the field
-        return $this->_createField($fieldType, $fieldTypeOptions, $hintText);
+        //return the html
+        return $response->html;
     }
 
     /**
      * Registers the necessary AssetBundles for the widget
      *
-     * @param array   $pluginOptions the plugin options initialized for the runtime
-     * @param boolean $isBs3         is bootstrapV3 loaded
+     * @param array   $pluginOptions        the plugin options initialized for the runtime
+     * @param string  $jsOptionsPersistence the json string for the persistence option
      *
      * @return null
      */
-    public function registerScripts($pluginOptions, $isBs3, $jsOptionsPersistence)
+    public function registerScripts(array $pluginOptions, $jsOptionsPersistence)
     {
         //get the container id
         $wizardContainerId = $this->wizardContainerId;
@@ -1013,7 +900,7 @@ JS;
         $themeSelected = $this->theme;
 
         //register plugin assets
-        $isBs3
+        $this->isBs3()
             ?
         Bs3Assets::register($view)
             : Bs4Assets::register($view);
