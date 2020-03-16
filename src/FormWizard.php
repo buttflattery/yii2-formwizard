@@ -265,6 +265,21 @@ class FormWizard extends Widget
     public $previewEmptyText = 'NA';
 
     /**
+     * @var mixed
+     */
+    public $previewTitle = self::PREVIEW_TITLE;
+
+    /**
+     * @var mixed
+     */
+    public $previewDescription = self::PREVIEW_DESCRIPTION;
+
+    /**
+     * @var mixed
+     */
+    public $previewFormInfoText = self::PREVIEW_FORM_INFO_TEXT;
+
+    /**
      * Enables restoring of the data for the unsaved form
      *
      * @var boolean
@@ -678,9 +693,9 @@ JS;
                 [
                     [
                         'type' => self::STEP_TYPE_PREVIEW,
-                        'title' => self::PREVIEW_TITLE,
-                        'description' => self::PREVIEW_DESCRIPTION,
-                        'formInfoText' => self::PREVIEW_FORM_INFO_TEXT,
+                        'title' => $this->previewTitle,
+                        'description' => $this->previewDescription,
+                        'formInfoText' => $this->previewFormInfoText,
                     ],
                 ]
             );
