@@ -202,13 +202,16 @@ $.formwizard = {
                     stepFields.forEach(function (fieldName, index) {
                         let inputLabel = $.formwizard.previewStep.getLabel(fieldName);
                         let inputValue = $.formwizard.previewStep.getValue(formId, fieldName);
+
                         let stepData = {
                             "label": inputLabel == '' ? $.formwizard.previewEmptyText : inputLabel,
                             "value": inputValue == '' ? $.formwizard.previewEmptyText : inputValue,
                             "target": fieldName
                         };
 
-                        rowHtml += $.formwizard.previewStep.getTemplate(stepData, bsVersion, formwizardOptions[formId]);
+                        if ($('#' + formId + ' #' + fieldName).attr("type") !== 'hidden') {
+                            rowHtml += $.formwizard.previewStep.getTemplate(stepData, bsVersion, formwizardOptions[formId]);
+                        }
 
                         //if tabular step then add divider after every model 
                         if (stepType == 'tabular') {
@@ -271,24 +274,31 @@ $.formwizard = {
                 },
                 checkbox: function () {
                     return inputType.is(":checked") ? inputType.val() : '';
+                },
+                file: function () {
+                    return inputType.get(0).files.length+' files';
                 }
             };
-            
+
             if (inputType.is("select")) {
-                inputPackage.select();
+                return inputPackage.select();
             }
 
             if (inputType.is('div') && inputType.attr('role') == 'radiogroup') {
-                inputPackage.radiogroup();
+                return inputPackage.radiogroup();
             }
 
             if (inputType.is('div')) {
-                inputPackage.checkboxgroup();
+                return inputPackage.checkboxgroup();
             }
 
             //check if single checkbox input
             if (inputType.attr("type") == 'checkbox') {
-                inputPackage.checkbox();
+                return inputPackage.checkbox();
+            }
+
+            if (inputType.attr("type") == "file") {
+                return inputPackage.file();
             }
 
             // <textarea> <input> element.
