@@ -142,7 +142,7 @@ class Tabular
 
             //get safe attributes
             $attributes = $sorter->getStepFields($model, $onlyFields, $disabledFields);
-
+        
             //sort fields
             $sorter->sortFields($attributes);
 
