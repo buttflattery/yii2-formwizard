@@ -14,11 +14,11 @@ class Sorter
     /**
      * @var mixed
      */
-    public $stepConfig;
+    public $stepConfig = false;
 
     /**
      * Sorts the attributes of the models
-     * 
+     *
      * @return mixed
      */
     public function sort()
@@ -46,10 +46,10 @@ class Sorter
                 $mappedFields[] = ['model' => $model, 'attribute' => $attribute];
             }
         }
-
-        return $mappedFields;
+        
+        return $this->sortFields($mappedFields);
     }
-    
+
     /**
      * Sorts the fields. If the `fieldOrder` option is specified then the
      * order will be dependend on the order specified in the `fieldOrder`
@@ -68,14 +68,17 @@ class Sorter
         $fieldConfig = ArrayHelper::getValue($this->stepConfig, 'fieldConfig', false);
 
         $defaultOrder = $fieldConfig !== false ? array_keys($fieldConfig) : false;
+
         $fieldOrder = ArrayHelper::getValue($this->stepConfig, 'fieldOrder', $defaultOrder);
 
         if ($fieldOrder) {
+
             $orderedAttributes = [];
             $unorderedAttributes = [];
 
             foreach ($attributes as $item) {
                 $attribute = isset($item['attribute']) ? $item['attribute'] : $item;
+                
                 $moveToIndex = array_search($attribute, $fieldOrder);
 
                 if ($moveToIndex !== false) {
@@ -91,6 +94,7 @@ class Sorter
             //merge array with unordered attributes
             $attributes = array_merge($orderedAttributes, $unorderedAttributes);
         }
+        return $attributes;
     }
 
     /**
