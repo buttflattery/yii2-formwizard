@@ -142,7 +142,7 @@ class Tabular
 
             //get safe attributes
             $attributes = $sorter->getStepFields($model, $onlyFields, $disabledFields);
-        
+
             //sort fields
             $sorter->sortFields($attributes);
 
@@ -259,7 +259,7 @@ class Tabular
                 $this->_addRestoreEvents($customFieldConfig, $attributeId);
 
                 //add dependent input script if available
-                $dependentInput && $this->_addDependentInputScript($dependentInput, $attributeId, $model, $attributeIndex);
+                $dependentInput && $this->_addDependentInputScript($dependentInput, $attributeId, $model, $attributeIndex, $modelIndex);
 
                 //go to next iteration, add after removing the else part of this if statement
                 continue;
