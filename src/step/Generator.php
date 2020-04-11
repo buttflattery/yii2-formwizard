@@ -78,6 +78,7 @@ class Generator
                 'stepConfig' => $this->stepConfig,
                 'limit' => $this->limit,
                 'form' => $this->form,
+                'index' => $this->stepIndex,
                 'formOptions' => $this->formOptions,
             ]
         );
