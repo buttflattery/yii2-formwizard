@@ -1,4 +1,4 @@
-# Yii2-FormWizard (v1.6.4)
+# Yii2-FormWizard (v1.7.2)
 
 ## What is this repository for?
 
@@ -62,7 +62,7 @@ or add into the `composer.json` file under `require` section
 - [Enable Preview Step](https://yii2plugins.omaraslam.com/formwizard/preview-step)
 - [Enable Form Persistence](https://yii2plugins.omaraslam.com/formwizard/form-persistence)
 - [Enable Skip Step](https://yii2plugins.omaraslam.com/formwizard/skip-step)
-- [Enable Edit Step](https://yii2plugins.omaraslam.com/formwizard/edit-step)
+- [Enable Edit Step](https://yii2plugins.omaraslam.com/formwizard/edit-mode)
 - [Group Step Fields](https://yii2plugins.omaraslam.com/formwizard/group-fields)
 
 - Themes
@@ -147,6 +147,10 @@ Adds a Preview Step as the last step in the form wizard where you can preview al
 
 When using `'enablePreview'=>true` you can customize the classes using the below options.
 
+- `previewTitle (string)` : Preview step Title, default is `Final Preview`.
+- `previewDescription (string)` : Description for the preview step, default is `Final Preview of all Steps`.
+- `previewFormInfoText (string)` : Preview step form description, default is `Review information below and click to change`.
+- `previewEmptyText (string)` : Text used for showing the value for the empty inputs, default is `NA`.
 - `classListGroup (string)` : Css class for the list group defaults to `'list-group'`.
 - `classListGroupHeading (string)` : Css class for the list group heading element, defaults to `'list-group-heading'`.
 - `classListGroupItem (string)` : Css class for the list group item, defaults to `'list-group-item-success'`.
@@ -239,7 +243,7 @@ An array of the steps(`array`), the steps can have models dedicated to each step
 
 - `only (array)` : list of the fields that should be populated for the step, only the fields specified in the list will be available and all other fields will be ignored.
 
-  Apart from the above options the `fieldConfig` recognizes some special options specific to every field separately when customizing a field, for example
+- Apart from the above options the `fieldConfig` recognizes some special options specific to every field separately when customizing a field, for example
 
   ```php
   'fieldConfig'=>[
