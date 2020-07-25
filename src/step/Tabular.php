@@ -180,9 +180,9 @@ class Tabular
         if ($this->allowedRowLimit($modelIndex)) {
             //start the row constainer
             $htmlFields .= Html::beginTag('div', ['id' => 'row_' . $modelIndex, 'class' => 'tabular-row']);
-
+            
             //add the remove icon if edit mode and more than one rows
-            ($modelIndex > 0) && $htmlFields .= Html::tag('i', '', ['class' => 'remove-row formwizard-x-ico', 'data' => ['rowid' => $modelIndex]]);
+            (!$model->isNewRecord) && $htmlFields .= Html::tag('i', '', ['class' => 'remove-row formwizard-x-ico', 'data' => ['rowid' => $modelIndex]]);
 
             //generate the html for the step
             $htmlFields .= $this->_createTabularStepHtml($attributes, $modelIndex, $model, $fieldConfig, $stepHeadings);

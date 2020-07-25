@@ -37,6 +37,9 @@ $.formwizard = {
                 }
             );
         },
+        clearField: (element) => {
+            $(element).val('');
+        },
         addField: (formId, element, currentStep) => {
             $.formwizard.fields[formId][currentStep].push(element.id);
         },
@@ -276,7 +279,7 @@ $.formwizard = {
                     return inputType.is(":checked") ? inputType.val() : '';
                 },
                 file: function () {
-                    return inputType.get(0).files.length+' files';
+                    return inputType.get(0).files.length + ' files';
                 }
             };
 
@@ -643,13 +646,12 @@ $.formwizard = {
                     }
                 });
 
-            //add the remove button
-            let removeIcon = document.createElement("i");
-            removeIcon.className = "remove-row formwizard-x-ico";
-            removeIcon.dataset.rowid = currentIndex;
-
-            rowClone.insertBefore(removeIcon, rowClone.firstChild);
+            //insert row content
             $(currentContainer)[0].appendChild(documentFragment);
+
+            //update the remove button
+            let removeIcon = document.querySelector("#row_" + currentIndex + " i.remove-row");
+            removeIcon.dataset.rowid = currentIndex;
 
             //trigger the afterInsert event 
             eventTrigger("formwizard.afterInsert", "#" + formId + " #step-" + currentStep + " #row_" + currentIndex, {
@@ -658,7 +660,14 @@ $.formwizard = {
         },
         removeRow: rowid => {
             let rowContainer = $("#row_" + rowid);
+            let isLastRow = rowContainer.closest('.fields_container').find('.tabular-row').length == 1;
+
             rowContainer.find("textarea,input,select").each(function (index, element) {
+
+                if (isLastRow) {
+                    //clear the fields list if last row in tabular step
+                    return $.formwizard.helper.clearField(element);
+                }
 
                 //remove from the fromwizard field list
                 $.formwizard.helper.removeField(element);
@@ -667,7 +676,7 @@ $.formwizard = {
                 $.formwizard.formValidation.removeField(element);
             });
 
-            rowContainer.remove();
+            !isLastRow && rowContainer.remove();
         },
         setFieldDefaults: (element, formId, oldFieldId) => {
             // get then name only for the tabular input
