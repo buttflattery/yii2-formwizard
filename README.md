@@ -109,6 +109,10 @@ Previous button label, default value `Previous`.
 
 Finish button label, default value `Finish`.
 
+#### `labelAddRow (string)`
+
+Add button label for tabular step, default value `Add`.
+
 #### `classNext (string)`
 
 Css classes for the button Next, default `btn btn-info`.
