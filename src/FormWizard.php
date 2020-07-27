@@ -315,6 +315,13 @@ class FormWizard extends Widget
     public $labelRestore = 'Restore';
 
     /**
+     * The label for the Add Row button in tabular step
+     *
+     * @var string
+     */
+    public $labelAddRow = 'Add';
+
+    /**
      * The icon for the Next button you want to be shown inside the button.
      * Default is `<i class="formwizard-arrow-right-alt1-ico"></i>`.
      *
@@ -833,7 +840,7 @@ JS;
         if ($isTabularStep) {
 
             $html .= Html::button(
-                $this->iconAdd . '&nbsp;Add',
+                $this->iconAdd . '&nbsp;' . $this->labelAddRow,
                 [
                     'class' => $this->classAdd . (($this->_bsVersion == self::BS_3) ? ' pull-right add_row' : ' float-right add_row'),
                 ]
