@@ -167,18 +167,21 @@ JS;
 
         //get the options
         list(
-            $options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText
+            $options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText, $activeFieldOptions
         ) = $this->_parseFieldConfig($fieldConfig);
 
         //create field
         $field = $this->createField(
             $model,
             $attribute,
-            [
-                'template' => $template,
-                'options' => $containerOptions,
-                'inputOptions' => $inputOptions,
-            ],
+            array_merge(
+                $activeFieldOptions,
+                [
+                    'template' => $template,
+                    'options' => $containerOptions,
+                    'inputOptions' => $inputOptions,
+                ]
+            ),
             $isMultiField
         );
 
@@ -327,43 +330,43 @@ JS;
      *
      * @return array
      */
-    private function _parseFieldConfig(array $fieldConfig)
+    protected function _parseFieldConfig(array $fieldConfig)
     {
         //options
         $options = ArrayHelper::getValue($fieldConfig, 'options', []);
-
+        unset($fieldConfig['label']);
         //is multi field name
         $isMultiField = Arrayhelper::getValue($fieldConfig, 'multifield', false);
-
+        unset($fieldConfig['multifield']);
         //field type
         $fieldType = ArrayHelper::getValue($options, 'type', 'text');
-
+        unset($fieldConfig['options']);
         //widget
         $widget = ArrayHelper::getValue($fieldConfig, 'widget', false);
-
+        unset($fieldConfig['widget']);
         //label configuration
         $labelConfig = ArrayHelper::getValue($fieldConfig, 'labelOptions', null);
-
+        unset($fieldConfig['labelOptions']);
         //template
         $template = ArrayHelper::getValue(
             $fieldConfig,
             'template',
             "{label}\n{input}\n{hint}\n{error}"
         );
-
+        unset($fieldConfig['template']);
         //container
         $containerOptions = ArrayHelper::getValue(
             $fieldConfig,
             'containerOptions',
             []
         );
-
+        unset($fieldConfig['containerOptions']);
         //inputOptions
         $inputOptions = ArrayHelper::getValue($fieldConfig, 'inputOptions', []);
-
+        unset($fieldConfig['inputOptions']);
         //items list
         $itemsList = ArrayHelper::getValue($options, 'itemsList', '');
-
+        unset($fieldConfig['itemsList']);
         //label text
         $label = ArrayHelper::getValue($labelConfig, 'label', null);
 
@@ -372,8 +375,9 @@ JS;
 
         //get the hint text for the field
         $hintText = ArrayHelper::getValue($fieldConfig, 'hint', false);
+        unset($fieldConfig['hint']);
 
-        return [$options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText];
+        return [$options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText, $fieldConfig];
     }
 
     /**
