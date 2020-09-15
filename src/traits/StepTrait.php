@@ -10,49 +10,6 @@ use buttflattery\formwizard\FormWizard;
 trait StepTrait
 {
     /**
-     * Adds the dependent input script for the inputs
-     *
-     * @param array   $dependentInput the dependent input configurations
-     * @param string  $attributeId    the id of the input it is applied on
-     * @param object  $model          the model object for the dependent input
-     * @param integer $attributeIndex the attribute index of the current attribute
-     * @param integer $modelIndex     the model index of the current attribute, used for tabular step
-     *
-     * @return null
-     */
-    private function _addDependentInputScript(array $dependentInput, $attributeId, Model $model, $attributeIndex, $modelIndex = 0)
-    {
-        $dependentAttribute = $dependentInput['attribute'];
-        $dependentValue = $model->$dependentAttribute;
-        $dependentValueRequired = $dependentInput['when'];
-        $dependentCondition = ArrayHelper::getValue($dependentInput, 'condition', '==');
-
-        $dependentActionThen = ArrayHelper::getValue(
-            $dependentInput,
-            'then',
-            "function(){\$('#{$attributeId}').show();}"
-        );
-
-        $dependentActionElse = ArrayHelper::getValue(
-            $dependentInput,
-            'else',
-            "function(){\$('#{$attributeId}').hide();}"
-        );
-
-        $this->_dependentInputScript .= <<<JS
-
-        let thenCallback_{$dependentAttribute}_{$modelIndex}_{$attributeIndex}={$dependentActionThen};
-        let elseCallback_{$dependentAttribute}_{$modelIndex}_{$attributeIndex}={$dependentActionElse};
-
-        if('{$dependentValue}'$dependentCondition'{$dependentValueRequired}'){
-            thenCallback_{$dependentAttribute}_{$modelIndex}_{$attributeIndex}.call(this,'{$attributeId}');
-        }else{
-            elseCallback_{$dependentAttribute}_{$modelIndex}_{$attributeIndex}.call(this,'{$attributeId}');
-        }
-JS;
-    }
-
-    /**
      * Adds the Heading for the Step
      *
      * @param string $attribute    the name of the attribute
@@ -74,40 +31,75 @@ JS;
     }
 
     /**
-     * Adds heading before the desired field
+     * Allowed Row limit
      *
-     * @param array $headingConfig the configuration array
+     * @param int $modelIndex the model index
      *
-     * @return HTML
+     * @return mixed
      */
-    private function _addHeading(array $headingConfig)
+    public function allowedRowLimit($modelIndex)
     {
-        $headingText = $headingConfig['text'];
-        $headingClass = ArrayHelper::getValue($headingConfig, 'className', 'field-heading');
-        $headingIcon = ArrayHelper::getValue($headingConfig, 'icon', FormWizard::ICON_HEADING);
-
-        return Html::tag('h3', $headingIcon . Html::encode($headingText), ['class' => $headingClass]);
+        return $this->limit === FormWizard::ROWS_UNLIMITED || $this->limit > $modelIndex;
     }
 
     /**
-     * Adds the restore events for the fields
+     * Creates a customized input field according to the
+     * structured option for the steps by user
      *
-     * @param array  $attributeConfig the configurations for the attribute
-     * @param string $attributeId     the field attribute id
+     * @param object $model       instance of the current model
+     * @param string $attribute   name of the current field
+     * @param array  $fieldConfig config for the current field
      *
-     * @return null
+     * @return \yii\widgets\ActiveField
      */
-    private function _addRestoreEvents(array $attributeConfig, $attributeId)
+    public function createCustomInput(Model $model, $attribute, array $fieldConfig)
     {
-        $persistenceEvents = ArrayHelper::getValue($attributeConfig, 'persistencEvents', []);
-        $formId = $this->formOptions['id'];
 
-        foreach ($persistenceEvents as $eventName => $callback) {
-            $eventCallBack = new JsExpression($callback);
-            $this->_persistenceEvents .= <<<JS
-            $(document).on("formwizard.{$formId}.{$eventName}","#{$formId} #{$attributeId}",{$eventCallBack});
-JS;
+        //get the options
+        list(
+            $options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText, $activeFieldOptions
+        ) = $this->_parseFieldConfig($fieldConfig);
+        
+        //create field
+        $field = $this->createField(
+            $model,
+            $attribute,
+            array_merge(
+                $activeFieldOptions,
+                [
+                    'template' => $template,
+                    'options' => $containerOptions,
+                    'inputOptions' => $inputOptions,
+                ]
+            ),
+            $isMultiField
+        );
+
+        //widget
+        if ($widget) {
+            $field = $field->widget($widget, $options)->label($label, $labelOptions);
+            return (!$hintText) ? $field : $field->hint($hintText);
         }
+
+        //remove the type and itemList from options list
+        if (isset($options['type']) && $options['type'] !== 'number') {
+            unset($options['type']);
+        }
+
+        //unset the itemsList from the options list
+        unset($options['itemsList']);
+
+        //init the options for the field types
+        $fieldTypeOptions = [
+            'field' => $field,
+            'options' => $options,
+            'labelOptions' => $labelOptions,
+            'label' => $label,
+            'itemsList' => $itemsList,
+        ];
+
+        //create the field
+        return $this->_createField($fieldType, $fieldTypeOptions, $hintText);
     }
 
     /**
@@ -153,63 +145,141 @@ JS;
     }
 
     /**
-     * Creates a customized input field according to the
-     * structured option for the steps by user
+     * Parse the configurations for the field
      *
-     * @param object $model       instance of the current model
-     * @param string $attribute   name of the current field
-     * @param array  $fieldConfig config for the current field
+     * @param array $fieldConfig the configurations array passed by the user
      *
-     * @return \yii\widgets\ActiveField
+     * @return array
      */
-    public function createCustomInput(Model $model, $attribute, array $fieldConfig)
+    protected function _parseFieldConfig(array $fieldConfig)
     {
+        //options
+        $options = ArrayHelper::getValue($fieldConfig, 'options', []);
 
-        //get the options
-        list(
-            $options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText, $activeFieldOptions
-        ) = $this->_parseFieldConfig($fieldConfig);
+        //is multi field name
+        $isMultiField = Arrayhelper::getValue($fieldConfig, 'multifield', false);
 
-        //create field
-        $field = $this->createField(
-            $model,
-            $attribute,
-            array_merge(
-                $activeFieldOptions,
-                [
-                    'template' => $template,
-                    'options' => $containerOptions,
-                    'inputOptions' => $inputOptions,
-                ]
-            ),
-            $isMultiField
-        );
+        //field type
+        $fieldType = ArrayHelper::getValue($options, 'type', 'text');
 
         //widget
-        if ($widget) {
-            $field = $field->widget($widget, $options)->label($label, $labelOptions);
-            return (!$hintText) ? $field : $field->hint($hintText);
+        $widget = ArrayHelper::getValue($fieldConfig, 'widget', false);
+
+        //label configuration
+        $labelConfig = ArrayHelper::getValue($fieldConfig, 'labelOptions', null);
+
+        //template
+        $template = ArrayHelper::getValue(
+            $fieldConfig,
+            'template',
+            "{label}\n{input}\n{hint}\n{error}"
+        );
+
+        //container
+        $containerOptions = ArrayHelper::getValue(
+            $fieldConfig,
+            'containerOptions',
+            []
+        );
+
+        //inputOptions
+        $inputOptions = ArrayHelper::getValue($fieldConfig, 'inputOptions', []);
+
+        //items list
+        $itemsList = ArrayHelper::getValue($options, 'itemsList', '');
+
+        //label text
+        $label = ArrayHelper::getValue($labelConfig, 'label', null);
+
+        //label options
+        $labelOptions = ArrayHelper::getValue($labelConfig, 'options', []);
+
+        //get the hint text for the field
+        $hintText = ArrayHelper::getValue($fieldConfig, 'hint', false);
+
+        $this->_removeWidgetOptions($fieldConfig);
+
+        return [$options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText, $fieldConfig];
+    }
+
+    /**
+     * Adds the dependent input script for the inputs
+     *
+     * @param array   $dependentInput the dependent input configurations
+     * @param string  $attributeId    the id of the input it is applied on
+     * @param object  $model          the model object for the dependent input
+     * @param integer $attributeIndex the attribute index of the current attribute
+     * @param integer $modelIndex     the model index of the current attribute, used for tabular step
+     *
+     * @return null
+     */
+    private function _addDependentInputScript(array $dependentInput, $attributeId, Model $model, $attributeIndex, $modelIndex = 0)
+    {
+        $dependentAttribute = $dependentInput['attribute'];
+        $dependentValue = $model->$dependentAttribute;
+        $dependentValueRequired = $dependentInput['when'];
+        $dependentCondition = ArrayHelper::getValue($dependentInput, 'condition', '==');
+
+        $dependentActionThen = ArrayHelper::getValue(
+            $dependentInput,
+            'then',
+            "function(){\$('#{$attributeId}').show();}"
+        );
+
+        $dependentActionElse = ArrayHelper::getValue(
+            $dependentInput,
+            'else',
+            "function(){\$('#{$attributeId}').hide();}"
+        );
+
+        $this->_dependentInputScript .= <<<JS
+
+        let thenCallback_{$dependentAttribute}_{$modelIndex}_{$attributeIndex}={$dependentActionThen};
+        let elseCallback_{$dependentAttribute}_{$modelIndex}_{$attributeIndex}={$dependentActionElse};
+
+        if('{$dependentValue}'$dependentCondition'{$dependentValueRequired}'){
+            thenCallback_{$dependentAttribute}_{$modelIndex}_{$attributeIndex}.call(this,'{$attributeId}');
+        }else{
+            elseCallback_{$dependentAttribute}_{$modelIndex}_{$attributeIndex}.call(this,'{$attributeId}');
         }
+JS;
+    }
 
-        //remove the type and itemList from options list
-        if (isset($options['type']) && $options['type'] !== 'number') {
-            unset($options['type']);
+    /**
+     * Adds heading before the desired field
+     *
+     * @param array $headingConfig the configuration array
+     *
+     * @return HTML
+     */
+    private function _addHeading(array $headingConfig)
+    {
+        $headingText = $headingConfig['text'];
+        $headingClass = ArrayHelper::getValue($headingConfig, 'className', 'field-heading');
+        $headingIcon = ArrayHelper::getValue($headingConfig, 'icon', FormWizard::ICON_HEADING);
+
+        return Html::tag('h3', $headingIcon . Html::encode($headingText), ['class' => $headingClass]);
+    }
+
+    /**
+     * Adds the restore events for the fields
+     *
+     * @param array  $attributeConfig the configurations for the attribute
+     * @param string $attributeId     the field attribute id
+     *
+     * @return null
+     */
+    private function _addRestoreEvents(array $attributeConfig, $attributeId)
+    {
+        $persistenceEvents = ArrayHelper::getValue($attributeConfig, 'persistencEvents', []);
+        $formId = $this->formOptions['id'];
+
+        foreach ($persistenceEvents as $eventName => $callback) {
+            $eventCallBack = new JsExpression($callback);
+            $this->_persistenceEvents .= <<<JS
+            $(document).on("formwizard.{$formId}.{$eventName}","#{$formId} #{$attributeId}",{$eventCallBack});
+JS;
         }
-
-        //unset the itemsList from the options list
-        unset($options['itemsList']);
-
-        //init the options for the field types
-        $fieldTypeOptions = [
-            'field' => $field,
-            'options' => $options,
-            'labelOptions' => $labelOptions,
-            'label' => $label,
-            'itemsList' => $itemsList,
-        ];
-
-        //create the field
-        return $this->_createField($fieldType, $fieldTypeOptions, $hintText);
     }
 
     /**
@@ -324,71 +394,33 @@ JS;
     }
 
     /**
-     * Parse the configurations for the field
-     *
-     * @param array $fieldConfig the configurations array passed by the user
-     *
-     * @return array
-     */
-    protected function _parseFieldConfig(array $fieldConfig)
-    {
-        //options
-        $options = ArrayHelper::getValue($fieldConfig, 'options', []);
-        unset($fieldConfig['label']);
-        //is multi field name
-        $isMultiField = Arrayhelper::getValue($fieldConfig, 'multifield', false);
-        unset($fieldConfig['multifield']);
-        //field type
-        $fieldType = ArrayHelper::getValue($options, 'type', 'text');
-        unset($fieldConfig['options']);
-        //widget
-        $widget = ArrayHelper::getValue($fieldConfig, 'widget', false);
-        unset($fieldConfig['widget']);
-        //label configuration
-        $labelConfig = ArrayHelper::getValue($fieldConfig, 'labelOptions', null);
-        unset($fieldConfig['labelOptions']);
-        //template
-        $template = ArrayHelper::getValue(
-            $fieldConfig,
-            'template',
-            "{label}\n{input}\n{hint}\n{error}"
-        );
-        unset($fieldConfig['template']);
-        //container
-        $containerOptions = ArrayHelper::getValue(
-            $fieldConfig,
-            'containerOptions',
-            []
-        );
-        unset($fieldConfig['containerOptions']);
-        //inputOptions
-        $inputOptions = ArrayHelper::getValue($fieldConfig, 'inputOptions', []);
-        unset($fieldConfig['inputOptions']);
-        //items list
-        $itemsList = ArrayHelper::getValue($options, 'itemsList', '');
-        unset($fieldConfig['itemsList']);
-        //label text
-        $label = ArrayHelper::getValue($labelConfig, 'label', null);
-
-        //label options
-        $labelOptions = ArrayHelper::getValue($labelConfig, 'options', []);
-
-        //get the hint text for the field
-        $hintText = ArrayHelper::getValue($fieldConfig, 'hint', false);
-        unset($fieldConfig['hint']);
-
-        return [$options, $isMultiField, $fieldType, $widget, $template, $containerOptions, $inputOptions, $itemsList, $label, $labelOptions, $hintText, $fieldConfig];
-    }
-
-    /**
-     * Allowed Row limit
-     *
-     * @param int $modelIndex the model index
+     * Remove custom widget options fro
+     * @param $fieldConfig
      *
      * @return mixed
      */
-    public function allowedRowLimit($modelIndex)
+    private function _removeWidgetOptions(&$fieldConfig)
     {
-        return $this->limit === FormWizard::ROWS_UNLIMITED || $this->limit > $modelIndex;
+        $defaultOptions = [
+            'containerOptions',
+            'hint',
+            'itemsList',
+            'inputOptions',
+            'template',
+            'labelOptions',
+            'widget',
+            'options',
+            'multifield',
+            'label',
+            'tabularEvents',
+        ];
+
+        foreach ($defaultOptions as $option) {
+            if (array_key_exists($option, $fieldConfig)) {
+                unset($fieldConfig[$option]);
+            }
+        }
+
+        return $fieldConfig;
     }
 }
