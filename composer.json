@@ -3,7 +3,8 @@
     "description": "A yii2 widget for form wizard, to create a multistep form.",
     "type": "yii2-extension",
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "yiisoft/yii2": "~2.0.7"
     },
     "license": "MIT",
     "authors": [{
