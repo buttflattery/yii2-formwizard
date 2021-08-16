@@ -40,6 +40,7 @@ class Sorter
 
             //get safe attributes
             $attributes = $this->getStepFields($model, $onlyFields, $disabledFields);
+			 $attributes = $this->sortFields($attributes); 
 
             //field order
             foreach ($attributes as $attribute) {
